@@ -61,7 +61,7 @@ gantt
 ### P6 — Packaging & Seed
 - **Scope:** Multi-stage Dockerfiles (non-root user, health checks, layered jar); Compose profiles `default` and `offline` (WireMock with the recorded PokeAPI fixtures); a `demo` profile that seeds an `ADMIN` and a `USER` account plus a Gen-1 collection with custom fields.
 - **Entry:** P4 and P5 done.
-- **Exit:** `docker compose up` from a fresh clone gives a working demo, and it also works **with no internet** using `--profile offline`. The Next.js standalone image (Node 24 Alpine, non-root) sends the nonce-based CSP and security headers. **The OWASP ZAP baseline scan reports no High findings.**
+- **Exit:** `docker compose up` from a fresh clone gives a working demo, and it also works **with no internet** using `--profile offline`. The Next.js standalone image (Node 26 Alpine, non-root) sends the nonce-based CSP and security headers. **The OWASP ZAP baseline scan reports no High findings.**
 
 ### P7 — Polish, Docs & GenAI
 - **Scope:** Final README (setup, env vars, demo credentials, test commands, coverage); finished ADRs; GenAI task-management write-up; prompt log; demo script for the presentation.

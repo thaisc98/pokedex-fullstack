@@ -28,7 +28,7 @@ The project follows **Clean Architecture** and **TDD**.
 | Caching | Caffeine (Spring Cache) |
 | Security | Spring Security 7, OAuth2 Resource Server (JWT in an httpOnly cookie + CSRF), BCrypt, Bucket4j rate limiting; OWASP Top 10:2025 / ASVS 5.0 L1 + selected L2 |
 | Testing (backend) | JUnit 5, AssertJ, jqwik, Mockito, WireMock, Testcontainers, RestAssured, ArchUnit, JaCoCo, PIT |
-| Frontend | Next.js 16 (App Router), React 19, TypeScript (strict), **HeroUI v3** (React Aria), Tailwind CSS v4, Redux Toolkit + RTK Query, React Hook Form + Zod, next-themes |
+| Frontend | Node.js 26, Next.js 16 (App Router), React 19, TypeScript (strict), **HeroUI v3** (React Aria), Tailwind CSS v4, Redux Toolkit + RTK Query, React Hook Form + Zod, next-themes |
 | Testing (frontend) | Vitest, React Testing Library, MSW, Playwright, axe-core, Lighthouse CI |
 | Security scanning | OWASP Dependency-Check, `npm audit`, OWASP ZAP baseline scan, CycloneDX SBOM, Dependabot |
 | Delivery | Docker (multi-stage), Docker Compose, GitHub Actions |

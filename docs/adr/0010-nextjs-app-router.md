@@ -24,7 +24,8 @@ Facts checked in the Next.js 16.3 docs bundled with the package (`node_modules/n
 - **Redux store per request:** `makeStore()` called inside a `StoreProvider` Client Component (`useRef`), following the RTK Next.js guide. **No module-level store**, because on the server it would be shared between users.
 - **Theme:** `next-themes` (HeroUI's documented Next.js approach) with `suppressHydrationWarning` on `<html>`. Its inline anti-flash script receives the CSP nonce.
 - **Images:** `next/image` with `images.remotePatterns` restricted to the PokeAPI sprites path on `raw.githubusercontent.com`. Images are served from our own origin, so CSP can use `img-src 'self' data:`.
-- **Docker:** `output: 'standalone'` on a Node 24 LTS Alpine image, non-root user.
+- **Node.js 26** everywhere: local development (`.nvmrc`), CI and the Docker image. Node 26 is the newest major line and becomes **LTS on 2026-10-28** (Node.js release schedule), supported until 2029-04-30.
+- **Docker:** `output: 'standalone'` on a `node:26-alpine` image, non-root user.
 
 ## Consequences
 - ✅ Routing, layouts, loading/error/404 states and code splitting with no extra libraries.

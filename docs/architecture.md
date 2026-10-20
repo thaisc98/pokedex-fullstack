@@ -289,7 +289,7 @@ pokedex/
 │           │   └── seed/pokemon-snapshot.json
 │           └── test/java/…                  # *IT E2E flows, ArchUnit rules
 └── frontend/                         # Next.js 16 (App Router) + HeroUI v3 + Redux Toolkit
-    ├── Dockerfile                   # next build (output: 'standalone') → node:24-alpine, non-root
+    ├── Dockerfile                   # next build (output: 'standalone') → node:26-alpine, non-root
     ├── next.config.ts               # rewrites /api/* → Spring API, images.remotePatterns, headers(), poweredByHeader: false
     ├── src/
     │   ├── proxy.ts                 # per-request CSP nonce + security headers; optimistic /collection redirect
