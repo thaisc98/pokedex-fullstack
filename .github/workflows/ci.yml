@@ -49,3 +49,93 @@ jobs:
           GITLEAKS_ENABLE_SUMMARY: "true"
           GITLEAKS_VERSION: "8.24.3" # pin the scanner binary (the action otherwise allows "latest")
           GITLEAKS_ENABLE_UPLOAD_ARTIFACT: "false" # public repo: artifacts are downloadable by others; keep the report off them
+
+  backend:
+    name: Backend (./mvnw verify)
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    defaults:
+      run:
+        working-directory: backend
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Set up Temurin 25 (Maven cache)
+        uses: actions/setup-java@b843ebf9b913146b38da2eaa7aeddf76074ae1ad # v6.1.0
+        with:
+          distribution: temurin
+          java-version: "25"
+          cache: maven
+          cache-dependency-path: backend/**/pom.xml
+
+      # Unit tests (Surefire), integration tests (Failsafe + Testcontainers; Docker is preinstalled on
+      # ubuntu-latest), enforcer, ArchUnit, Spotless check and JaCoCo gates all run in `verify`.
+      - name: Build and test
+        run: ./mvnw -B -ntp verify
+
+  dependency-scan:
+    name: Dependency scan (OWASP Dependency-Check)
+    runs-on: ubuntu-latest
+    timeout-minutes: 120 # one-time cost: the first run downloads the full NVD database; cached runs take minutes
+    defaults:
+      run:
+        working-directory: backend
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Set up Temurin 25 (Maven cache)
+        uses: actions/setup-java@b843ebf9b913146b38da2eaa7aeddf76074ae1ad # v6.1.0
+        with:
+          distribution: temurin
+          java-version: "25"
+          cache: maven
+          cache-dependency-path: backend/**/pom.xml
+
+      # Maven 3.9 only WARNS when a requested profile doesn't exist, so a missing/renamed profile would make this
+      # job silently green without scanning anything. Fail closed instead.
+      - name: Require the security profile
+        run: |
+          if ! grep -q '<id>security</id>' pom.xml; then
+            echo "::error file=backend/pom.xml::Maven profile 'security' (Dependency-Check + CycloneDX) is not defined"
+            exit 1
+          fi
+
+      # Restore the last NVD database so each run only downloads deltas. run_id makes every save a new key;
+      # restore-keys picks the most recent one.
+      - name: Restore NVD database
+        uses: actions/cache/restore@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: ~/.m2/repository/org/owasp/dependency-check-data
+          key: nvd-${{ runner.os }}-${{ github.run_id }}
+          restore-keys: |
+            nvd-${{ runner.os }}-
+
+      # Tests are skipped here: the backend job already runs them.
+      # The `security` profile (backend/pom.xml) runs Dependency-Check (fails on CVSS >= 7, docs/security.md §4.10)
+      # and the CycloneDX SBOM. Reports stay on the runner: public repo, so no artifact upload.
+      - name: Dependency-Check + SBOM
+        run: ./mvnw -B -ntp -Psecurity -DskipTests verify
+        env:
+          NVD_API_KEY: ${{ secrets.NVD_API_KEY }}
+
+      # Save even when the scan fails (e.g. a CVSS >= 7 finding): the downloaded NVD data is still valid.
+      - name: Save NVD database
+        if: always()
+        uses: actions/cache/save@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: ~/.m2/repository/org/owasp/dependency-check-data
+          key: nvd-${{ runner.os }}-${{ github.run_id }}
+
+  # TODO(Phase 0, frontend): add once frontend/package.json and package-lock.json exist.
+  #   frontend:
+  #     - actions/setup-node (pinned SHA) with node-version-file: .nvmrc, cache: npm, cache-dependency-path: frontend/package-lock.json
+  #     - npm ci → npm run lint → npx tsc --noEmit → npm test → npm run build   (working-directory: frontend)
+  #   frontend-audit:
+  #     - npm ci → npm audit --audit-level=high   (docs/security.md §4.10)
+  #     - CycloneDX SBOM for the frontend; no artifact upload (public repo)
