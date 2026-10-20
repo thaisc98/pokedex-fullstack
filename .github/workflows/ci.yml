@@ -106,10 +106,21 @@ jobs:
             exit 1
           fi
 
+      # Restore the last NVD database so each run only downloads deltas. run_id makes every save a new key;
+      # restore-keys picks the most recent one.
+      - name: Cache NVD database
+        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: ~/.m2/repository/org/owasp/dependency-check-data
+          key: nvd-${{ runner.os }}-${{ github.run_id }}
+          restore-keys: |
+            nvd-${{ runner.os }}-
+
+      # Tests are skipped here: the backend job already runs them.
       # The `security` profile (backend/pom.xml) runs Dependency-Check (fails on CVSS >= 7, docs/security.md §4.10)
       # and the CycloneDX SBOM. Reports stay on the runner: public repo, so no artifact upload.
       - name: Dependency-Check + SBOM
-        run: ./mvnw -B -ntp -Psecurity verify
+        run: ./mvnw -B -ntp -Psecurity -DskipTests verify
         env:
           NVD_API_KEY: ${{ secrets.NVD_API_KEY }}
 
