@@ -1,0 +1,20 @@
+# Frontend-specific ignores (the root .gitignore covers node_modules/, coverage/, *.tsbuildinfo, .env*)
+
+# next.js
+/.next/
+/out/
+/build
+next-env.d.ts
+
+# misc
+*.pem
+
+# debug
+npm-debug.log*
+
+# env files: keep the committed template
+.env*
+!.env.example
+
+# vercel
+.vercel
