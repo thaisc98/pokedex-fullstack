@@ -140,6 +140,32 @@ Every substantial AI interaction, with the decision taken on its output. This lo
 
 ---
 
+## #006 — P0 frontend scaffold (Next.js 16 + HeroUI v3 + Redux Toolkit)
+
+- **Date:** 2026-10-20
+- **Tool:** Claude Code (Claude Opus 5.5): frontend-engineer subagent
+- **Phase:** P0 — Inception & Scaffolding
+
+**Prompt (summary):** Scaffold `frontend/` with no features: Next.js 16 App Router + React 19 + TS strict + ESLint + Tailwind v4 in the `src/` layout of `frontend/AGENTS.md`, without letting the generator overwrite `AGENTS.md`/`CLAUDE.md`/`.env.example`; HeroUI v3 set up from the HeroUI MCP quick-start, and confirm whether `@heroui/react` ships `"use client"`; RTK skeleton (`makeStore`, `StoreProvider`, typed hooks, empty `baseApi`); Vitest + RTL + MSW with one real test; scripts incl. `gen:api`; exact-pinned versions, `engines.node` 26; placeholder home page with a HeroUI component; `output: 'standalone'`. Lint, typecheck, test and build must pass with zero warnings.
+
+**Output:** `frontend/` skeleton (`create-next-app@16.4.2` generated into a scratch dir, then copied in), `src/store/*`, `src/shared/api/{baseApi.ts,schema.d.ts}`, `src/mocks/*`, `vitest.config.mts`, `vitest.setup.ts`, `StoreProvider.test.tsx` (4 tests), `.npmrc` (`save-exact`, `engine-strict`).
+
+**Verdict:** ✏️ Modified
+
+| What the AI / generator did or proposed | What was changed / decided | Why |
+|---|---|---|
+| `create-next-app` 16.4.2 enables `cacheComponents` + `partialPrefetching` by default | Removed for now; open question for the human | Cache Components prerenders a static shell, but our CSP needs a per-request nonce and therefore dynamic rendering (Next.js CSP guide, security.md). Needs a decision, not a generator default |
+| `StoreProvider` with `useRef` (RTK Next.js guide, and the brief) | Lazy `useState(makeStore)` | `eslint-plugin-react-hooks` 7 (`react-hooks/refs`) rejects reading `ref.current` during render, in both the guide's form and a local-variable variant. Same once-per-mount guarantee; no lint rule disabled |
+| MSW setup from memory would use `server.listen({ onUnhandledRequest: 'error' })` | `onUnhandledFrame: 'error'` | MSW 3 renamed the option; checked in `msw/lib/node/index.d.ts` and `shared-options.d.ts` |
+| Latest majors: TypeScript 7, ESLint 10 | TypeScript 5.9.3, ESLint 9.39.5 | `openapi-typescript` 7.13 peers on `typescript ^5`; `eslint-plugin-react`/`import`/`jsx-a11y` peer on `eslint ^9` |
+| HeroUI's React Aria peers installed implicitly by npm | Pinned explicitly in `package.json` | HeroUI's quick-start says to install missing mandatory peers; "pin every dependency" |
+
+**What was checked rather than assumed:** the `"use client"` question was answered by grepping `node_modules/@heroui/react/dist` (every component implementation file starts with `"use client"`; barrels, hooks and utils do not). HeroUI setup came from the MCP quick-start and frameworks guide; Next.js config from the bundled `node_modules/next/dist/docs/`.
+
+**Checklist items triggered:** [workflow.md §2](workflow.md): outdated APIs (MSW 3 rename, Next 16 generator defaults), security (`react/no-danger` as an error, `poweredByHeader: false`, no module-level store).
+
+---
+
 ## Template
 
 ```markdown
