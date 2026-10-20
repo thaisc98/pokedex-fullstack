@@ -1,0 +1,1242 @@
+openapi: 3.1.0
+
+# =============================================================================
+# Pokedex API contract — v1
+#
+# Owner: backend-engineer. This file is the single source of truth shared with
+# the frontend and test engineers (docs/agents/README.md §2). It is written
+# BEFORE implementation, straight from docs/architecture.md §2.8 (endpoints),
+# §1.2/§1.3 (DTO shapes + business rules) and docs/security.md §3/§4
+# (auth + cookie/CSRF mechanics).
+#
+# Places where architecture.md/security.md are silent or ambiguous are marked
+# with "ASSUMPTION:" inline and collected in the handoff note under
+# "Open questions / risks". Nothing here invents an endpoint, field or status
+# the docs do not define.
+# =============================================================================
+
+info:
+  title: Pokedex API
+  version: 1.0.0
+  description: |
+    REST API for the Pokedex full-stack exercise.
+
+    Two resources (ADR 0002):
+      * **Catalog** (`/api/v1/pokemon`): read-only, sourced from PokeAPI, public.
+      * **Collection** (`/api/v1/collection`): local `CollectedPokemon` aggregate,
+        full CRUD, authenticated.
+
+    Plus **Identity** (`/api/v1/auth`): register / login / logout / me / csrf.
+
+    ## Authentication & CSRF (security.md §4.2)
+    * The JWT is delivered in an **httpOnly** cookie `access_token`
+      (`HttpOnly; Secure; SameSite=Strict; Path=/api; Max-Age=3600`). JavaScript
+      can never read it. Protected endpoints require this cookie.
+    * CSRF protection is always on (`csrf.spa()`). A JavaScript-readable
+      `XSRF-TOKEN` cookie is issued by `GET /api/v1/auth/csrf`; its value must be
+      echoed in the `X-XSRF-TOKEN` header on **every non-GET request**
+      (login included). A missing/invalid token returns `403`
+      (`type: /problems/csrf-token-invalid`).
+    * Same origin only: no CORS. The browser talks to the Next.js server, which
+      forwards `/api/*` to this API.
+
+    ## Errors
+    Every error is an RFC 9457 `ProblemDetail` (`application/problem+json`) with an
+    optional `errors[]` list of field violations.
+  license:
+    name: Proprietary (exercise)
+
+servers:
+  - url: /api/v1
+    description: Same-origin base path (frontend rewrites /api/* to this API).
+
+tags:
+  - name: Catalog
+    description: Read-only Pokémon catalog from PokeAPI (US01, US02). Public.
+  - name: Collection
+    description: Local collection CRUD (US03, US04). Authenticated.
+  - name: Identity
+    description: Registration, login, logout, current user and CSRF token.
+
+# =============================================================================
+# Paths
+# =============================================================================
+paths:
+  # ---------------------------------------------------------------- Catalog
+  /pokemon:
+    get:
+      tags: [Catalog]
+      summary: List Pokémon (paginated summaries)
+      description: |
+        US01. Returns a page of Pokémon summaries sourced from PokeAPI.
+        BR-01: a page past the end returns empty `content`, not an error.
+      operationId: listPokemon
+      security: []        # public
+      parameters:
+        - $ref: '#/components/parameters/PageParam'
+        - $ref: '#/components/parameters/SizeParam'
+      responses:
+        '200':
+          description: A page of Pokémon summaries.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PageResponsePokemonSummary'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '503':
+          $ref: '#/components/responses/UpstreamUnavailable'
+
+  /pokemon/{idOrName}:
+    get:
+      tags: [Catalog]
+      summary: Get Pokémon detail by numeric id or name
+      description: |
+        US02. `idOrName` resolves as: all digits → `PokedexId`; otherwise
+        lowercased then matched against `^[a-z0-9-]{1,50}$` (`Pikachu` is
+        normalized, not rejected). A malformed value is a `400`; a well-formed
+        value with no match is a `404`.
+      operationId: getPokemonDetail
+      security: []        # public
+      parameters:
+        - $ref: '#/components/parameters/IdOrNameParam'
+      responses:
+        '200':
+          description: The Pokémon detail.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PokemonDetailDto'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '503':
+          $ref: '#/components/responses/UpstreamUnavailable'
+
+  # ---------------------------------------------------------------- Identity
+  /auth/register:
+    post:
+      tags: [Identity]
+      summary: Register a new user
+      description: |
+        UC-06. Creates a `USER` account. Email is unique and stored lowercased
+        (BR-09). Password is 12–64 chars, rejected if on the common-password list.
+        Rate-limited (security.md §4.1): exceeding the limit returns `429`.
+      operationId: registerUser
+      security: []        # public (but CSRF header still required: non-GET)
+      parameters:
+        - $ref: '#/components/parameters/CsrfHeader'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RegisterRequest'
+      responses:
+        '201':
+          description: The created user.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserDto'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '403':
+          $ref: '#/components/responses/CsrfForbidden'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '413':
+          $ref: '#/components/responses/PayloadTooLarge'
+        '415':
+          $ref: '#/components/responses/UnsupportedMediaType'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+
+  /auth/csrf:
+    get:
+      tags: [Identity]
+      summary: Obtain a CSRF token
+      description: |
+        Returns the CSRF token and the header name to send it in, and (as a side
+        effect) sets the readable `XSRF-TOKEN` cookie. The SPA calls this on
+        startup and after login/logout (security.md §4.2.1).
+      operationId: getCsrfToken
+      security: []        # public
+      responses:
+        '200':
+          description: The CSRF token descriptor.
+          headers:
+            Set-Cookie:
+              description: 'Sets the readable CSRF cookie, e.g. `XSRF-TOKEN=<token>; Path=/; SameSite=Strict`.'
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CsrfTokenDto'
+
+  /auth/login:
+    post:
+      tags: [Identity]
+      summary: Log in
+      description: |
+        UC-07. On success sets the `access_token` httpOnly cookie and returns the
+        user plus token expiry. Bad credentials return a generic `401` (same
+        response for unknown email and wrong password — security.md §4.1).
+        Rate-limited: `429`. A missing/invalid CSRF token returns `403`.
+      operationId: login
+      security: []        # public (CSRF still required: login is a write)
+      parameters:
+        - $ref: '#/components/parameters/CsrfHeader'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginRequest'
+      responses:
+        '200':
+          description: Login succeeded; `access_token` cookie set.
+          headers:
+            Set-Cookie:
+              description: '`access_token=<jwt>; HttpOnly; Secure; SameSite=Strict; Path=/api; Max-Age=3600`'
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LoginResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/CsrfForbidden'
+        '413':
+          $ref: '#/components/responses/PayloadTooLarge'
+        '415':
+          $ref: '#/components/responses/UnsupportedMediaType'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+
+  /auth/logout:
+    post:
+      tags: [Identity]
+      summary: Log out
+      description: |
+        Clears the `access_token` cookie (`Max-Age=0`). The token itself stays
+        valid until expiry (no deny-list; documented limitation, security.md §9).
+      operationId: logout
+      security:
+        - accessTokenCookie: []
+      parameters:
+        - $ref: '#/components/parameters/CsrfHeader'
+      responses:
+        '204':
+          description: Logged out; cookie cleared.
+          headers:
+            Set-Cookie:
+              description: '`access_token=; Max-Age=0; Path=/api`'
+              schema:
+                type: string
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/CsrfForbidden'
+
+  /auth/me:
+    get:
+      tags: [Identity]
+      summary: Get the current user
+      description: UC-08. Returns the authenticated principal. Used by the SPA on startup to restore the session.
+      operationId: getCurrentUser
+      security:
+        - accessTokenCookie: []
+      responses:
+        '200':
+          description: The current user.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserDto'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  # ---------------------------------------------------------------- Collection
+  /collection:
+    get:
+      tags: [Collection]
+      summary: List collected Pokémon (paginated)
+      description: |
+        UC-05. Optional filters: `tag` (exact `Tag`) and `q` (name search,
+        `LIKE`-escaped server-side). BR-01 pagination rules apply.
+      operationId: listCollection
+      security:
+        - accessTokenCookie: []
+      parameters:
+        - $ref: '#/components/parameters/PageParam'
+        - $ref: '#/components/parameters/SizeParam'
+        - $ref: '#/components/parameters/TagFilterParam'
+        - $ref: '#/components/parameters/QueryParam'
+      responses:
+        '200':
+          description: A page of collected Pokémon.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PageResponseCollectedPokemon'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+    post:
+      tags: [Collection]
+      summary: Sync a Pokémon into the collection (idempotent upsert)
+      description: |
+        UC-03 / BR-05. Idempotent upsert keyed by `pokedexId`. First time → `201`
+        with a `Location` header; a re-sync refreshes the `UpstreamSnapshot` and
+        returns `200` without touching `CustomAttributes`. `404` if the Pokémon is
+        not upstream; `503` if PokeAPI is unavailable.
+      operationId: syncCollection
+      security:
+        - accessTokenCookie: []
+      parameters:
+        - $ref: '#/components/parameters/CsrfHeader'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SyncRequest'
+      responses:
+        '201':
+          description: A new collected Pokémon was created.
+          headers:
+            Location:
+              description: URI of the created resource, e.g. `/api/v1/collection/25`.
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CollectedPokemonDto'
+        '200':
+          description: An existing collected Pokémon was refreshed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CollectedPokemonDto'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/CsrfForbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '413':
+          $ref: '#/components/responses/PayloadTooLarge'
+        '415':
+          $ref: '#/components/responses/UnsupportedMediaType'
+        '503':
+          $ref: '#/components/responses/UpstreamUnavailable'
+
+  /collection/{pokedexId}:
+    parameters:
+      - $ref: '#/components/parameters/PokedexIdPathParam'
+    get:
+      tags: [Collection]
+      summary: Get a collected Pokémon by Pokédex id
+      operationId: getCollectedPokemon
+      security:
+        - accessTokenCookie: []
+      responses:
+        '200':
+          description: The collected Pokémon.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CollectedPokemonDto'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+    put:
+      tags: [Collection]
+      summary: Replace the custom attributes of a collected Pokémon
+      description: |
+        UC-04. Full replace of `customAttributes` (US04 uses PUT, not PATCH).
+        BR-06: only custom attributes may change; upstream fields are read-only,
+        so the body carries none. BR-08: `version` must match the current one or
+        the response is `409`. Body capped at 16 KB (`413`); `Content-Type` must
+        be `application/json` (`415`).
+      operationId: updateCollectedPokemon
+      security:
+        - accessTokenCookie: []
+      parameters:
+        - $ref: '#/components/parameters/CsrfHeader'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateCollectedPokemonRequest'
+      responses:
+        '200':
+          description: The updated collected Pokémon.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CollectedPokemonDto'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/CsrfForbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '413':
+          $ref: '#/components/responses/PayloadTooLarge'
+        '415':
+          $ref: '#/components/responses/UnsupportedMediaType'
+    delete:
+      tags: [Collection]
+      summary: Delete a collected Pokémon (ADMIN only)
+      description: |
+        BR-10 / security.md §3.2. Requires the `ADMIN` role. A `USER` without
+        `ADMIN` gets `403`.
+      operationId: deleteCollectedPokemon
+      security:
+        - accessTokenCookie: []
+      parameters:
+        - $ref: '#/components/parameters/CsrfHeader'
+      responses:
+        '204':
+          description: Deleted.
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          description: |
+            Forbidden, for either reason: the CSRF token is missing or invalid
+            (`type: /problems/csrf-token-invalid`), or the caller is authenticated
+            but is not an `ADMIN` (delete requires `ADMIN`; BR-10).
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetail'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+# =============================================================================
+# Components
+# =============================================================================
+components:
+
+  # ---------------------------------------------------------------- Security
+  securitySchemes:
+    accessTokenCookie:
+      type: apiKey
+      in: cookie
+      name: access_token
+      description: |
+        JWT delivered in an httpOnly cookie (ADR 0008). Set by `POST /auth/login`,
+        cleared by `POST /auth/logout`. Not readable by JavaScript. This is the
+        only authentication scheme; protected endpoints require it.
+
+  # ---------------------------------------------------------------- Parameters
+  parameters:
+    PageParam:
+      name: page
+      in: query
+      required: false
+      description: 'Zero-based page index (BR-01).'
+      schema:
+        type: integer
+        format: int32
+        minimum: 0
+        default: 0
+    SizeParam:
+      name: size
+      in: query
+      required: false
+      description: 'Page size (BR-01). 1–100, default 20.'
+      schema:
+        type: integer
+        format: int32
+        minimum: 1
+        maximum: 100
+        default: 20
+    IdOrNameParam:
+      name: idOrName
+      in: path
+      required: true
+      description: |
+        A `PokedexId` or a `PokemonName`. Resolution rule: all digits → treated
+        as a Pokédex id; otherwise lowercased, then matched against
+        `^[a-z0-9-]{1,50}$`. So `Pikachu` is normalized (not rejected);
+        `pika;drop` is a `400`.
+      schema:
+        type: string
+        pattern: '^[A-Za-z0-9-]{1,50}$'
+      examples:
+        byId:
+          value: '25'
+        byName:
+          value: pikachu
+    PokedexIdPathParam:
+      name: pokedexId
+      in: path
+      required: true
+      description: 'Pokédex id (`PokedexId`): a positive integer.'
+      schema:
+        type: integer
+        format: int32
+        minimum: 1
+    TagFilterParam:
+      name: tag
+      in: query
+      required: false
+      description: 'Filter by an exact `Tag` (`^[a-z0-9-]{1,30}$`).'
+      schema:
+        $ref: '#/components/schemas/Tag'
+    QueryParam:
+      name: q
+      in: query
+      required: false
+      description: 'Case-insensitive name search. `LIKE` wildcards are escaped server-side (security.md §4.4).'
+      schema:
+        type: string
+        minLength: 1
+        maxLength: 50
+    CsrfHeader:
+      name: X-XSRF-TOKEN
+      in: header
+      required: true
+      description: |
+        CSRF token echoed from the readable `XSRF-TOKEN` cookie (obtained via
+        `GET /auth/csrf`). Required on every non-GET request. Missing or invalid
+        → `403` (`type: /problems/csrf-token-invalid`).
+      schema:
+        type: string
+
+  # ---------------------------------------------------------------- Schemas
+  schemas:
+
+    # ---- Shared pagination ------------------------------------------------
+    PageResponse:
+      type: object
+      description: 'Generic page envelope. `content` is specialized per endpoint. (`PageResponse = {content, page, size, totalElements, totalPages}`.)'
+      required: [content, page, size, totalElements, totalPages]
+      properties:
+        content:
+          type: array
+          items: {}
+          description: 'The items on this page (type specialized per endpoint).'
+        page:
+          type: integer
+          format: int32
+          minimum: 0
+          description: Zero-based index of this page.
+        size:
+          type: integer
+          format: int32
+          minimum: 1
+          maximum: 100
+          description: Requested page size.
+        totalElements:
+          type: integer
+          format: int64
+          minimum: 0
+          description: Total number of items across all pages.
+        totalPages:
+          type: integer
+          format: int32
+          minimum: 0
+          description: Total number of pages.
+      examples:
+        - content: []
+          page: 0
+          size: 20
+          totalElements: 0
+          totalPages: 0
+
+    PageResponsePokemonSummary:
+      allOf:
+        - $ref: '#/components/schemas/PageResponse'
+        - type: object
+          properties:
+            content:
+              type: array
+              items:
+                $ref: '#/components/schemas/PokemonSummaryDto'
+
+    PageResponseCollectedPokemon:
+      allOf:
+        - $ref: '#/components/schemas/PageResponse'
+        - type: object
+          properties:
+            content:
+              type: array
+              items:
+                $ref: '#/components/schemas/CollectedPokemonDto'
+
+    # ---- Catalog value objects / DTOs ------------------------------------
+    PokedexId:
+      type: integer
+      format: int32
+      minimum: 1
+      description: 'PokeAPI id; `PokedexId` (int > 0).'
+      examples: [25]
+
+    PokemonName:
+      type: string
+      pattern: '^[a-z0-9-]{1,50}$'
+      description: 'Lowercase name; `PokemonName` (`mr-mime`, `ho-oh`, `porygon-z`).'
+      examples: [pikachu]
+
+    ImageUrl:
+      type: string
+      format: uri
+      description: |
+        HTTPS image URL on an allow-listed host (`raw.githubusercontent.com`).
+        A disallowed or missing upstream URL is replaced by a placeholder
+        (security.md §4.5). May be the placeholder but is always present.
+      examples: ['https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/25.png']
+
+    Category:
+      type: string
+      description: 'Species genus, e.g. "Mouse Pokémon"; `Category.UNKNOWN` when absent.'
+      examples: ['Mouse Pokémon']
+
+    MassKg:
+      type: number
+      format: double
+      minimum: 0
+      description: 'kg, rounded to 0.1 (BR-02).'
+      examples: [6.9]
+
+    HeightM:
+      type: number
+      format: double
+      minimum: 0
+      description: 'Height in metres (`Height.meters()`).'
+      examples: [0.4]
+
+    Ability:
+      type: object
+      description: 'A Pokémon ability with a hidden flag (`Ability`).'
+      required: [name, hidden]
+      properties:
+        name:
+          type: string
+          description: 'Ability name (PokeAPI slug), e.g. `static`.'
+          examples: [static]
+        hidden:
+          type: boolean
+          description: Whether this is a hidden ability.
+      additionalProperties: false
+
+    BaseStat:
+      type: object
+      description: 'One of the six core statistics (`BaseStat`).'
+      required: [name, value]
+      properties:
+        name:
+          type: string
+          enum: [hp, attack, defense, special-attack, special-defense, speed]
+        value:
+          type: integer
+          format: int32
+          minimum: 1
+          maximum: 255
+      additionalProperties: false
+
+    PokemonType:
+      type: string
+      enum:
+        - normal
+        - fire
+        - water
+        - electric
+        - grass
+        - ice
+        - fighting
+        - poison
+        - ground
+        - flying
+        - psychic
+        - bug
+        - rock
+        - ghost
+        - dragon
+        - dark
+        - steel
+        - fairy
+      description: 'Pokémon type slug (one of the 18 types; matches the `bg-type-*` tokens in ui-ux.md §6).'
+      examples: [electric]
+
+    LevelUpTrigger:
+      type: object
+      description: 'Evolution by levelling up (`kind: level-up`). `minLevel` is the level required, if any.'
+      required: [kind]
+      properties:
+        kind:
+          type: string
+          const: level-up
+        minLevel:
+          type: integer
+          format: int32
+          minimum: 1
+          maximum: 100
+          description: 'Minimum level required, when the trigger specifies one.'
+      additionalProperties: false
+
+    UseItemTrigger:
+      type: object
+      description: 'Evolution by using an item (`kind: use-item`).'
+      required: [kind, item]
+      properties:
+        kind:
+          type: string
+          const: use-item
+        item:
+          type: string
+          description: 'Item name (PokeAPI slug), e.g. `thunder-stone`.'
+          examples: [thunder-stone]
+      additionalProperties: false
+
+    TradeTrigger:
+      type: object
+      description: 'Evolution by trading (`kind: trade`).'
+      required: [kind]
+      properties:
+        kind:
+          type: string
+          const: trade
+      additionalProperties: false
+
+    OtherTrigger:
+      type: object
+      description: 'Any other trigger (`kind: other`), carrying the raw PokeAPI trigger name.'
+      required: [kind, name]
+      properties:
+        kind:
+          type: string
+          const: other
+        name:
+          type: string
+          description: 'Raw trigger name from PokeAPI.'
+          examples: [shed]
+      additionalProperties: false
+
+    EvolutionTrigger:
+      description: |
+        What triggers this evolution step. Discriminated on `kind`: `level-up`,
+        `use-item`, `trade` or `other`. The chain root carries no trigger
+        (`null` — see `EvolutionNode.trigger`).
+      oneOf:
+        - $ref: '#/components/schemas/LevelUpTrigger'
+        - $ref: '#/components/schemas/UseItemTrigger'
+        - $ref: '#/components/schemas/TradeTrigger'
+        - $ref: '#/components/schemas/OtherTrigger'
+      discriminator:
+        propertyName: kind
+        mapping:
+          level-up: '#/components/schemas/LevelUpTrigger'
+          use-item: '#/components/schemas/UseItemTrigger'
+          trade: '#/components/schemas/TradeTrigger'
+          other: '#/components/schemas/OtherTrigger'
+
+    EvolutionNode:
+      type: object
+      description: |
+        A node in the evolution tree (BR-04). Branches are preserved: a node may
+        evolve into several others (`evolvesTo`). Recursive.
+      required: [speciesId, name, evolvesTo]
+      properties:
+        speciesId:
+          $ref: '#/components/schemas/PokedexId'
+        name:
+          $ref: '#/components/schemas/PokemonName'
+        trigger:
+          # nullable for the root node.
+          oneOf:
+            - $ref: '#/components/schemas/EvolutionTrigger'
+            - type: 'null'
+        evolvesTo:
+          type: array
+          description: 'Next stages (empty for a final form; multiple for a branch).'
+          items:
+            $ref: '#/components/schemas/EvolutionNode'
+      additionalProperties: false
+
+    EvolutionChain:
+      type: object
+      description: 'The evolution tree for a species (`EvolutionChain`), rooted at a single node.'
+      required: [root]
+      properties:
+        root:
+          $ref: '#/components/schemas/EvolutionNode'
+      additionalProperties: false
+
+    PokemonSummaryDto:
+      type: object
+      description: 'Catalog list item (`PokemonSummary`).'
+      required: [id, name, sprite, category, mass, abilities]
+      properties:
+        id:
+          $ref: '#/components/schemas/PokedexId'
+        name:
+          $ref: '#/components/schemas/PokemonName'
+        sprite:
+          $ref: '#/components/schemas/ImageUrl'
+        category:
+          $ref: '#/components/schemas/Category'
+        mass:
+          $ref: '#/components/schemas/MassKg'
+        abilities:
+          type: array
+          items:
+            $ref: '#/components/schemas/Ability'
+      additionalProperties: false
+
+    PokemonDetailDto:
+      type: object
+      description: 'Catalog detail (`PokemonDetail`).'
+      required: [id, name, artwork, stats, description, evolution, types, height, mass]
+      properties:
+        id:
+          $ref: '#/components/schemas/PokedexId'
+        name:
+          $ref: '#/components/schemas/PokemonName'
+        artwork:
+          $ref: '#/components/schemas/ImageUrl'
+        stats:
+          type: array
+          items:
+            $ref: '#/components/schemas/BaseStat'
+        description:
+          type: string
+          description: 'Cleaned English flavor text (BR-03). May be empty.'
+        evolution:
+          $ref: '#/components/schemas/EvolutionChain'
+        types:
+          type: array
+          items:
+            $ref: '#/components/schemas/PokemonType'
+        height:
+          $ref: '#/components/schemas/HeightM'
+        mass:
+          $ref: '#/components/schemas/MassKg'
+      additionalProperties: false
+
+    # ---- Collection value objects / DTOs ---------------------------------
+    Tag:
+      type: string
+      pattern: '^[a-z0-9-]{1,30}$'
+      description: 'A normalized tag (`Tag`): lowercased, trimmed.'
+      examples: [starter]
+
+    LocalizedName:
+      type: object
+      description: 'A name in a specific language (`LocalizedName`); at most one per language.'
+      required: [lang, value]
+      properties:
+        lang:
+          type: string
+          description: |
+            BCP-47 language tag (e.g. `en`, `ja`, `pt-BR`). This pattern accepts the
+            common forms; the domain does full validation with `Locale.forLanguageTag`.
+          pattern: '^[A-Za-z]{2,3}(-[A-Za-z0-9]{2,8})*$'
+          maxLength: 35
+          examples: [ja]
+        value:
+          type: string
+          minLength: 1
+          maxLength: 60
+          description: 'The localized value (1–60 chars).'
+          examples: [ピカチュウ]
+      additionalProperties: false
+
+    Coordinates:
+      type: object
+      description: 'Optional geographic coordinates.'
+      required: [latitude, longitude]
+      properties:
+        latitude:
+          type: number
+          format: double
+          minimum: -90
+          maximum: 90
+        longitude:
+          type: number
+          format: double
+          minimum: -180
+          maximum: 180
+      additionalProperties: false
+
+    GeoMetadata:
+      type: object
+      description: 'Geographic metadata (`GeoMetadata`). All fields optional.'
+      properties:
+        region:
+          type: string
+          maxLength: 60
+          examples: [Kanto]
+        habitat:
+          type: string
+          maxLength: 60
+          examples: [forest]
+        coordinates:
+          oneOf:
+            - $ref: '#/components/schemas/Coordinates'
+            - type: 'null'
+      additionalProperties: false
+
+    CustomAttributes:
+      type: object
+      description: |
+        The editable part of a `CollectedPokemon` (`CustomAttributes`). This is
+        the only thing US04 can change (BR-06).
+      required: [localizedNames, tags]
+      properties:
+        localizedNames:
+          type: array
+          description: 'Localized names, at most one per language.'
+          uniqueItems: true
+          items:
+            $ref: '#/components/schemas/LocalizedName'
+        geo:
+          oneOf:
+            - $ref: '#/components/schemas/GeoMetadata'
+            - type: 'null'
+        tags:
+          type: array
+          description: 'Tags: normalized, de-duplicated, at most 10 (BR-07).'
+          uniqueItems: true
+          maxItems: 10
+          items:
+            $ref: '#/components/schemas/Tag'
+      additionalProperties: false
+
+    UpstreamSnapshot:
+      type: object
+      description: |
+        The read-only snapshot copied from PokeAPI on sync (`UpstreamSnapshot`).
+        Never editable through US04 (BR-06); refreshed by re-sync (BR-05).
+      required: [id, name, sprite, category, mass, abilities, stats]
+      properties:
+        id:
+          $ref: '#/components/schemas/PokedexId'
+        name:
+          $ref: '#/components/schemas/PokemonName'
+        sprite:
+          $ref: '#/components/schemas/ImageUrl'
+        category:
+          $ref: '#/components/schemas/Category'
+        mass:
+          $ref: '#/components/schemas/MassKg'
+        abilities:
+          type: array
+          items:
+            $ref: '#/components/schemas/Ability'
+        stats:
+          type: array
+          items:
+            $ref: '#/components/schemas/BaseStat'
+      additionalProperties: false
+
+    CollectedPokemonDto:
+      type: object
+      description: 'A collected Pokémon (`CollectedPokemon` aggregate).'
+      required: [id, snapshot, custom, version, syncedAt, updatedAt]
+      properties:
+        id:
+          # The resource is addressed by pokedexId in the URL
+          # (`/collection/{pokedexId}`); the internal UUID primary key is never
+          # exposed (security.md §4.3). So `id` here is the PokedexId.
+          $ref: '#/components/schemas/PokedexId'
+        snapshot:
+          $ref: '#/components/schemas/UpstreamSnapshot'
+        custom:
+          $ref: '#/components/schemas/CustomAttributes'
+        version:
+          type: integer
+          format: int64
+          minimum: 0
+          description: 'Optimistic-concurrency version (BR-08).'
+        syncedAt:
+          type: string
+          format: date-time
+          description: 'When the snapshot was last synced (ISO-8601 / RFC 3339 UTC).'
+        updatedAt:
+          type: string
+          format: date-time
+          description: 'When the custom attributes were last updated (ISO-8601 / RFC 3339 UTC).'
+      additionalProperties: false
+
+    # ---- Identity DTOs ----------------------------------------------------
+    Role:
+      type: string
+      enum: [USER, ADMIN]
+      description: 'User role (`Role`).'
+
+    Email:
+      type: string
+      format: email
+      maxLength: 254
+      description: 'Email (`Email`): trimmed, lowercased, valid format (BR-09).'
+      examples: [ash@example.com]
+
+    UserDto:
+      type: object
+      description: |
+        A user. The password hash and any internal id are never exposed
+        (security.md §4.3).
+      required: [id, email, displayName, role]
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: 'User id (`UserId`, UUID).'
+        email:
+          $ref: '#/components/schemas/Email'
+        displayName:
+          type: string
+          minLength: 1
+          maxLength: 60
+          description: 'Display name (1–60 chars).'
+          examples: [Ash Ketchum]
+        role:
+          $ref: '#/components/schemas/Role'
+      additionalProperties: false
+
+    LoginResponse:
+      type: object
+      description: 'Login result: the user and the token expiry. The token itself is only in the cookie.'
+      required: [user, expiresAt]
+      properties:
+        user:
+          $ref: '#/components/schemas/UserDto'
+        expiresAt:
+          type: string
+          format: date-time
+          description: 'When the access token expires (ISO-8601 / RFC 3339 UTC; ~60 min out).'
+      additionalProperties: false
+
+    CsrfTokenDto:
+      type: object
+      description: 'CSRF token descriptor from `GET /auth/csrf`.'
+      required: [headerName, token]
+      properties:
+        headerName:
+          type: string
+          description: 'Header to send the token in (default `X-XSRF-TOKEN`).'
+          examples: [X-XSRF-TOKEN]
+        token:
+          type: string
+          description: The CSRF token value.
+      additionalProperties: false
+
+    # ---- Request bodies ---------------------------------------------------
+    RegisterRequest:
+      type: object
+      description: 'Registration body (UC-06). Rejects unknown fields (security.md §4.3).'
+      required: [email, password, displayName]
+      properties:
+        email:
+          $ref: '#/components/schemas/Email'
+        password:
+          type: string
+          minLength: 12
+          maxLength: 64
+          format: password
+          description: 'Plaintext password, 12–64 chars, no composition rules; rejected if on the common-password list (BR-09). Never logged.'
+        displayName:
+          type: string
+          minLength: 1
+          maxLength: 60
+          description: 'Display name (1–60 chars; see UserDto.displayName).'
+      additionalProperties: false
+
+    LoginRequest:
+      type: object
+      description: 'Login body (UC-07). Rejects unknown fields.'
+      required: [email, password]
+      properties:
+        email:
+          $ref: '#/components/schemas/Email'
+        password:
+          type: string
+          minLength: 1
+          maxLength: 64
+          format: password
+          description: 'Plaintext password. Never logged.'
+      additionalProperties: false
+
+    SyncRequest:
+      type: object
+      description: 'Collection sync body (UC-03). Just the Pokédex id to sync.'
+      required: [pokedexId]
+      properties:
+        pokedexId:
+          $ref: '#/components/schemas/PokedexId'
+      additionalProperties: false
+
+    UpdateCollectedPokemonRequest:
+      type: object
+      description: |
+        Full replace of a collected Pokémon's custom attributes (UC-04 / US04,
+        PUT not PATCH). Carries only `customAttributes` + `version`; any attempt
+        to include upstream fields is an unknown field → `400` (BR-06, mass
+        assignment). `version` enables optimistic concurrency (BR-08).
+      required: [customAttributes, version]
+      properties:
+        customAttributes:
+          $ref: '#/components/schemas/CustomAttributes'
+        version:
+          type: integer
+          format: int64
+          minimum: 0
+          description: 'The version the client last saw. A stale value → `409`.'
+      additionalProperties: false
+
+    # ---- Errors -----------------------------------------------------------
+    FieldViolation:
+      type: object
+      description: 'A single field-level validation error.'
+      required: [field, message]
+      properties:
+        field:
+          type: string
+          description: |
+            Name/path of the offending field, using Spring `FieldError` paths
+            (dot-and-index notation), e.g. `password` or
+            `customAttributes.tags[2]`.
+        message:
+          type: string
+          description: Human-readable, non-sensitive description of the violation.
+      additionalProperties: false
+
+    ProblemDetail:
+      type: object
+      description: |
+        RFC 9457 problem details. Served as `application/problem+json`. No stack
+        traces or secrets (security.md §4.6). `errors[]` lists field violations
+        when the problem is a validation failure.
+      required: [type, title, status]
+      properties:
+        type:
+          type: string
+          format: uri-reference
+          default: 'about:blank'
+          description: 'Problem type URI, e.g. `/problems/csrf-token-invalid`, `/problems/validation-error`.'
+        title:
+          type: string
+          description: Short, human-readable summary of the problem type.
+        status:
+          type: integer
+          format: int32
+          minimum: 100
+          maximum: 599
+          description: The HTTP status code.
+        detail:
+          type: string
+          description: Human-readable explanation specific to this occurrence.
+        instance:
+          type: string
+          format: uri-reference
+          description: URI reference identifying the specific occurrence (often the request path).
+        errors:
+          type: array
+          description: 'Field-level violations (present for validation failures).'
+          items:
+            $ref: '#/components/schemas/FieldViolation'
+        correlationId:
+          type: string
+          description: 'Optional correlation id for tracing (at least on 5xx). Matches `X-Request-Id`. RFC 9457 extension member.'
+      # RFC 9457 allows extension members, so additionalProperties is permitted.
+      additionalProperties: true
+      examples:
+        - type: /problems/validation-error
+          title: Validation failed
+          status: 400
+          detail: One or more fields are invalid.
+          instance: /api/v1/auth/register
+          errors:
+            - field: password
+              message: must be between 12 and 64 characters
+
+  # ---------------------------------------------------------------- Responses
+  responses:
+    BadRequest:
+      description: 'Invalid request (validation, malformed path/query, or disallowed field change — BR-06).'
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/ProblemDetail'
+    Unauthorized:
+      description: 'Authentication required or failed. The login response is deliberately generic (security.md §4.1).'
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/ProblemDetail'
+    Forbidden:
+      description: 'Authenticated but not authorized (e.g. a `USER` attempting a `DELETE`).'
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/ProblemDetail'
+    CsrfForbidden:
+      description: 'Missing or invalid CSRF token (`type: /problems/csrf-token-invalid`). The SPA fetches a fresh token and retries once.'
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/ProblemDetail'
+    NotFound:
+      description: Resource not found.
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/ProblemDetail'
+    Conflict:
+      description: 'Conflict: duplicate email (register) or stale `version` (update, BR-08).'
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/ProblemDetail'
+    PayloadTooLarge:
+      description: 'Request body exceeds the 16 KB limit (security.md §4.3).'
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/ProblemDetail'
+    UnsupportedMediaType:
+      description: '`Content-Type` is not `application/json` (security.md §4.3).'
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/ProblemDetail'
+    TooManyRequests:
+      description: 'Rate limit exceeded (security.md §4.1). Includes a `Retry-After` header.'
+      headers:
+        Retry-After:
+          description: Seconds to wait before retrying.
+          schema:
+            type: integer
+            format: int32
+            minimum: 0
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/ProblemDetail'
+    UpstreamUnavailable:
+      description: 'PokeAPI is unavailable or returned a partial page (architecture.md §1.5). We never return half-filled results.'
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/ProblemDetail'
