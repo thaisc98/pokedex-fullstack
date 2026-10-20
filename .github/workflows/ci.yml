@@ -1,0 +1,51 @@
+# CI pipeline. Grows phase by phase (see docs/roadmap.md):
+#   now      → secret scan
+#   Phase 0  → backend (./mvnw verify) + frontend (lint, typecheck, test, build) + dependency scanning
+#   P4–P5    → e2e (Playwright vs docker compose --profile offline) + API contract check
+#   P6       → Docker build, image scan, OWASP ZAP baseline
+#
+# Security rules (docs/security.md §4.10):
+#   - Third-party actions are pinned to a full commit SHA (the tag is in the comment). Dependabot updates both.
+#   - Least-privilege GITHUB_TOKEN: read-only by default; jobs ask only for what they need.
+
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+  workflow_dispatch:
+  schedule:
+    - cron: "0 4 * * 1" # weekly full-history secret scan (Mondays 04:00 UTC)
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+jobs:
+  secret-scan:
+    name: Secret scan (gitleaks)
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: read
+      pull-requests: read # gitleaks lists the PR's commits through the GitHub API
+    steps:
+      - name: Checkout (full history)
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6.1.0
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Run gitleaks
+        uses: gitleaks/gitleaks-action@e0c47f4f8be36e29cdc102c57e68cb5cbf0e8d1e # v3.0.0
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          # A license is only required for organization-owned repos; this is a personal account.
+          GITLEAKS_ENABLE_COMMENTS: "false" # would need pull-requests: write; findings show in the job summary
+          GITLEAKS_ENABLE_SUMMARY: "true"
+          GITLEAKS_VERSION: "8.24.3" # pin the scanner binary (the action otherwise allows "latest")
+          GITLEAKS_ENABLE_UPLOAD_ARTIFACT: "false" # public repo: artifacts are downloadable by others; keep the report off them

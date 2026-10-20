@@ -1,0 +1,21 @@
+# Dependabot: keeps dependencies (and the commit SHAs pinned in workflows) up to date.
+# Maven (backend/) and npm (frontend/) entries are added in Phase 0, once pom.xml and package.json exist.
+# Adding them earlier makes Dependabot report "dependency file not found".
+
+version: 2
+updates:
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
+      day: monday
+    open-pull-requests-limit: 5
+    commit-message:
+      prefix: "chore(deps)"
+    labels:
+      - dependencies
+      - github-actions
+    groups:
+      github-actions:
+        patterns:
+          - "*"
