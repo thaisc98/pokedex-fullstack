@@ -107,6 +107,39 @@ Every substantial AI interaction, with the decision taken on its output. This lo
 
 ---
 
+## #005 — P0 backend: API contract, CI gates and dependency scanning with three agents
+
+- **Date:** 2026-10-20
+- **Tool:** Claude Code (Claude Opus 5.5): backend-engineer and test-engineer subagents, plus a lead session reviewing their handoffs
+- **Phase:** P0 — Inception & Scaffolding
+
+**Prompts (summary):** One focused prompt per task, each ending with the handoff note: (1) backend writes `docs/api/openapi.yaml` v1 from architecture §2.8 and security.md §3; (2) backend adds CycloneDX + OWASP Dependency-Check in a `-Psecurity` profile and proves the enforcer and ArchUnit fail on deliberate violations; (3) test engineer adds the `backend` and `dependency-scan` CI jobs and `docker-compose.yml` with PostgreSQL; plus small follow-ups (Maven wrapper checksum, Tomcat CVE override).
+
+**Output:** PRs #5 (contract), #6 (architecture.md aligned with the contract), #7 (`-Psecurity`), #8 (CI + Compose), #9 (wrapper checksum), #10 (Tomcat override).
+
+**Verdict:** ✏️ Modified
+
+| What the AI did or proposed | What I changed / decided | Why |
+|---|---|---|
+| Contract v1 left 5 open questions and several assumptions as inline `ASSUMPTION:` comments | Decided each one: `idOrName` accepts mixed case (testing-strategy §5 says `Pikachu` is normalized), 403/413/415 on **every** write, `PokemonType` as a closed 18-value enum, `EvolutionTrigger` as a tagged union, no `multipleOf` on mass | The agent didn't guess silently. Two assumptions contradicted the docs, and `multipleOf: 0.1` breaks on floating-point values like 6.9 |
+| First contract pass left the CSRF 403 off PUT | Kept the 403 on every non-GET | Spring Security's CSRF filter protects every non-GET method anyway; the contract must say so |
+| Dependency-Check with the per-module `check` goal | `aggregate` goal at the root | One report for the whole backend instead of six |
+| Guard proofs (enforcer, ArchUnit) on a throwaway branch | Accepted; the agent's own cleanup wiped its uncommitted POM change, and it noticed and re-applied it | Lesson: commit before any destructive experiment |
+| My prompt said to take the wrapper checksum "from the official `.sha256` file" | The agent used the official `.sha512` instead (the `.sha256` file returns 404 on Maven Central) and said so in the commit | The instruction was wrong; I verified the chain independently (SHA-512 matches, SHA-256 of the same zip matches the pin) |
+| CI scan job with a 45-min timeout and a cache that only saves on success | 120-min timeout, `actions/cache/restore` + `save` with `if: always()`, `-DskipTests` | The first NVD download (410,848 records) took 1 h 35 min; a timed-out run saved nothing and every retry started from zero |
+| Considered switching to Trivy when NVD stalled | Kept Dependency-Check once the cache worked (cached scans take ~1 min) | The docs name Dependency-Check; the tool then caught a real problem |
+
+**What the scan found:** 9 CVEs (CVSS 7.5–9.8) in `tomcat-embed-core 11.0.24`, the version Spring Boot 4.1.1 manages. NVD lists them as fixed in 11.0.25. Fixed with `<tomcat.version>11.0.27</tomcat.version>`, keeping Boot at 4.1.1 (pinned stack, no ADR needed); remove the override once Boot manages Tomcat ≥ 11.0.25.
+
+**What I checked critically:**
+- Plugin versions, action SHAs and the Postgres digest were looked up (Maven Central, `git ls-remote`, `docker buildx imagetools inspect`), not generated from memory.
+- The test engineer added a guard so the scan job fails if the `security` profile is missing, because Maven 3.9 only warns about unknown profiles and the job would otherwise pass without scanning anything.
+- An agent session's status reports went stale twice ("uncommitted skeleton on main", "#7 still open"); checking `git` and `gh` directly showed both were wrong.
+
+**Checklist items triggered:** [workflow.md §2](workflow.md): correctness and outdated APIs (verify every unfamiliar API), security (no secrets in logs or artifacts), over-engineering (one aggregate report).
+
+---
+
 ## Template
 
 ```markdown

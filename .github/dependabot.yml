@@ -1,6 +1,6 @@
 # Dependabot: keeps dependencies (and the commit SHAs pinned in workflows) up to date.
-# Maven (backend/) and npm (frontend/) entries are added in Phase 0, once pom.xml and package.json exist.
-# Adding them earlier makes Dependabot report "dependency file not found".
+# The npm (frontend/) entry is added once frontend/package.json exists; adding it earlier makes
+# Dependabot report "dependency file not found".
 
 version: 2
 updates:
@@ -19,3 +19,37 @@ updates:
       github-actions:
         patterns:
           - "*"
+
+  # Backend libraries and Maven plugins (backend/pom.xml + module POMs).
+  - package-ecosystem: maven
+    directory: /backend
+    schedule:
+      interval: weekly
+      day: monday
+    open-pull-requests-limit: 5
+    commit-message:
+      prefix: "chore(deps)"
+    labels:
+      - dependencies
+      - java
+    ignore:
+      # The stack is pinned to Spring Boot 4.1.x (AGENTS.md); a minor or major upgrade needs an ADR.
+      # Patch releases still come through (they carry security fixes).
+      - dependency-name: "org.springframework.boot:spring-boot-starter-parent"
+        update-types: ["version-update:semver-major", "version-update:semver-minor"]
+    groups:
+      maven-minor-and-patch:
+        update-types: ["minor", "patch"]
+
+  # Images in docker-compose.yml (tag + digest), e.g. postgres.
+  - package-ecosystem: docker-compose
+    directory: /
+    schedule:
+      interval: weekly
+      day: monday
+    open-pull-requests-limit: 5
+    commit-message:
+      prefix: "chore(deps)"
+    labels:
+      - dependencies
+      - docker

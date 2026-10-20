@@ -23,7 +23,9 @@ services:
       POSTGRES_USER: ${FLYWAY_USER:?set FLYWAY_USER in .env}
       POSTGRES_PASSWORD: ${FLYWAY_PASSWORD:?set FLYWAY_PASSWORD in .env}
     ports:
-      - "127.0.0.1:5432:5432"
+      # Host port is configurable (POSTGRES_PORT in .env) for machines that already run Postgres on 5432.
+      # The bind address stays 127.0.0.1 whatever the port.
+      - "127.0.0.1:${POSTGRES_PORT:-5432}:5432"
     volumes:
       - postgres-data:/var/lib/postgresql/data
     healthcheck:

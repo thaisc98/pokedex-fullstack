@@ -16,7 +16,7 @@ on:
     branches: [main]
   workflow_dispatch:
   schedule:
-    - cron: "0 4 * * 1" # weekly full-history secret scan (Mondays 04:00 UTC)
+    - cron: "0 4 * * 1" # weekly (Mondays 04:00 UTC): full-history secret scan + dependency scan with a fresh NVD
 
 permissions:
   contents: read
@@ -76,8 +76,34 @@ jobs:
       - name: Build and test
         run: ./mvnw -B -ntp verify
 
+  # Path filter for dependency-scan. PR-only: push to main, the weekly schedule and manual runs always scan.
+  changes:
+    name: Detect dependency changes
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      contents: read
+      pull-requests: read # paths-filter lists the PR's changed files through the GitHub API (no checkout needed)
+    outputs:
+      backend-deps: ${{ steps.filter.outputs.backend-deps }}
+    steps:
+      - name: Filter changed paths
+        id: filter
+        uses: dorny/paths-filter@ceb8a2b8f2d89434be7ff52d3de7ec3738c5cc9d # v4.0.3
+        with:
+          filters: |
+            backend-deps:
+              - 'backend/**/pom.xml'
+              - 'backend/.mvn/**'
+
   dependency-scan:
     name: Dependency scan (OWASP Dependency-Check)
+    needs: changes
+    # `changes` is skipped outside pull_request, and a job whose needs were skipped is skipped too unless its
+    # condition overrides that, hence !cancelled(). On a PR: scan only if a pom.xml or the wrapper changed.
+    # backend/**/pom.xml also matches backend/pom.xml (** matches zero directories).
+    if: ${{ !cancelled() && (github.event_name != 'pull_request' || needs.changes.outputs.backend-deps == 'true') }}
     runs-on: ubuntu-latest
     timeout-minutes: 120 # one-time cost: the first run downloads the full NVD database; cached runs take minutes
     defaults:
