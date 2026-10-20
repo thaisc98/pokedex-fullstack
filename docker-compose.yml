@@ -1,0 +1,40 @@
+# Pokédex: local stack.
+#   cp .env.example .env   # then fill in the values
+#   docker compose up -d
+#
+# Grows phase by phase (see docs/roadmap.md): P0 = PostgreSQL only.
+# P6 adds backend + frontend (Next.js standalone) and the "offline" profile (WireMock + recorded PokeAPI fixtures).
+#
+# Security (docs/security.md §4.8, §4.10):
+#   - Credentials come only from .env (git-ignored); compose refuses to start if they are missing.
+#   - Image pinned by tag AND digest (bump both together; Dependabot's docker ecosystem can automate this).
+#   - Port bound to 127.0.0.1 only: the database is never exposed on the LAN.
+
+name: pokedex
+
+services:
+  postgres:
+    # PostgreSQL 17 per ADR 0003. Digest verified with `docker buildx imagetools inspect postgres:17.11-alpine`.
+    image: postgres:17.11-alpine@sha256:b0f9560a2de083e2cc7382e75f808c7381a32852a7ec49117deedb300e552b24
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:?set POSTGRES_DB in .env}
+      # The container superuser is the schema owner (Flyway). See .env.example.
+      POSTGRES_USER: ${FLYWAY_USER:?set FLYWAY_USER in .env}
+      POSTGRES_PASSWORD: ${FLYWAY_PASSWORD:?set FLYWAY_PASSWORD in .env}
+    ports:
+      - "127.0.0.1:5432:5432"
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      # $$ escapes compose interpolation: the variables are expanded inside the container.
+      test: ["CMD-SHELL", "pg_isready -U \"$${POSTGRES_USER}\" -d \"$${POSTGRES_DB}\""]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+      start_period: 10s
+    security_opt:
+      - no-new-privileges:true
+
+volumes:
+  postgres-data:
