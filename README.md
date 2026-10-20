@@ -62,6 +62,25 @@ pokedex/
 
 ## Getting started
 
+### 1. Environment variables
+
+Secrets are never committed. Copy the templates and fill them in:
+
+```bash
+cp .env.example .env
+```
+```bash
+cp frontend/.env.example frontend/.env.local
+```
+
+Set `JWT_SECRET` in `.env` to at least 256 bits of random data:
+
+```bash
+openssl rand -base64 32
+```
+
+### 2. Run
+
 > Filled in during Phase 6 (Packaging & Seed). Planned commands:
 
 ```bash
