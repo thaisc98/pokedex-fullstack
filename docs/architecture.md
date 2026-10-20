@@ -111,6 +111,7 @@ classDiagram
       <<Aggregate Root>>
       UserId id
       Email email
+      DisplayName displayName
       PasswordHash hash
       Role role
     }
@@ -129,12 +130,15 @@ classDiagram
 | `Height` | Built from decimetres; `meters()` |
 | `BaseStat` | name ∈ {hp, attack, defense, special-attack, special-defense, speed}; value 1–255 |
 | `Ability` | name plus a `hidden` flag |
+| `PokemonType` | closed set of the 18 types (`normal` … `fairy`), the same 18 as the `bg-type-*` tokens in [ui-ux.md §6](ui-ux.md) |
+| `EvolutionTrigger` | sealed: `LevelUp(minLevel?)`, `UseItem(item)`, `Trade`, `Other(name)`; the chain root has no trigger |
 | `Description` | `\f`, `\n` and soft hyphens become spaces; whitespace collapsed; may be empty |
 | `Category` | non-blank, or `Category.UNKNOWN` |
 | `Tag` | lowercased, `^[a-z0-9-]{1,30}$` |
-| `LocalizedName` | BCP-47 language tag + a 1–60 char value; at most one per language |
+| `LocalizedName` | BCP-47 language tag (checked with `Locale.forLanguageTag`) + a 1–60 char value; at most one per language |
 | `GeoMetadata` | region ≤ 60, habitat ≤ 60, optional `Coordinates` (lat −90..90, lon −180..180) |
-| `Email` | trimmed, lowercased, valid format |
+| `Email` | trimmed, lowercased, valid format, ≤ 254 chars |
+| `DisplayName` | trimmed, 1–60 chars |
 | `PageRequest` | page ≥ 0, 1 ≤ size ≤ 100, default size 20 |
 
 ### 1.3 Business rules
@@ -350,7 +354,7 @@ pokedex/
 | Feature | Use |
 |---|---|
 | Records + compact constructors | All value objects and commands |
-| Sealed interfaces | `DomainException`, `EvolutionTrigger`, `ApiError`, which gives an exhaustive `switch` in `GlobalExceptionHandler` |
+| Sealed interfaces | `DomainException`, `EvolutionTrigger` (`LevelUp`, `UseItem`, `Trade`, `Other`), `ApiError`, which gives an exhaustive `switch` in `GlobalExceptionHandler` |
 | Pattern matching for `switch` / record patterns | Mapping errors to HTTP status; PokeAPI DTO → domain |
 | Virtual threads | PokeAPI fan-out |
 | **No preview features** | Keeps JaCoCo, PIT, ArchUnit and Mockito compatible |
@@ -405,19 +409,22 @@ The upstream snapshot is stored as JSONB because it is read-only and never queri
 |---|---|---|---|---|
 | GET | `/api/v1/pokemon?page&size` | public | 200 `PageResponse<PokemonSummaryDto>` | 400, 503 |
 | GET | `/api/v1/pokemon/{idOrName}` | public | 200 `PokemonDetailDto` | 400, 404, 503 |
-| POST | `/api/v1/auth/register` | public | 201 `UserDto` | 400, 409, 429 |
+| POST | `/api/v1/auth/register` | public | 201 `UserDto` | 400, 403 (CSRF), 409, 413, 415, 429 |
 | GET | `/api/v1/auth/csrf` | public | 200 `{headerName, token}` | — |
-| POST | `/api/v1/auth/login` | public | 200 `{user, expiresAt}` + `Set-Cookie: access_token` (httpOnly) | 400, 401, 403 (CSRF), 429 |
-| POST | `/api/v1/auth/logout` | USER | 204, cookie cleared | 401 |
+| POST | `/api/v1/auth/login` | public | 200 `{user, expiresAt}` + `Set-Cookie: access_token` (httpOnly) | 400, 401, 403 (CSRF), 413, 415, 429 |
+| POST | `/api/v1/auth/logout` | USER | 204, cookie cleared | 401, 403 (CSRF) |
 | GET | `/api/v1/auth/me` | USER | 200 `UserDto` | 401 |
-| POST | `/api/v1/collection` `{pokedexId}` | USER | 201 + `Location` (new) / 200 (refreshed) | 400, 401, 404, 503 |
+| POST | `/api/v1/collection` `{pokedexId}` | USER | 201 + `Location` (new) / 200 (refreshed) | 400, 401, 403 (CSRF), 404, 413, 415, 503 |
 | GET | `/api/v1/collection?page&size&tag&q` | USER | 200 `PageResponse<CollectedPokemonDto>` | 400, 401 |
 | GET | `/api/v1/collection/{pokedexId}` | USER | 200 | 401, 404 |
-| PUT | `/api/v1/collection/{pokedexId}` (full `customAttributes` + `version`) | USER | 200 | 400, 401, 404, 409, 413, 415 |
-| DELETE | `/api/v1/collection/{pokedexId}` | ADMIN | 204 | 401, 403, 404 |
+| PUT | `/api/v1/collection/{pokedexId}` (full `customAttributes` + `version`) | USER | 200 | 400, 401, 403 (CSRF), 404, 409, 413, 415 |
+| DELETE | `/api/v1/collection/{pokedexId}` | ADMIN | 204 | 401, 403 (CSRF or not ADMIN), 404 |
 
+- The full contract (schemas, examples, constraints) is [api/openapi.yaml](api/openapi.yaml). This table is the summary; if they disagree, the YAML wins.
 - `PageResponse = {content, page, size, totalElements, totalPages}`.
-- Every error is an RFC 9457 `ProblemDetail` with an `errors[]` list of field violations.
+- `{idOrName}`: all digits → Pokédex id; anything else is lowercased and then checked against `^[a-z0-9-]{1,50}$` (`Pikachu` → `pikachu`; `pika;drop` → 400). `0` and unknown ids → 404.
+- Every error is an RFC 9457 `ProblemDetail` with an `errors[]` list of `{field, message}` violations; `field` uses Spring `FieldError` paths (`customAttributes.tags[2]`).
+- Every endpoint with a request body also returns 413 (body > 16 KB) and 415 (not `application/json`), per [security.md §4.3](security.md).
 - US04 uses PUT, not PATCH: replacing the whole object avoids having to decide whether `null` means "clear" or "unchanged".
 - Authentication uses the `access_token` httpOnly cookie. Every non-GET request needs the `X-XSRF-TOKEN` header (403 if missing). Controls in [security.md](security.md).
 
