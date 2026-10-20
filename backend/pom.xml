@@ -45,6 +45,15 @@
              cyclonedx-maven-plugin <release>=2.9.3, dependency-check-maven <release>=13.0.0. -->
         <cyclonedx.version>2.9.3</cyclonedx.version>
         <dependency-check.version>13.0.0</dependency-check.version>
+
+        <!-- CVE override: Spring Boot 4.1.1 manages tomcat-embed-core 11.0.24, which Dependency-Check
+             flags for the following CVEs (CVSS 7.5–9.8), fixed upstream in 11.0.25:
+             CVE-2026-65905, CVE-2026-65637, CVE-2026-68525, CVE-2026-65182, CVE-2026-65183,
+             CVE-2026-65927, CVE-2026-66422, CVE-2026-68569, CVE-2026-68763, CVE-2026-73180,
+             CVE-2026-66299.
+             11.0.27 is the latest 11.0.x on Maven Central (<release>, verified 2026-10-20) and is >= 11.0.25.
+             Remove this override once a Spring Boot release manages Tomcat >= 11.0.25. -->
+        <tomcat.version>11.0.27</tomcat.version>
     </properties>
 
     <dependencyManagement>
