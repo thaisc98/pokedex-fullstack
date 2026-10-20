@@ -39,6 +39,12 @@
         <palantir.version>2.102.0</palantir.version>
         <archunit.version>1.5.1</archunit.version>
         <jspecify.version>1.0.0</jspecify.version>
+
+        <!-- Supply-chain security tooling (-Psecurity only; see security.md §4.10). Versions are the
+             latest releases on Maven Central, verified 2026-10-20:
+             cyclonedx-maven-plugin <release>=2.9.3, dependency-check-maven <release>=13.0.0. -->
+        <cyclonedx.version>2.9.3</cyclonedx.version>
+        <dependency-check.version>13.0.0</dependency-check.version>
     </properties>
 
     <dependencyManagement>
@@ -198,6 +204,56 @@
                                 <phase>verify</phase>
                                 <goals>
                                     <goal>mutationCoverage</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+
+        <!-- `./mvnw -Psecurity verify` — supply-chain security scan (security.md §4.10, threat T11).
+             Kept out of the default build: the NVD scan is slow and needs an API key. CI runs it on a
+             schedule / dedicated job. CycloneDX emits an aggregate SBOM; Dependency-Check fails on CVSS >= 7.
+             The NVD API key is read from the NVD_API_KEY environment variable. -->
+        <profile>
+            <id>security</id>
+            <build>
+                <plugins>
+                    <!-- SBOM (CycloneDX). makeAggregateBom runs once on the root and covers all modules. -->
+                    <plugin>
+                        <groupId>org.cyclonedx</groupId>
+                        <artifactId>cyclonedx-maven-plugin</artifactId>
+                        <version>${cyclonedx.version}</version>
+                        <executions>
+                            <execution>
+                                <id>cyclonedx-sbom</id>
+                                <phase>verify</phase>
+                                <goals>
+                                    <goal>makeAggregateBom</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+
+                    <!-- OWASP Dependency-Check: fail the build on any dependency CVE with CVSS >= 7.
+                         The `aggregate` goal with inherited=false runs once on the root reactor and
+                         produces a single report covering every module's dependencies. -->
+                    <plugin>
+                        <groupId>org.owasp</groupId>
+                        <artifactId>dependency-check-maven</artifactId>
+                        <version>${dependency-check.version}</version>
+                        <inherited>false</inherited>
+                        <configuration>
+                            <nvdApiKey>${env.NVD_API_KEY}</nvdApiKey>
+                            <failBuildOnCVSS>7</failBuildOnCVSS>
+                        </configuration>
+                        <executions>
+                            <execution>
+                                <id>dependency-check-aggregate</id>
+                                <phase>verify</phase>
+                                <goals>
+                                    <goal>aggregate</goal>
                                 </goals>
                             </execution>
                         </executions>
