@@ -161,8 +161,7 @@
             </plugin>
 
             <!-- Coverage. prepare-agent + report run in every module; report-aggregate lives in bootstrap.
-                 Per-module coverage gates (domain 95/90 … infrastructure 80/75, testing-strategy §3) are
-                 added in P1 once real code exists; the sample classes here are fully covered. -->
+                 jacoco-check enforces the per-module gates from testing-strategy §3 (see coverage.*.min). -->
             <plugin>
                 <groupId>org.jacoco</groupId>
                 <artifactId>jacoco-maven-plugin</artifactId>
