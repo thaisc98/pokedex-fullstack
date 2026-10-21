@@ -20,10 +20,10 @@
     "@react-aria/utils": "3.34.1",
     "@reduxjs/toolkit": "2.13.0",
     "next": "16.4.2",
-    "react": "19.3.0",
+    "react": "19.3.1",
     "react-aria": "3.53.1",
     "react-aria-components": "1.22.1",
-    "react-dom": "19.3.0",
+    "react-dom": "19.3.1",
     "react-redux": "9.3.0",
     "server-only": "0.0.1"
   },
