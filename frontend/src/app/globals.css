@@ -3,4 +3,10 @@
 
 @import "tailwindcss";
 @import "@heroui/styles";
-@import "../styles/themes/pokedex.css" layer(theme);
+/*
+ * HeroUI declares its theme variables in `@layer base`. Our overrides must sit in the
+ * same layer, after HeroUI, or they lose the cascade (a lower layer never beats a
+ * higher one, whatever the specificity). ui-ux.md §6.1 says `layer(theme)`; that
+ * layer is below `base`, so the overrides would be ignored.
+ */
+@import "../styles/themes/pokedex.css" layer(base);
