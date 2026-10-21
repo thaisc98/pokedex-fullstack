@@ -4,7 +4,10 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import com.github.benmanes.caffeine.cache.Caffeine;
+import com.pokedex.application.catalog.PokemonDetailFixtures;
 import com.pokedex.application.catalog.StubPokemonCatalog;
+import com.pokedex.application.catalog.port.out.PokemonCatalogPort;
+import com.pokedex.domain.catalog.PokemonDetail;
 import com.pokedex.domain.catalog.PokemonSummary;
 import com.pokedex.domain.catalog.vo.Ability;
 import com.pokedex.domain.catalog.vo.Category;
@@ -12,6 +15,7 @@ import com.pokedex.domain.catalog.vo.ImageUrl;
 import com.pokedex.domain.catalog.vo.Mass;
 import com.pokedex.domain.catalog.vo.PokedexId;
 import com.pokedex.domain.catalog.vo.PokemonName;
+import com.pokedex.domain.catalog.vo.PokemonRef;
 import com.pokedex.domain.shared.Page;
 import com.pokedex.domain.shared.PageRequest;
 import com.pokedex.domain.shared.UpstreamUnavailableException;
@@ -76,7 +80,18 @@ class CachingPokemonCatalogTest {
     @Test
     void should_rethrow_the_cache_wrapper_when_the_loader_fails_with_a_checked_exception() {
         IOException checked = new IOException("socket closed");
-        CachingPokemonCatalog sneaky = new CachingPokemonCatalog(request -> sneakyThrow(checked), cache);
+        PokemonCatalogPort throwingChecked = new PokemonCatalogPort() {
+            @Override
+            public Page<PokemonSummary> fetchPage(PageRequest request) {
+                return sneakyThrow(checked);
+            }
+
+            @Override
+            public PokemonDetail fetchDetail(PokemonRef ref) {
+                return sneakyThrow(checked);
+            }
+        };
+        CachingPokemonCatalog sneaky = new CachingPokemonCatalog(throwingChecked, cache);
 
         assertThatThrownBy(() -> sneaky.fetchPage(PageRequest.ofPage(0)))
                 .isInstanceOf(Cache.ValueRetrievalException.class)
@@ -86,6 +101,18 @@ class CachingPokemonCatalogTest {
     @SuppressWarnings("unchecked")
     private static <T, E extends Throwable> T sneakyThrow(Throwable throwable) throws E {
         throw (E) throwable;
+    }
+
+    @Test
+    void should_pass_detail_lookups_through_since_resources_are_cached_below() {
+        StubPokemonCatalog details = StubPokemonCatalog.withDetails(PokemonDetailFixtures.pikachu());
+        CachingPokemonCatalog withDetails = new CachingPokemonCatalog(details, cache);
+        PokemonRef ref = new PokemonRef.ById(new PokedexId(25));
+
+        assertThat(withDetails.fetchDetail(ref)).isEqualTo(PokemonDetailFixtures.pikachu());
+        withDetails.fetchDetail(ref);
+
+        assertThat(details.detailRequests()).hasSize(2);
     }
 
     private static PokemonSummary summary(int id) {

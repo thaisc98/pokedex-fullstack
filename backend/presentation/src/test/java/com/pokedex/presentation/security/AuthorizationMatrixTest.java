@@ -9,6 +9,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import com.pokedex.application.catalog.PokemonDetailFixtures;
+import com.pokedex.application.catalog.port.in.GetPokemonDetailUseCase;
 import com.pokedex.application.catalog.port.in.ListPokemonUseCase;
 import com.pokedex.domain.shared.Page;
 import com.pokedex.domain.shared.PageRequest;
@@ -39,17 +41,26 @@ class AuthorizationMatrixTest {
     @MockitoBean
     private ListPokemonUseCase listPokemon;
 
+    @MockitoBean
+    private GetPokemonDetailUseCase getPokemonDetail;
+
     @BeforeEach
     void emptyCatalog() {
         when(listPokemon.list(any())).thenReturn(new Page<>(List.of(), PageRequest.ofPage(0), 0));
+        when(getPokemonDetail.get(any())).thenReturn(PokemonDetailFixtures.pikachu());
     }
 
     @ParameterizedTest(name = "anonymous {0} {1} -> {2}")
     @CsvSource({
         // US01: the catalog list is public
         "GET,    /api/v1/pokemon,        200",
+        // US02: the catalog detail is public
+        "GET,    /api/v1/pokemon/25,     200",
+        "GET,    /api/v1/pokemon/pikachu, 200",
         // deny by default: everything not listed
-        "GET,    /api/v1/pokemon/25,     401",
+        "GET,    /api/v1/pokemon/25/evolution, 401",
+        "POST,   /api/v1/pokemon/25,     401",
+        "DELETE, /api/v1/pokemon/25,     401",
         "GET,    /api/v1/collection,     401",
         "GET,    /api/v1/anything-else,  401",
         "GET,    /,                      401",
