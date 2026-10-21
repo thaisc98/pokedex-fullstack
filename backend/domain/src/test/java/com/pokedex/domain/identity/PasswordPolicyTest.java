@@ -25,6 +25,9 @@ import org.junit.jupiter.params.provider.ValueSource;
  *       domain never holds a password beyond this check (BR-09 "the domain only ever holds the hash").
  *   <li>Length counts Unicode code points, not UTF-16 units. The password is <b>not</b> trimmed or
  *       normalized: spaces are legitimate characters.
+ *   <li>The password must also fit in 72 UTF-8 bytes, because BCrypt ignores everything after byte 72
+ *       (security.md §4.1 caps the length for that reason). Over 72 bytes is reported as "too long", like
+ *       over 64 code points.
  *   <li>The list lookup is case-insensitive: the predicate receives the password lowercased with
  *       {@code Locale.ROOT}, so the list is stored lowercase ({@code PASSWORD1234} is as weak as
  *       {@code password1234}).
@@ -80,9 +83,27 @@ class PasswordPolicyTest {
     @Test
     void should_count_code_points_not_utf16_units() {
         assertInvalid("🔑".repeat(11)); // 22 UTF-16 units, 11 code points
-        assertThatCode(() -> policy.check("🔑".repeat(12))).doesNotThrowAnyException();
-        assertThatCode(() -> policy.check("🔑".repeat(64))).doesNotThrowAnyException(); // 128 units
-        assertInvalid("🔑".repeat(65));
+        assertThatCode(() -> policy.check("🔑".repeat(12))).doesNotThrowAnyException(); // 24 units, 48 bytes
+    }
+
+    @Test
+    void should_accept_exactly_72_utf8_bytes() {
+        String seventyTwoBytes = "🔑".repeat(18); // 18 code points x 4 bytes
+
+        assertThatCode(() -> policy.check(seventyTwoBytes)).doesNotThrowAnyException();
+    }
+
+    @Test
+    void should_reject_more_than_72_utf8_bytes_even_within_64_code_points() {
+        // BCrypt only reads the first 72 bytes; a longer password would be silently truncated.
+        assertInvalid("🔑".repeat(19)); // 76 bytes, 19 code points
+        assertInvalid("é".repeat(37)); // 74 bytes, 37 code points
+        assertInvalid("🔑".repeat(64)); // 256 bytes, 64 code points
+    }
+
+    @Test
+    void should_use_the_too_long_message_for_the_byte_cap() {
+        assertThat(messageFor("🔑".repeat(19))).isEqualTo(messageFor("a".repeat(65)));
     }
 
     @Test
