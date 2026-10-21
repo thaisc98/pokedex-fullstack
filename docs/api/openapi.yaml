@@ -1143,6 +1143,7 @@ components:
             | `/problems/unauthorized` | 401 | Authentication required or failed. Anonymous access to a non-public route also gets this (deny by default). |
             | `/problems/forbidden` | 403 | Authenticated but not allowed (e.g. a `USER` calling an `ADMIN` route). |
             | `/problems/csrf-token-invalid` | 403 | Missing or invalid `X-XSRF-TOKEN` on a non-GET request (security.md §4.2.1). |
+            | `/problems/not-found` | 404 | The resource does not exist (e.g. no such Pokémon; `0` and unknown ids or names). |
             | `/problems/upstream-unavailable` | 503 | PokeAPI down, erroring, too large (> 1 MB) or partial; never a half-filled page (architecture.md §1.5). |
             | `/problems/internal-error` | 500 | Unexpected error. Only a `correlationId`, never details. |
 
@@ -1153,6 +1154,7 @@ components:
             - /problems/unauthorized
             - /problems/forbidden
             - /problems/csrf-token-invalid
+            - /problems/not-found
             - /problems/upstream-unavailable
             - /problems/internal-error
         title:
@@ -1253,11 +1255,16 @@ components:
             detail: An unexpected error occurred.
             correlationId: 3f2b8c1e-9d4a-4e7b-8a61-2c5d0f9e7a10
     NotFound:
-      description: Resource not found.
+      description: 'Resource not found (`type: /problems/not-found`). The body never repeats the requested id or name in `detail`.'
       content:
         application/problem+json:
           schema:
             $ref: '#/components/schemas/ProblemDetail'
+          example:
+            type: /problems/not-found
+            title: Not found
+            status: 404
+            detail: The requested resource does not exist.
     Conflict:
       description: 'Conflict: duplicate email (register) or stale `version` (update, BR-08).'
       content:

@@ -1,5 +1,7 @@
 package com.pokedex.domain.shared;
 
+import org.jspecify.annotations.Nullable;
+
 /**
  * Root of every business-rule failure. Sealed so the presentation layer's error handler can switch over
  * it exhaustively and map each subtype to one RFC 9457 problem type (architecture.md §2.6).
@@ -12,6 +14,7 @@ public abstract sealed class DomainException extends RuntimeException
                 AuthenticationRequiredException,
                 EmailAlreadyRegisteredException,
                 InvalidValueException,
+                NotFoundException,
                 UpstreamUnavailableException {
 
     private static final long serialVersionUID = 1L;
@@ -20,7 +23,7 @@ public abstract sealed class DomainException extends RuntimeException
         super(message);
     }
 
-    protected DomainException(String message, Throwable cause) {
+    protected DomainException(String message, @Nullable Throwable cause) {
         super(message, cause);
     }
 }

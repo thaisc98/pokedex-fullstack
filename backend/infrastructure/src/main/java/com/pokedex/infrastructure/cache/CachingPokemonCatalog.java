@@ -1,7 +1,9 @@
 package com.pokedex.infrastructure.cache;
 
 import com.pokedex.application.catalog.port.out.PokemonCatalogPort;
+import com.pokedex.domain.catalog.PokemonDetail;
 import com.pokedex.domain.catalog.PokemonSummary;
+import com.pokedex.domain.catalog.vo.PokemonRef;
 import com.pokedex.domain.shared.Page;
 import com.pokedex.domain.shared.PageRequest;
 import java.util.Objects;
@@ -27,13 +29,12 @@ public final class CachingPokemonCatalog implements PokemonCatalogPort {
 
     @Override
     public Page<PokemonSummary> fetchPage(PageRequest request) {
-        try {
-            return Objects.requireNonNull(pages.get(request, () -> delegate.fetchPage(request)));
-        } catch (Cache.ValueRetrievalException e) {
-            if (e.getCause() instanceof RuntimeException cause) {
-                throw cause;
-            }
-            throw e;
-        }
+        return CacheLookup.get(pages, request, () -> delegate.fetchPage(request));
+    }
+
+    /** Not cached as a whole: its PokeAPI resources are cached one by one ({@link CachingPokeApiResources}). */
+    @Override
+    public PokemonDetail fetchDetail(PokemonRef ref) {
+        return delegate.fetchDetail(ref);
     }
 }

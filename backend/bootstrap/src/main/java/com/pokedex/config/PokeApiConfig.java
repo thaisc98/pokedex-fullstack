@@ -2,16 +2,19 @@ package com.pokedex.config;
 
 import com.github.benmanes.caffeine.cache.Caffeine;
 import com.pokedex.application.catalog.port.out.PokemonCatalogPort;
+import com.pokedex.infrastructure.cache.CachingPokeApiResources;
 import com.pokedex.infrastructure.cache.CachingPokemonCatalog;
 import com.pokedex.infrastructure.pokeapi.PokeApiCatalogAdapter;
 import com.pokedex.infrastructure.pokeapi.PokeApiGateway;
 import com.pokedex.infrastructure.pokeapi.PokeApiHttpClient;
 import com.pokedex.infrastructure.pokeapi.PokeApiMapper;
+import com.pokedex.infrastructure.pokeapi.PokeApiResources;
 import com.pokedex.infrastructure.pokeapi.ResponseSizeLimitInterceptor;
 import java.time.Duration;
 import java.util.List;
 import java.util.Objects;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cache.Cache;
 import org.springframework.cache.CacheManager;
 import org.springframework.cache.caffeine.CaffeineCacheManager;
 import org.springframework.context.annotation.Bean;
@@ -35,7 +38,7 @@ import org.springframework.web.service.registry.ImportHttpServices;
  * </ul>
  */
 @Configuration(proxyBeanMethods = false)
-@EnableResilientMethods
+@EnableResilientMethods(proxyTargetClass = true)
 @ImportHttpServices(group = PokeApiConfig.POKEAPI_GROUP, types = PokeApiHttpClient.class)
 public class PokeApiConfig {
 
@@ -55,20 +58,45 @@ public class PokeApiConfig {
         return new PokeApiGateway(pokeApiHttpClient);
     }
 
+    /**
+     * One Caffeine {@link CacheManager} (ADR 0004): the page cache plus one cache per PokeAPI resource, each with a
+     * size cap and a TTL (24 h by default). Failures are never stored.
+     */
     @Bean
     CacheManager cacheManager(
-            @Value("${pokeapi.cache.max-pages:500}") long maxPages, @Value("${pokeapi.cache.ttl:24h}") Duration ttl) {
+            @Value("${pokeapi.cache.max-pages:500}") long maxPages,
+            @Value("${pokeapi.cache.max-resources:2000}") long maxResources,
+            @Value("${pokeapi.cache.ttl:24h}") Duration ttl) {
         CaffeineCacheManager manager = new CaffeineCacheManager();
+        manager.setAllowNullValues(false);
         manager.setCaffeine(Caffeine.newBuilder().maximumSize(maxPages).expireAfterWrite(ttl));
         manager.setCacheNames(List.of(CachingPokemonCatalog.PAGES_CACHE));
-        manager.setAllowNullValues(false);
+        for (String resource : List.of(
+                CachingPokeApiResources.POKEMON_CACHE,
+                CachingPokeApiResources.SPECIES_CACHE,
+                CachingPokeApiResources.EVOLUTION_CHAIN_CACHE)) {
+            manager.registerCustomCache(
+                    resource,
+                    Caffeine.newBuilder()
+                            .maximumSize(maxResources)
+                            .expireAfterWrite(ttl)
+                            .build());
+        }
         return manager;
     }
 
     @Bean
     PokemonCatalogPort pokemonCatalog(PokeApiGateway pokeApiGateway, CacheManager cacheManager) {
-        PokeApiCatalogAdapter adapter = new PokeApiCatalogAdapter(pokeApiGateway, new PokeApiMapper());
-        return new CachingPokemonCatalog(
-                adapter, Objects.requireNonNull(cacheManager.getCache(CachingPokemonCatalog.PAGES_CACHE)));
+        PokeApiResources resources = new CachingPokeApiResources(
+                pokeApiGateway,
+                cache(cacheManager, CachingPokeApiResources.POKEMON_CACHE),
+                cache(cacheManager, CachingPokeApiResources.SPECIES_CACHE),
+                cache(cacheManager, CachingPokeApiResources.EVOLUTION_CHAIN_CACHE));
+        PokeApiCatalogAdapter adapter = new PokeApiCatalogAdapter(resources, new PokeApiMapper());
+        return new CachingPokemonCatalog(adapter, cache(cacheManager, CachingPokemonCatalog.PAGES_CACHE));
+    }
+
+    private static Cache cache(CacheManager cacheManager, String name) {
+        return Objects.requireNonNull(cacheManager.getCache(name), name);
     }
 }
