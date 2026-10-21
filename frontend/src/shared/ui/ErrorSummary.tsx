@@ -18,11 +18,16 @@ type ErrorSummaryProps = {
  */
 export function ErrorSummary({ items, focusKey, title }: ErrorSummaryProps) {
   const ref = useRef<HTMLDivElement>(null);
+  const focusedFor = useRef(0);
+  const hasItems = items.length > 0;
   useEffect(() => {
-    if (items.length > 0) ref.current?.focus();
-    // Focus only when a new submit fails, not on every keystroke that edits the list.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [focusKey]);
+    // Focus once per failed submit. The errors can arrive a render after the submit counter
+    // (React Hook Form updates formState separately), so wait until there is something to show.
+    if (hasItems && focusKey > 0 && focusedFor.current !== focusKey) {
+      focusedFor.current = focusKey;
+      ref.current?.focus();
+    }
+  }, [focusKey, hasItems]);
 
   if (items.length === 0) return null;
   // A single form-level message (e.g. "Email or password is incorrect.") is the whole summary.
