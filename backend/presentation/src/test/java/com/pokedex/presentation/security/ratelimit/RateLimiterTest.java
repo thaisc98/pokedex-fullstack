@@ -40,8 +40,9 @@ class RateLimiterTest {
         nanos.addAndGet(Duration.ofSeconds(15).toNanos());
 
         assertThatThrownBy(() -> limiter.consume("1.2.3.4|ash@example.com"))
-                .isInstanceOfSatisfying(RateLimitedException.class, e -> assertThat(e.retryAfterSeconds())
-                        .isEqualTo(45));
+                .isInstanceOfSatisfying(
+                        RateLimitedException.class,
+                        e -> assertThat(e.retryAfterSeconds()).isEqualTo(45));
     }
 
     @Test
@@ -52,8 +53,9 @@ class RateLimiterTest {
         nanos.addAndGet(Duration.ofSeconds(59).plusMillis(900).toNanos());
 
         assertThatThrownBy(() -> limiter.consume("k"))
-                .isInstanceOfSatisfying(RateLimitedException.class, e -> assertThat(e.retryAfterSeconds())
-                        .isEqualTo(1));
+                .isInstanceOfSatisfying(
+                        RateLimitedException.class,
+                        e -> assertThat(e.retryAfterSeconds()).isEqualTo(1));
     }
 
     @Test

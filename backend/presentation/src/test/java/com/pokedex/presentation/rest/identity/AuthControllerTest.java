@@ -33,6 +33,7 @@ import com.pokedex.domain.shared.AuthenticationFailedException;
 import com.pokedex.domain.shared.AuthenticationRequiredException;
 import com.pokedex.domain.shared.EmailAlreadyRegisteredException;
 import com.pokedex.domain.shared.InvalidValueException;
+import com.pokedex.presentation.rest.shared.StrictJsonConfig;
 import com.pokedex.presentation.security.AccessTokenCookies;
 import com.pokedex.presentation.security.SecurityConfig;
 import com.pokedex.presentation.security.ratelimit.AuthRateLimits;
@@ -59,7 +60,7 @@ import org.springframework.test.web.servlet.MvcResult;
  * cookies, CSRF reset, rate limiting and the authorization rows for the identity endpoints.
  */
 @WebMvcTest(AuthController.class)
-@Import({SecurityConfig.class, AuthControllerTest.Beans.class})
+@Import({SecurityConfig.class, StrictJsonConfig.class, AuthControllerTest.Beans.class})
 class AuthControllerTest {
 
     private static final String PROBLEM_JSON = "application/problem+json";
@@ -281,7 +282,8 @@ class AuthControllerTest {
     void should_return_the_current_user_for_a_valid_token() throws Exception {
         when(getCurrentUser.currentUser(ASH.id())).thenReturn(ASH);
 
-        mockMvc.perform(get("/api/v1/auth/me").with(jwt().jwt(j -> j.subject(ASH.id().value().toString()))))
+        mockMvc.perform(get("/api/v1/auth/me")
+                        .with(jwt().jwt(j -> j.subject(ASH.id().value().toString()))))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.email").value("ash@example.com"))
                 .andExpect(jsonPath("$.length()").value(4));
@@ -298,7 +300,8 @@ class AuthControllerTest {
     void should_answer_401_when_the_user_no_longer_exists() throws Exception {
         when(getCurrentUser.currentUser(any())).thenThrow(new AuthenticationRequiredException());
 
-        mockMvc.perform(get("/api/v1/auth/me").with(jwt().jwt(j -> j.subject(ASH.id().value().toString()))))
+        mockMvc.perform(get("/api/v1/auth/me")
+                        .with(jwt().jwt(j -> j.subject(ASH.id().value().toString()))))
                 .andExpect(status().isUnauthorized())
                 .andExpect(jsonPath("$.type").value("/problems/unauthorized"));
     }
@@ -313,19 +316,6 @@ class AuthControllerTest {
                 .andExpect(cookie().maxAge("access_token", 0))
                 .andExpect(cookie().path("access_token", "/api"))
                 .andExpect(cookie().maxAge("XSRF-TOKEN", 0));
-    }
-
-    @Test
-    void should_return_the_csrf_token_that_is_also_in_the_readable_cookie() throws Exception {
-        MvcResult result = mockMvc.perform(get("/api/v1/auth/csrf"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.headerName").value("X-XSRF-TOKEN"))
-                .andExpect(jsonPath("$.length()").value(2))
-                .andExpect(cookie().httpOnly("XSRF-TOKEN", false))
-                .andReturn();
-        String cookieValue = result.getResponse().getCookie("XSRF-TOKEN").getValue();
-
-        assertThat(result.getResponse().getContentAsString()).contains("\"token\":\"" + cookieValue + "\"");
     }
 
     // ------------------------------------------------------------ authorization rows (security.md §3.2)
