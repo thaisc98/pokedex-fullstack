@@ -84,7 +84,7 @@ class PokeApiDetailMapperTest {
         ObjectNode species = PokeApiFixtures.tree("pokemon-species/25.json");
         for (JsonNode entry : species.get("flavor_text_entries")) {
             if ("legends-arceus".equals(entry.get("version").get("name").asString())) {
-                ((ObjectNode) entry.get("version")).put("url", "https://evil.example/version/999/");
+                ((ObjectNode) entry.get("version")).put("url", "https://pokeapi.co/api/v2/version/latest/");
             }
         }
 

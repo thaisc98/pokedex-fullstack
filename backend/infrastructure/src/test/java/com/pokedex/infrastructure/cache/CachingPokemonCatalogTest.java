@@ -6,6 +6,8 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import com.github.benmanes.caffeine.cache.Caffeine;
 import com.pokedex.application.catalog.PokemonDetailFixtures;
 import com.pokedex.application.catalog.StubPokemonCatalog;
+import com.pokedex.application.catalog.port.out.PokemonCatalogPort;
+import com.pokedex.domain.catalog.PokemonDetail;
 import com.pokedex.domain.catalog.PokemonSummary;
 import com.pokedex.domain.catalog.vo.Ability;
 import com.pokedex.domain.catalog.vo.Category;
@@ -78,7 +80,18 @@ class CachingPokemonCatalogTest {
     @Test
     void should_rethrow_the_cache_wrapper_when_the_loader_fails_with_a_checked_exception() {
         IOException checked = new IOException("socket closed");
-        CachingPokemonCatalog sneaky = new CachingPokemonCatalog(request -> sneakyThrow(checked), cache);
+        PokemonCatalogPort throwingChecked = new PokemonCatalogPort() {
+            @Override
+            public Page<PokemonSummary> fetchPage(PageRequest request) {
+                return sneakyThrow(checked);
+            }
+
+            @Override
+            public PokemonDetail fetchDetail(PokemonRef ref) {
+                return sneakyThrow(checked);
+            }
+        };
+        CachingPokemonCatalog sneaky = new CachingPokemonCatalog(throwingChecked, cache);
 
         assertThatThrownBy(() -> sneaky.fetchPage(PageRequest.ofPage(0)))
                 .isInstanceOf(Cache.ValueRetrievalException.class)
