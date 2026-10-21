@@ -4,9 +4,11 @@ import com.pokedex.domain.shared.AuthenticationFailedException;
 import com.pokedex.domain.shared.AuthenticationRequiredException;
 import com.pokedex.domain.shared.DomainException;
 import com.pokedex.domain.shared.EmailAlreadyRegisteredException;
+import com.pokedex.domain.shared.ForbiddenException;
 import com.pokedex.domain.shared.InvalidValueException;
 import com.pokedex.domain.shared.NotFoundException;
 import com.pokedex.domain.shared.UpstreamUnavailableException;
+import com.pokedex.domain.shared.VersionConflictException;
 import com.pokedex.presentation.security.ratelimit.RateLimitedException;
 import java.net.URI;
 import java.util.List;
@@ -42,6 +44,8 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
     static final URI INVALID_CREDENTIALS = URI.create("/problems/invalid-credentials");
     static final URI EMAIL_TAKEN = URI.create("/problems/email-taken");
     static final URI RATE_LIMITED = URI.create("/problems/rate-limited");
+    static final URI VERSION_CONFLICT = URI.create("/problems/version-conflict");
+    static final URI FORBIDDEN = URI.create("/problems/forbidden");
 
     private static final Logger LOG = LoggerFactory.getLogger(GlobalExceptionHandler.class);
 
@@ -72,6 +76,16 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
                         UNAUTHORIZED,
                         "Unauthorized",
                         "Authentication is required to access this resource.");
+            // BR-08: someone else changed the record first; the client reloads and retries.
+            case VersionConflictException conflict ->
+                problem(
+                        HttpStatus.CONFLICT,
+                        VERSION_CONFLICT,
+                        "Version conflict",
+                        "The resource was modified by someone else. Reload it and try again.");
+            // BR-10, defence in depth: the use case refused the caller's role.
+            case ForbiddenException forbidden ->
+                problem(HttpStatus.FORBIDDEN, FORBIDDEN, "Forbidden", "You are not allowed to perform this operation.");
             case NotFoundException notFound -> {
                 ProblemDetail problem = ProblemDetail.forStatusAndDetail(
                         HttpStatus.NOT_FOUND, "The requested resource does not exist.");

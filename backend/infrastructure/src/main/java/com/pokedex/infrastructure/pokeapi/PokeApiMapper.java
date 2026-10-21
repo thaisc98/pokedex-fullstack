@@ -16,6 +16,7 @@ import com.pokedex.domain.catalog.vo.PokedexId;
 import com.pokedex.domain.catalog.vo.PokemonName;
 import com.pokedex.domain.catalog.vo.PokemonType;
 import com.pokedex.domain.catalog.vo.StatName;
+import com.pokedex.domain.collection.UpstreamSnapshot;
 import com.pokedex.infrastructure.pokeapi.dto.NamedResourceDto;
 import com.pokedex.infrastructure.pokeapi.dto.PokeApiEvolutionChainDto;
 import com.pokedex.infrastructure.pokeapi.dto.PokeApiPokemonDto;
@@ -58,6 +59,19 @@ public final class PokeApiMapper {
                 category(species),
                 new Mass(Objects.requireNonNull(pokemon.weight(), "weight")),
                 abilities(pokemon));
+    }
+
+    /** UC-03 sync snapshot: the summary fields (sprite, category, mass, abilities) plus the base stats. */
+    public UpstreamSnapshot toSnapshot(PokeApiPokemonDto pokemon, PokeApiSpeciesDto species) {
+        PokemonSummary summary = toSummary(pokemon, species);
+        return new UpstreamSnapshot(
+                summary.id(),
+                summary.name(),
+                summary.sprite(),
+                summary.category(),
+                summary.mass(),
+                summary.abilities(),
+                stats(pokemon));
     }
 
     /** Pokémon id from a list result URL such as {@code https://pokeapi.co/api/v2/pokemon/25/}. */

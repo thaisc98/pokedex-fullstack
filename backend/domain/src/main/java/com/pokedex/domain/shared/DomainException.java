@@ -13,9 +13,11 @@ public abstract sealed class DomainException extends RuntimeException
         permits AuthenticationFailedException,
                 AuthenticationRequiredException,
                 EmailAlreadyRegisteredException,
+                ForbiddenException,
                 InvalidValueException,
                 NotFoundException,
-                UpstreamUnavailableException {
+                UpstreamUnavailableException,
+                VersionConflictException {
 
     private static final long serialVersionUID = 1L;
 
