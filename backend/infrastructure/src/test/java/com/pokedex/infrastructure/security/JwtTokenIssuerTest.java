@@ -42,7 +42,7 @@ class JwtTokenIssuerTest {
 
         Jwt jwt = decoderAt(NOW).decode(token.value());
         assertThat(jwt.getHeaders()).containsEntry("alg", "HS256");
-        assertThat(jwt.getIssuer()).hasToString("pokedex-api");
+        assertThat(jwt.getClaimAsString("iss")).isEqualTo("pokedex-api");
         assertThat(jwt.getAudience()).containsExactly("pokedex-web");
         assertThat(jwt.getSubject()).isEqualTo(ASH.id().value().toString());
         assertThat(jwt.getClaimAsStringList("roles")).containsExactly("USER");
@@ -54,7 +54,8 @@ class JwtTokenIssuerTest {
 
     @Test
     void should_put_every_implied_role_in_an_admin_token() {
-        Jwt jwt = decoderAt(NOW).decode(issuer.issue(user(Role.ADMIN), NOW, EXPIRES).value());
+        Jwt jwt = decoderAt(NOW)
+                .decode(issuer.issue(user(Role.ADMIN), NOW, EXPIRES).value());
 
         assertThat(jwt.getClaimAsStringList("roles")).containsExactlyInAnyOrder("USER", "ADMIN");
     }

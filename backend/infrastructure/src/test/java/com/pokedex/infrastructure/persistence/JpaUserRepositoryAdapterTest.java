@@ -46,7 +46,9 @@ class JpaUserRepositoryAdapterTest {
         assertThat(UserEntityMapper.toDomain(entity)).isEqualTo(ASH);
         assertThat(entity.getEmail()).isEqualTo("ash@example.com");
         assertThat(entity.getRole()).isEqualTo("ADMIN");
-        assertThat(entity.getVersion()).as("new entities are persisted, not merged").isNull();
+        assertThat(entity.getVersion())
+                .as("new entities are persisted, not merged")
+                .isNull();
     }
 
     @Test
