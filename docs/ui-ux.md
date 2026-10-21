@@ -227,7 +227,7 @@ The component library is **HeroUI v3** ([ADR 0009](adr/0009-heroui-v3-component-
 | Item | Choice |
 |---|---|
 | Packages | `@heroui/react`, `@heroui/styles` (peer deps: React 19+, Tailwind CSS v4) |
-| CSS entry (`app/globals.css`) | `@layer theme, base, components, utilities;` → `@import "tailwindcss";` → `@import "@heroui/styles";` → `@import "../styles/themes/pokedex.css" layer(theme);` |
+| CSS entry (`app/globals.css`) | `@layer theme, base, components, utilities;` → `@import "tailwindcss";` → `@import "@heroui/styles";` → `@import "../styles/themes/pokedex.css" layer(base);` (HeroUI defines its variables in `base`; a `theme`-layer override would lose to them) |
 | Provider | **None needed** for components. `<Toast.Provider placement="bottom end" />` mounted once in the root layout |
 | Theme / dark mode | `next-themes` `ThemeProvider attribute="class" defaultTheme="system"` + `suppressHydrationWarning` on `<html>`. Its inline script gets the CSP nonce. Toggle in the user menu (Light / Dark / System) |
 | Router links | `AppLink` = HeroUI `Link`/`Button` with `render={({ref, ...props}) => <NextLink {...props} ref={ref} href=… />}` |
