@@ -24,11 +24,22 @@ public final class PokeApiSnapshotAdapter implements UpstreamSnapshotPort {
 
     private final PokeApiResources gateway;
     private final PokeApiMapper mapper;
+    private final FreshResourcesListener listener;
 
     /** @param gateway the uncached, resilient gateway */
     public PokeApiSnapshotAdapter(PokeApiResources gateway, PokeApiMapper mapper) {
+        this(gateway, mapper, FreshResourcesListener.NONE);
+    }
+
+    /**
+     * @param gateway the uncached, resilient gateway
+     * @param listener told about the fresh {@code /pokemon} and species after a successful fetch, so the catalog
+     *     caches serve what the sync stores (approved decision)
+     */
+    public PokeApiSnapshotAdapter(PokeApiResources gateway, PokeApiMapper mapper, FreshResourcesListener listener) {
         this.gateway = Objects.requireNonNull(gateway, "gateway");
         this.mapper = Objects.requireNonNull(mapper, "mapper");
+        this.listener = Objects.requireNonNull(listener, "listener");
     }
 
     @Override
@@ -47,6 +58,7 @@ public final class PokeApiSnapshotAdapter implements UpstreamSnapshotPort {
             if (!snapshot.id().equals(id)) {
                 throw new IllegalStateException("PokeAPI answered for another Pokémon");
             }
+            listener.refreshed(pokemon, species);
             return snapshot;
         } catch (RuntimeException e) {
             throw unavailable(e);

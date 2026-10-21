@@ -84,11 +84,14 @@ class SyncCollectionIT extends AbstractCollectionIT {
         Response updated = put(user, id, update(custom, version(created)));
         updated.then().statusCode(200);
         Instant syncedBefore = Instant.parse(updated.jsonPath().getString("syncedAt"));
+        // Warm the catalog cache with the old upstream data (6.0 kg).
+        user.get(CATALOG_PATH + "/" + id).then().statusCode(200);
+        assertThat(new BigDecimal(user.get(CATALOG_PATH + "/" + id).jsonPath().getString("mass")))
+                .isEqualByComparingTo("6.0");
 
-        // PokeAPI changed in the meantime: heavier now. The catalog cache is cleared to stand in for its TTL
-        // expiring, so the re-sync really sees the new upstream data.
+        // PokeAPI changed in the meantime: heavier now. Lead decision: sync always reads PokeAPI live (bypassing
+        // the catalog cache) and refreshes the cache, so no cache is cleared here.
         stubUpstream(id, name, 75);
-        clearAllCaches();
         Response resynced = sync(user, id);
 
         resynced.then()
@@ -109,6 +112,9 @@ class SyncCollectionIT extends AbstractCollectionIT {
         assertThat(resynced.jsonPath().getMap("custom"))
                 .as("custom attributes untouched by the re-sync")
                 .isEqualTo(updated.jsonPath().getMap("custom"));
+        assertThat(new BigDecimal(user.get(CATALOG_PATH + "/" + id).jsonPath().getString("mass")))
+                .as("the live re-sync also refreshed the catalog cache")
+                .isEqualByComparingTo("7.5");
     }
 
     @Test
@@ -183,7 +189,8 @@ class SyncCollectionIT extends AbstractCollectionIT {
         user.writeRaw("POST", COLLECTION_PATH, "{\"pokedexId\":25}", "text/plain")
                 .then()
                 .statusCode(415)
-                .contentType(startsWith(PROBLEM_JSON));
+                .contentType(startsWith(PROBLEM_JSON))
+                .body("type", equalTo("/problems/unsupported-media-type"));
     }
 
     @Test

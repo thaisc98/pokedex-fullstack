@@ -13,6 +13,8 @@ import com.pokedex.domain.catalog.vo.StatName;
 import com.pokedex.domain.collection.UpstreamSnapshot;
 import com.pokedex.domain.shared.NotFoundException;
 import com.pokedex.domain.shared.UpstreamUnavailableException;
+import java.util.ArrayList;
+import java.util.List;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -83,5 +85,35 @@ class PokeApiSnapshotAdapterTest {
 
         assertThatThrownBy(() -> adapter.fetchSnapshot(new PokedexId(26)))
                 .isInstanceOf(UpstreamUnavailableException.class);
+    }
+
+    // ------------------------------------------------------------ a live re-sync refreshes the catalog caches
+
+    @Test
+    void should_hand_the_fresh_pokemon_and_species_to_the_listener_after_a_successful_fetch() {
+        List<String> refreshed = new ArrayList<>();
+        PokeApiSnapshotAdapter listening = new PokeApiSnapshotAdapter(
+                new PokeApiGateway(client),
+                new PokeApiMapper(),
+                (pokemon, species) -> refreshed.add(pokemon.name() + "/" + species.id()));
+        client.pokemon(25, () -> PokeApiFixtures.pokemon(25)).species(25, () -> PokeApiFixtures.species(25));
+
+        listening.fetchSnapshot(new PokedexId(25));
+
+        assertThat(refreshed).containsExactly("pikachu/25");
+    }
+
+    @Test
+    void should_not_notify_the_listener_when_the_fetch_fails() {
+        List<String> refreshed = new ArrayList<>();
+        PokeApiSnapshotAdapter listening = new PokeApiSnapshotAdapter(
+                new PokeApiGateway(client), new PokeApiMapper(), (pokemon, species) -> refreshed.add("called"));
+        client.pokemon(26, () -> PokeApiFixtures.pokemon(25)).species(25, () -> PokeApiFixtures.species(25));
+
+        assertThatThrownBy(() -> listening.fetchSnapshot(new PokedexId(99_999))).isInstanceOf(NotFoundException.class);
+        assertThatThrownBy(() -> listening.fetchSnapshot(new PokedexId(26)))
+                .isInstanceOf(UpstreamUnavailableException.class);
+
+        assertThat(refreshed).isEmpty();
     }
 }
