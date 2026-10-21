@@ -13,7 +13,7 @@
     <artifactId>pokedex-infrastructure</artifactId>
     <name>pokedex-infrastructure</name>
     <description>Outbound adapters (PokeAPI client, JPA, cache, JWT, BCrypt). Depends on application.
-                 P0 keeps this minimal; the technology deps arrive in P3.</description>
+                 PokeAPI client, Caffeine cache decorator; JPA, JWT and BCrypt arrive with their stories.</description>
 
     <dependencies>
         <dependency>
@@ -21,16 +21,36 @@
             <artifactId>pokedex-application</artifactId>
             <version>${project.version}</version>
         </dependency>
-        <!-- A framework dependency is legitimate here (unlike domain/application): proves the enforcer
-             ban is scoped correctly. -->
+        <!-- PokeAPI client: RestClient + @HttpExchange interface clients + Jackson 3 (Boot-managed). -->
         <dependency>
-            <groupId>org.springframework</groupId>
-            <artifactId>spring-context</artifactId>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-restclient</artifactId>
+        </dependency>
+        <!-- ADR 0004: Caffeine behind Spring's Cache abstraction (spring-context-support). Boot-managed. -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-cache</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.github.ben-manes.caffeine</groupId>
+            <artifactId>caffeine</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.jspecify</groupId>
+            <artifactId>jspecify</artifactId>
         </dependency>
 
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-test</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <!-- In-memory fakes (StubPokemonCatalog) from application's test-jar. -->
+        <dependency>
+            <groupId>com.pokedex</groupId>
+            <artifactId>pokedex-application</artifactId>
+            <version>${project.version}</version>
+            <type>test-jar</type>
             <scope>test</scope>
         </dependency>
     </dependencies>
