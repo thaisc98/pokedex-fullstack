@@ -24,11 +24,16 @@ import java.time.Clock;
 import java.time.Duration;
 import java.util.Objects;
 import javax.crypto.SecretKey;
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.flyway.autoconfigure.FlywayConfigurationCustomizer;
+import org.springframework.boot.jdbc.autoconfigure.JdbcConnectionDetails;
 import org.springframework.cache.CacheManager;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
+import org.springframework.transaction.PlatformTransactionManager;
+import org.springframework.transaction.support.TransactionTemplate;
 
 /**
  * Identity wiring (UC-06/07/08, security.md §4.1–4.2): plain use cases with their adapters, the HS256 key from
@@ -80,10 +85,18 @@ public class IdentityConfig {
         return new JpaUserRepositoryAdapter(springDataUserRepository);
     }
 
+    /** Exists-check and insert in one transaction (the unique index still guards concurrent registrations). */
     @Bean
     RegisterUserUseCase registerUserUseCase(
-            UserRepository users, PasswordHasher hasher, CommonPasswordList commonPasswords, Clock clock) {
-        return new RegisterUserService(users, hasher, commonPasswords, clock);
+            UserRepository users,
+            PasswordHasher hasher,
+            CommonPasswordList commonPasswords,
+            Clock clock,
+            PlatformTransactionManager transactionManager) {
+        return TransactionalUseCase.wrap(
+                RegisterUserUseCase.class,
+                new RegisterUserService(users, hasher, commonPasswords, clock),
+                new TransactionTemplate(transactionManager));
     }
 
     @Bean
@@ -92,13 +105,34 @@ public class IdentityConfig {
             PasswordHasher hasher,
             TokenIssuer tokens,
             Clock clock,
-            @Value("${pokedex.security.jwt.lifetime:60m}") Duration lifetime) {
-        return new AuthenticateUserService(users, hasher, tokens, clock, lifetime);
+            @Value("${pokedex.security.jwt.lifetime:60m}") Duration lifetime,
+            PlatformTransactionManager transactionManager) {
+        return TransactionalUseCase.wrap(
+                AuthenticateUserUseCase.class,
+                new AuthenticateUserService(users, hasher, tokens, clock, lifetime),
+                readOnly(transactionManager));
     }
 
     @Bean
-    GetCurrentUserUseCase getCurrentUserUseCase(UserRepository users) {
-        return new GetCurrentUserService(users);
+    GetCurrentUserUseCase getCurrentUserUseCase(UserRepository users, PlatformTransactionManager transactionManager) {
+        return TransactionalUseCase.wrap(
+                GetCurrentUserUseCase.class, new GetCurrentUserService(users), readOnly(transactionManager));
+    }
+
+    /** security.md §4.8: Flyway migrates as FLYWAY_USER when it is set; the app always connects as DB_USER. */
+    @Bean
+    FlywayConfigurationCustomizer flywayOwnerCredentials(
+            @Value("${FLYWAY_USER:}") String user,
+            @Value("${FLYWAY_PASSWORD:}") String password,
+            ObjectProvider<JdbcConnectionDetails> connectionDetails) {
+        return new FlywayOwnerCredentials(
+                user, password, () -> connectionDetails.getObject().getJdbcUrl());
+    }
+
+    private static TransactionTemplate readOnly(PlatformTransactionManager transactionManager) {
+        TransactionTemplate template = new TransactionTemplate(transactionManager);
+        template.setReadOnly(true);
+        return template;
     }
 
     @Bean
