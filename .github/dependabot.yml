@@ -53,3 +53,8 @@ updates:
     labels:
       - dependencies
       - docker
+    ignore:
+      # ADR 0003 picked PostgreSQL 17; a major upgrade needs a new ADR (and a data migration plan).
+      # Minor and patch releases of 17.x still come through.
+      - dependency-name: "postgres"
+        update-types: ["version-update:semver-major"]
