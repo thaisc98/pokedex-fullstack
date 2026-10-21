@@ -1,18 +1,25 @@
 package com.pokedex.catalog;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
-import static com.github.tomakehurst.wiremock.client.WireMock.equalTo;
 import static com.github.tomakehurst.wiremock.client.WireMock.get;
 import static com.github.tomakehurst.wiremock.client.WireMock.okJson;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlPathMatching;
 import static com.github.tomakehurst.wiremock.core.WireMockConfiguration.wireMockConfig;
+import static io.restassured.RestAssured.given;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.hamcrest.Matchers.blankOrNullString;
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.not;
+import static org.hamcrest.Matchers.startsWith;
 
 import com.github.tomakehurst.wiremock.WireMockServer;
 import com.github.tomakehurst.wiremock.client.ResponseDefinitionBuilder;
+import com.github.tomakehurst.wiremock.client.WireMock;
 import io.restassured.RestAssured;
 import io.restassured.config.JsonConfig;
 import io.restassured.config.RestAssuredConfig;
 import io.restassured.path.json.config.JsonPathConfig;
+import io.restassured.response.Response;
 import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.nio.charset.StandardCharsets;
@@ -131,8 +138,8 @@ abstract class AbstractPokeApiIT {
     /** {@code GET /api/v2/pokemon?offset=&limit=} (trailing slash tolerated). */
     static void stubList(int offset, int limit, ResponseDefinitionBuilder response) {
         POKEAPI.stubFor(get(urlPathMatching(API_PREFIX + "/pokemon/?"))
-                .withQueryParam("offset", equalTo(String.valueOf(offset)))
-                .withQueryParam("limit", equalTo(String.valueOf(limit)))
+                .withQueryParam("offset", WireMock.equalTo(String.valueOf(offset)))
+                .withQueryParam("limit", WireMock.equalTo(String.valueOf(limit)))
                 .willReturn(response));
     }
 
@@ -166,5 +173,42 @@ abstract class AbstractPokeApiIT {
                 .withStatus(code)
                 .withHeader("Content-Type", "application/json")
                 .withBody("{\"detail\":\"upstream failure " + code + "\"}");
+    }
+
+    // ---------------------------------------------------------------- requests and problem assertions
+
+    static final String UPSTREAM_UNAVAILABLE_TYPE = "/problems/upstream-unavailable";
+    static final String VALIDATION_ERROR_TYPE = "/problems/validation-error";
+
+    static Response requestPage(int page, int size) {
+        return given().queryParam("page", page)
+                .queryParam("size", size)
+                .when()
+                .get(CATALOG_PATH)
+                .then()
+                .extract()
+                .response();
+    }
+
+    /**
+     * 503 {@code ProblemDetail} with the exact {@code type} {@value #UPSTREAM_UNAVAILABLE_TYPE}, and no stack
+     * trace, exception name, internal topology or partial page in the body (security.md §4.6, architecture §1.5).
+     */
+    static void assertUpstreamUnavailableProblem(Response response) {
+        response.then()
+                .statusCode(503)
+                .contentType(startsWith(PROBLEM_JSON))
+                .body("type", equalTo(UPSTREAM_UNAVAILABLE_TYPE))
+                .body("status", equalTo(503))
+                .body("title", not(blankOrNullString()));
+
+        String body = response.asString();
+        assertThat(body)
+                .doesNotContain("Exception")
+                .doesNotContain("\tat ")
+                .doesNotContain("com.pokedex")
+                .doesNotContain("tools.jackson")
+                .doesNotContain(POKEAPI.baseUrl())
+                .doesNotContain("\"content\"");
     }
 }
