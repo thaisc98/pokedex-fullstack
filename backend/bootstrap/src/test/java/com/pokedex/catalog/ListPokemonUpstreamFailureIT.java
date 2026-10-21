@@ -3,12 +3,7 @@ package com.pokedex.catalog;
 import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
 import static com.github.tomakehurst.wiremock.client.WireMock.getRequestedFor;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlPathMatching;
-import static io.restassured.RestAssured.given;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.hamcrest.Matchers.blankOrNullString;
-import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.Matchers.not;
-import static org.hamcrest.Matchers.startsWith;
 
 import com.github.tomakehurst.wiremock.client.WireMock;
 import com.github.tomakehurst.wiremock.http.Fault;
@@ -102,36 +97,5 @@ class ListPokemonUpstreamFailureIT extends AbstractPokeApiIT {
         assertThat(POKEAPI.findAll(getRequestedFor(urlPathMatching(API_PREFIX + "/pokemon/?"))
                         .withQueryParam("offset", WireMock.equalTo("210"))))
                 .hasSizeGreaterThan(1);
-    }
-
-    // ------------------------------------------------------------ helpers
-
-    private static Response requestPage(int page, int size) {
-        return given().queryParam("page", page)
-                .queryParam("size", size)
-                .when()
-                .get(CATALOG_PATH)
-                .then()
-                .extract()
-                .response();
-    }
-
-    private static void assertUpstreamUnavailableProblem(Response response) {
-        response.then()
-                .statusCode(503)
-                .contentType(startsWith(PROBLEM_JSON))
-                .body("status", equalTo(503))
-                .body("title", not(blankOrNullString()))
-                .body("type", not(blankOrNullString()));
-
-        // security.md §4.6: no stack traces, exception names or internal topology in the response.
-        String body = response.asString();
-        assertThat(body)
-                .doesNotContain("Exception")
-                .doesNotContain("\tat ")
-                .doesNotContain("com.pokedex")
-                .doesNotContain("tools.jackson")
-                .doesNotContain(POKEAPI.baseUrl())
-                .doesNotContain("\"content\"");
     }
 }
