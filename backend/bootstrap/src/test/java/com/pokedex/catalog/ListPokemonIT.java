@@ -316,12 +316,18 @@ class ListPokemonIT extends AbstractPokeApiIT {
             stubRecordedSpecies(id);
         }
 
-        given().when()
+        Response response = given().when()
                 .get(CATALOG_PATH + "?page=0&size=3")
                 .then()
                 .statusCode(200)
                 .header("WWW-Authenticate", nullValue())
-                // STATELESS: no server session is ever created (security.md §4.2.1)
-                .cookie("JSESSIONID", nullValue());
+                .extract()
+                .response();
+
+        // STATELESS: no server session is ever created (security.md §4.2.1). Other cookies (XSRF-TOKEN from
+        // csrf.spa()) are allowed. Check the parsed cookie map AND every raw Set-Cookie header.
+        assertThat(response.getCookies()).doesNotContainKey("JSESSIONID");
+        assertThat(response.getHeaders().getValues("Set-Cookie"))
+                .noneSatisfy(setCookie -> assertThat(setCookie).containsIgnoringCase("JSESSIONID"));
     }
 }
