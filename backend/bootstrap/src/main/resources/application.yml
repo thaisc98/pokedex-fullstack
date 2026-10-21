@@ -13,6 +13,15 @@ spring:
         base-url: ${pokeapi.base-url}
         connect-timeout: 2s
         read-timeout: 5s
+  # PostgreSQL (ADR 0003). Credentials only from the environment (security.md §4.8); ITs use @ServiceConnection.
+  datasource:
+    url: ${DB_URL:jdbc:postgresql://localhost:5432/pokedex}
+    username: ${DB_USER:}
+    password: ${DB_PASSWORD:}
+  jpa:
+    open-in-view: false
+    hibernate:
+      ddl-auto: validate
 
 # OpenAPI docs and Swagger UI are off by default; only the demo profile turns them on (security.md §3.2).
 springdoc:
@@ -25,6 +34,17 @@ pokedex:
   security:
     # Only application-demo.yml sets this to true. Otherwise the springdoc routes stay denied (401).
     api-docs-public: false
+    # security.md §4.2. The app refuses to start unless JWT_SECRET has at least 256 bits (32 UTF-8 bytes).
+    jwt:
+      secret: ${JWT_SECRET:}
+      issuer: ${JWT_ISSUER:pokedex-api}
+      audience: ${JWT_AUDIENCE:pokedex-web}
+      lifetime: 60m
+      clock-skew: 30s
+    # security.md §4.1 (Bucket4j, per IP + email / per IP)
+    rate-limit:
+      login-per-minute: 5
+      registrations-per-minute: 3
 
 server:
   error:

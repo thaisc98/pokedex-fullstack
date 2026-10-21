@@ -51,6 +51,10 @@
         <wiremock.version>3.13.2</wiremock.version>
         <rest-assured.version>6.2.0</rest-assured.version>
 
+        <!-- Rate limiting (security.md §4.1 names Bucket4j). Not managed by Boot; 8.21.0 = <release> of
+             com.bucket4j:bucket4j_jdk17-core on Maven Central, verified 2026-10-21. -->
+        <bucket4j.version>8.21.0</bucket4j.version>
+
         <!-- Supply-chain security tooling (-Psecurity only; see security.md §4.10). Versions are the
              latest releases on Maven Central, verified 2026-10-20:
              cyclonedx-maven-plugin <release>=2.9.3, dependency-check-maven <release>=13.0.0. -->

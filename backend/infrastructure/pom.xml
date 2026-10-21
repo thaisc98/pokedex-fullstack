@@ -27,6 +27,25 @@
             <artifactId>pokedex-application</artifactId>
             <version>${project.version}</version>
         </dependency>
+        <!-- Identity persistence: JPA + PostgreSQL driver (Boot-managed). -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-data-jpa</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.postgresql</groupId>
+            <artifactId>postgresql</artifactId>
+            <scope>runtime</scope>
+        </dependency>
+        <!-- BCrypt (DelegatingPasswordEncoder) and the Nimbus JWT encoder/decoder (Spring Security BOM). -->
+        <dependency>
+            <groupId>org.springframework.security</groupId>
+            <artifactId>spring-security-crypto</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.security</groupId>
+            <artifactId>spring-security-oauth2-jose</artifactId>
+        </dependency>
         <!-- PokeAPI client: RestClient + @HttpExchange interface clients + Jackson 3 (Boot-managed). -->
         <dependency>
             <groupId>org.springframework.boot</groupId>

@@ -4,7 +4,7 @@ import static io.restassured.RestAssured.given;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.containsString;
 
-import io.restassured.RestAssured;
+import com.pokedex.support.AbstractIntegrationIT;
 import io.restassured.path.json.JsonPath;
 import java.io.IOException;
 import java.io.Reader;
@@ -20,11 +20,8 @@ import java.util.Set;
 import java.util.TreeMap;
 import java.util.TreeSet;
 import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 import org.yaml.snakeyaml.LoaderOptions;
 import org.yaml.snakeyaml.Yaml;
@@ -44,10 +41,9 @@ import org.yaml.snakeyaml.constructor.SafeConstructor;
  * {@code @ActiveProfiles("demo")} in its own context. In that profile the docs and Swagger UI are reachable
  * anonymously.
  */
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @ActiveProfiles("demo")
 @DisplayName("Contract - /v3/api-docs matches docs/api/openapi.yaml")
-class OpenApiContractIT {
+class OpenApiContractIT extends AbstractIntegrationIT {
 
     private static final Path CONTRACT = Path.of(System.getProperty("basedir", System.getProperty("user.dir")))
             .resolve("../../docs/api/openapi.yaml")
@@ -60,21 +56,12 @@ class OpenApiContractIT {
 
     private static Map<String, Object> contract;
 
-    @Value("${local.server.port}")
-    int port;
-
     @BeforeAll
     static void loadContract() throws IOException {
         try (Reader reader = Files.newBufferedReader(CONTRACT, StandardCharsets.UTF_8)) {
             contract = asMap(new Yaml(new SafeConstructor(new LoaderOptions())).load(reader));
         }
         assertThat(contract).as("contract %s", CONTRACT).containsKey("paths");
-    }
-
-    @BeforeEach
-    void configureRestAssured() {
-        RestAssured.port = port;
-        RestAssured.basePath = "";
     }
 
     @Test

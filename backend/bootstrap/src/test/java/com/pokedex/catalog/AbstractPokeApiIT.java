@@ -15,32 +15,22 @@ import static org.hamcrest.Matchers.startsWith;
 import com.github.tomakehurst.wiremock.WireMockServer;
 import com.github.tomakehurst.wiremock.client.ResponseDefinitionBuilder;
 import com.github.tomakehurst.wiremock.client.WireMock;
-import io.restassured.RestAssured;
-import io.restassured.config.JsonConfig;
-import io.restassured.config.RestAssuredConfig;
-import io.restassured.path.json.config.JsonPathConfig;
+import com.pokedex.support.AbstractIntegrationIT;
 import io.restassured.response.Response;
 import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.Objects;
 import org.junit.jupiter.api.BeforeEach;
-import org.springframework.beans.factory.ObjectProvider;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.cache.Cache;
-import org.springframework.cache.CacheManager;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 
 /**
- * Shared harness for the Catalog acceptance tests (US01, later US02).
+ * Shared harness for the Catalog acceptance tests (US01, US02). Extends {@link AbstractIntegrationIT} (random port,
+ * RestAssured, PostgreSQL Testcontainer, test {@code JWT_SECRET}, cache clear before each test).
  *
  * <ul>
- *   <li>Full application on a random port, called over real HTTP with RestAssured.
  *   <li>PokeAPI is replaced by an in-process WireMock server. The application is pointed at it through
  *       {@value #POKEAPI_BASE_URL_PROPERTY} (security.md §4.5: the base URL comes from config only). The
  *       value includes the {@code /api/v2} prefix, exactly like the real {@code https://pokeapi.co/api/v2}.
@@ -61,23 +51,20 @@ import org.springframework.test.context.DynamicPropertySource;
  *
  * <ol>
  *   <li>{@code POKEAPI.resetAll()} drops every stub and the request journal;
- *   <li>every cache of every {@link CacheManager} bean is cleared (none exists until the backend adds caching,
- *       so the lookup is optional).
+ *   <li>every cache of every {@code CacheManager} bean is cleared ({@link AbstractIntegrationIT}).
  * </ol>
  *
  * Tests still use unique (page, size) pairs and Pokémon ids as a second line of defence.
  *
  * <p>Abstract, so Failsafe does not run it on its own.
  */
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-abstract class AbstractPokeApiIT {
+abstract class AbstractPokeApiIT extends AbstractIntegrationIT {
 
     /** Property name the backend must read the PokeAPI base URL from (security.md §4.5). */
     static final String POKEAPI_BASE_URL_PROPERTY = "pokeapi.base-url";
 
     static final String API_PREFIX = "/api/v2";
     static final String CATALOG_PATH = "/api/v1/pokemon";
-    static final String PROBLEM_JSON = "application/problem+json";
 
     /** Recorded fixtures live in the infrastructure module (owned by the test engineer). */
     private static final Path FIXTURES = Path.of(System.getProperty("basedir", System.getProperty("user.dir")))
@@ -96,30 +83,10 @@ abstract class AbstractPokeApiIT {
         registry.add(POKEAPI_BASE_URL_PROPERTY, () -> POKEAPI.baseUrl() + API_PREFIX);
     }
 
-    @Value("${local.server.port}")
-    int port;
-
-    @Autowired
-    ObjectProvider<CacheManager> cacheManagers;
-
+    /** Runs after {@link AbstractIntegrationIT}'s cache clear and RestAssured setup (superclass first). */
     @BeforeEach
-    void resetPokeApiAndCaches() {
+    void resetPokeApi() {
         POKEAPI.resetAll();
-        cacheManagers
-                .orderedStream()
-                .forEach(manager -> manager.getCacheNames().stream()
-                        .map(manager::getCache)
-                        .filter(Objects::nonNull)
-                        .forEach(Cache::clear));
-    }
-
-    @BeforeEach
-    void configureRestAssured() {
-        RestAssured.port = port;
-        RestAssured.basePath = "";
-        // Numbers as BigDecimal so mass assertions (6.9 kg) are exact, never float-rounded by the test itself.
-        RestAssured.config = RestAssuredConfig.config()
-                .jsonConfig(JsonConfig.jsonConfig().numberReturnType(JsonPathConfig.NumberReturnType.BIG_DECIMAL));
     }
 
     // ---------------------------------------------------------------- fixtures
