@@ -1,26 +1,20 @@
 package com.pokedex.config;
 
-import com.pokedex.application.shared.SampleGateway;
-import com.pokedex.application.shared.SampleService;
-import com.pokedex.infrastructure.shared.SampleAdapter;
+import com.pokedex.application.catalog.port.in.ListPokemonUseCase;
+import com.pokedex.application.catalog.port.out.PokemonCatalogPort;
+import com.pokedex.application.catalog.service.ListPokemonService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 /**
- * Turns plain use cases and adapters into Spring beans here in bootstrap, so {@code application} needs no
- * {@code @Service} and {@code infrastructure} needs no {@code @Component}. The real wiring lands in P2–P4;
- * this placeholder proves the pattern.
+ * Turns the plain use cases into Spring beans here in bootstrap, so {@code application} needs no
+ * {@code @Service}.
  */
-@Configuration
+@Configuration(proxyBeanMethods = false)
 public class UseCaseConfig {
 
     @Bean
-    SampleGateway sampleGateway() {
-        return new SampleAdapter();
-    }
-
-    @Bean
-    SampleService sampleService(SampleGateway sampleGateway) {
-        return new SampleService(sampleGateway);
+    ListPokemonUseCase listPokemonUseCase(PokemonCatalogPort pokemonCatalog) {
+        return new ListPokemonService(pokemonCatalog);
     }
 }

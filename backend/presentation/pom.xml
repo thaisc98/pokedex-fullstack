@@ -12,6 +12,12 @@
 
     <artifactId>pokedex-presentation</artifactId>
     <name>pokedex-presentation</name>
+
+    <properties>
+        <!-- JaCoCo gate (testing-strategy §3). -->
+        <coverage.line.min>0.85</coverage.line.min>
+        <coverage.branch.min>0.80</coverage.branch.min>
+    </properties>
     <description>REST controllers, request/response DTOs, error handler, SecurityFilterChain.
                  Depends on application; must never depend on infrastructure.</description>
 
@@ -26,6 +32,15 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-webmvc</artifactId>
         </dependency>
+        <!-- SecurityFilterChain: deny by default, stateless, CSRF on (security.md §3-4). Boot-managed. -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-security</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.jspecify</groupId>
+            <artifactId>jspecify</artifactId>
+        </dependency>
 
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -37,6 +52,20 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-webmvc-test</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <!-- Boot 4: spring-security-test + the security auto-config for @WebMvcTest slices. -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-security-test</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <!-- StubPokemonCatalog / in-memory fakes. -->
+        <dependency>
+            <groupId>com.pokedex</groupId>
+            <artifactId>pokedex-application</artifactId>
+            <version>${project.version}</version>
+            <type>test-jar</type>
             <scope>test</scope>
         </dependency>
     </dependencies>

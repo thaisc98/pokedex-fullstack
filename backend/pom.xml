@@ -39,6 +39,13 @@
         <palantir.version>2.102.0</palantir.version>
         <archunit.version>1.5.1</archunit.version>
         <jspecify.version>1.0.0</jspecify.version>
+        <!-- JaCoCo gate defaults; domain/application/presentation/infrastructure override them. -->
+        <coverage.line.min>0.00</coverage.line.min>
+        <coverage.branch.min>0.00</coverage.branch.min>
+
+        <!-- Test-only, used by the bootstrap acceptance ITs (approved for US01). -->
+        <wiremock.version>3.13.2</wiremock.version>
+        <rest-assured.version>6.2.0</rest-assured.version>
 
         <!-- Supply-chain security tooling (-Psecurity only; see security.md §4.10). Versions are the
              latest releases on Maven Central, verified 2026-10-20:
@@ -154,8 +161,7 @@
             </plugin>
 
             <!-- Coverage. prepare-agent + report run in every module; report-aggregate lives in bootstrap.
-                 Per-module coverage gates (domain 95/90 … infrastructure 80/75, testing-strategy §3) are
-                 added in P1 once real code exists; the sample classes here are fully covered. -->
+                 jacoco-check enforces the per-module gates from testing-strategy §3 (see coverage.*.min). -->
             <plugin>
                 <groupId>org.jacoco</groupId>
                 <artifactId>jacoco-maven-plugin</artifactId>
@@ -173,6 +179,34 @@
                         <goals>
                             <goal>report</goal>
                         </goals>
+                    </execution>
+                    <!-- Per-module gates (testing-strategy §3). Each module sets coverage.line.min /
+                         coverage.branch.min; the defaults here (0) leave bootstrap to its aggregate report. -->
+                    <execution>
+                        <id>jacoco-check</id>
+                        <phase>verify</phase>
+                        <goals>
+                            <goal>check</goal>
+                        </goals>
+                        <configuration>
+                            <rules>
+                                <rule>
+                                    <element>BUNDLE</element>
+                                    <limits>
+                                        <limit>
+                                            <counter>LINE</counter>
+                                            <value>COVEREDRATIO</value>
+                                            <minimum>${coverage.line.min}</minimum>
+                                        </limit>
+                                        <limit>
+                                            <counter>BRANCH</counter>
+                                            <value>COVEREDRATIO</value>
+                                            <minimum>${coverage.branch.min}</minimum>
+                                        </limit>
+                                    </limits>
+                                </rule>
+                            </rules>
+                        </configuration>
                     </execution>
                 </executions>
             </plugin>

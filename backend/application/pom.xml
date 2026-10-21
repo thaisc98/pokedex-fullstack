@@ -12,6 +12,12 @@
 
     <artifactId>pokedex-application</artifactId>
     <name>pokedex-application</name>
+
+    <properties>
+        <!-- JaCoCo gate (testing-strategy §3). -->
+        <coverage.line.min>0.95</coverage.line.min>
+        <coverage.branch.min>0.90</coverage.branch.min>
+    </properties>
     <description>Use cases, inbound/outbound ports, commands. Depends on domain + JDK only.</description>
 
     <dependencies>
