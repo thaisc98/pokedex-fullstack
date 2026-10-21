@@ -1,5 +1,8 @@
 import { NextResponse, type NextRequest } from "next/server";
 
+/** Same name as `SIGNED_IN_HINT_COOKIE` in shared/api/cookies.ts (kept local: proxy stays dependency-free). */
+const SIGNED_IN_HINT_COOKIE = "pokedex_signed_in";
+
 /**
  * Per-request CSP nonce + security headers (docs/security.md §4.7, §5; Next.js CSP guide).
  *
@@ -47,8 +50,19 @@ export function proxy(request: NextRequest) {
   requestHeaders.set("x-nonce", nonce);
   requestHeaders.set("Content-Security-Policy", csp);
 
-  // TODO(Phase B): optimistic redirect of /collection/** to /login?from=… when the
-  // `access_token` cookie is ABSENT (presence check only, never verification).
+  // Optimistic, UX-only redirect (security.md §3.3): no sign-in hint → go to login first.
+  // `access_token` is `Path=/api`, so it is never sent with page requests; we check the
+  // `pokedex_signed_in` hint the app sets after login. Never an authorization decision:
+  // the Spring API still answers 401/403 on its own.
+  const { pathname, search } = request.nextUrl;
+  if (
+    (pathname === "/collection" || pathname.startsWith("/collection/")) &&
+    request.cookies.get(SIGNED_IN_HINT_COOKIE)?.value !== "1"
+  ) {
+    const login = new URL("/login", request.url);
+    login.searchParams.set("from", `${pathname}${search}`);
+    return NextResponse.redirect(login);
+  }
 
   const response = NextResponse.next({ request: { headers: requestHeaders } });
   response.headers.set("Content-Security-Policy", csp);

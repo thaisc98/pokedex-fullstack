@@ -1,11 +1,24 @@
 "use client";
 
-import { Button, Drawer, Separator } from "@heroui/react";
+import { Button, Chip, Drawer, Separator } from "@heroui/react";
 import { usePathname } from "next/navigation";
+import { selectUser } from "@/features/auth/authSlice";
+import { useSignOut } from "@/features/auth/useSignOut";
+import { useAppSelector } from "@/store/hooks";
 import { AppButtonLink, AppLink } from "./AppLink";
 
-const NAV_ITEMS = [{ href: "/pokemon", label: "Catalog" }] as const;
-// Phase B: "Collection" appears here when signed in.
+type NavItem = { href: string; label: string };
+
+/** Catalog always; Collection only when signed in (ui-ux.md §3.2). */
+function useNavItems(): NavItem[] {
+  const user = useAppSelector(selectUser);
+  return user
+    ? [
+        { href: "/pokemon", label: "Catalog" },
+        { href: "/collection", label: "Collection" },
+      ]
+    : [{ href: "/pokemon", label: "Catalog" }];
+}
 
 function isActive(pathname: string, href: string) {
   return pathname === href || pathname.startsWith(`${href}/`);
@@ -13,10 +26,11 @@ function isActive(pathname: string, href: string) {
 
 export function MainNav({ className = "" }: { className?: string }) {
   const pathname = usePathname();
+  const items = useNavItems();
   return (
     <nav aria-label="Main" className={className}>
       <ul className="flex items-center gap-1">
-        {NAV_ITEMS.map((item) => {
+        {items.map((item) => {
           const active = isActive(pathname, item.href);
           return (
             <li key={item.href}>
@@ -40,6 +54,9 @@ export function MainNav({ className = "" }: { className?: string }) {
 /** Below 768 px the nav collapses into a ☰ button that opens a HeroUI Drawer (ui-ux.md §3.2). */
 export function MobileMenu({ className = "" }: { className?: string }) {
   const pathname = usePathname();
+  const items = useNavItems();
+  const user = useAppSelector(selectUser);
+  const { signOut } = useSignOut();
   return (
     <div className={className}>
       <Drawer>
@@ -60,7 +77,7 @@ export function MobileMenu({ className = "" }: { className?: string }) {
                   <Drawer.Body>
                     <nav aria-label="Main">
                       <ul className="flex flex-col gap-1">
-                        {NAV_ITEMS.map((item) => {
+                        {items.map((item) => {
                           const active = isActive(pathname, item.href);
                           return (
                             <li key={item.href}>
@@ -80,14 +97,36 @@ export function MobileMenu({ className = "" }: { className?: string }) {
                       </ul>
                     </nav>
                     <Separator className="my-4" />
-                    <div className="flex flex-col gap-2">
-                      <AppButtonLink href="/login" variant="secondary" className="w-full" onClick={close}>
-                        Log in
-                      </AppButtonLink>
-                      <AppButtonLink href="/register" className="w-full" onClick={close}>
-                        Register
-                      </AppButtonLink>
-                    </div>
+                    {user ? (
+                      <div className="flex flex-col gap-3">
+                        <div className="flex flex-col gap-1">
+                          <span className="font-semibold">{user.displayName}</span>
+                          <span className="text-xs text-muted">{user.email}</span>
+                          <Chip size="sm" color={user.role === "ADMIN" ? "accent" : "default"} className="self-start">
+                            {user.role === "ADMIN" ? "Admin" : "Trainer"}
+                          </Chip>
+                        </div>
+                        <Button
+                          variant="secondary"
+                          fullWidth
+                          onPress={() => {
+                            close();
+                            void signOut();
+                          }}
+                        >
+                          Log out
+                        </Button>
+                      </div>
+                    ) : (
+                      <div className="flex flex-col gap-2">
+                        <AppButtonLink href="/login" variant="secondary" className="w-full" onClick={close}>
+                          Log in
+                        </AppButtonLink>
+                        <AppButtonLink href="/register" className="w-full" onClick={close}>
+                          Register
+                        </AppButtonLink>
+                      </div>
+                    )}
                   </Drawer.Body>
                 </>
               )}

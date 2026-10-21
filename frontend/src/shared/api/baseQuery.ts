@@ -2,6 +2,7 @@ import {
   fetchBaseQuery,
   type BaseQueryFn,
   type FetchArgs,
+  type FetchBaseQueryMeta,
 } from "@reduxjs/toolkit/query/react";
 import { sessionEnded } from "@/features/auth/authSlice";
 import { toApiError, type ApiError } from "./apiError";
@@ -63,7 +64,7 @@ function withHeader(args: FetchArgs, name: string, value: string): FetchArgs {
  * - errors become a serializable `ApiError` (ProblemDetail + Retry-After);
  * - a 401 ends the client session (Redux auth state + signed-in hint).
  */
-export const baseQuery: BaseQueryFn<string | FetchArgs, unknown, ApiError> = async (
+export const baseQuery: BaseQueryFn<string | FetchArgs, unknown, ApiError, object, FetchBaseQueryMeta> = async (
   args,
   api,
   extraOptions,
