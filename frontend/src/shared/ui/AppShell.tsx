@@ -51,7 +51,7 @@ export function AppShell({ children }: { children: ReactNode }) {
 
       <footer className="border-t border-separator">
         <div className="mx-auto flex w-full max-w-7xl flex-wrap items-center justify-between gap-2 px-4 py-6 text-sm text-muted">
-          <p>Data from PokeAPI · v1.0</p>
+          <p>Pokémon data from PokéAPI v2 (pokeapi.co)</p>
           <p>Pokémon and Pokémon names are trademarks of Nintendo.</p>
         </div>
       </footer>
