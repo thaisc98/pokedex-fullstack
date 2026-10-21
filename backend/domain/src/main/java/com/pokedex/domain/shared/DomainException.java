@@ -10,7 +10,11 @@ import org.jspecify.annotations.Nullable;
  * caught.
  */
 public abstract sealed class DomainException extends RuntimeException
-        permits InvalidValueException, NotFoundException, UpstreamUnavailableException {
+        permits ForbiddenException,
+                InvalidValueException,
+                NotFoundException,
+                UpstreamUnavailableException,
+                VersionConflictException {
 
     private static final long serialVersionUID = 1L;
 
