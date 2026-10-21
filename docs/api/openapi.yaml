@@ -1145,8 +1145,11 @@ components:
             |---|---|---|
             | `/problems/validation-error` | 400 | Invalid input; `errors[]` lists the fields. |
             | `/problems/unauthorized` | 401 | Authentication required or failed. Anonymous access to a non-public route also gets this (deny by default). |
+            | `/problems/invalid-credentials` | 401 | Login failed. One fixed body for an unknown email and a wrong password (security.md §4.1). |
             | `/problems/forbidden` | 403 | Authenticated but not allowed (e.g. a `USER` calling an `ADMIN` route). |
             | `/problems/csrf-token-invalid` | 403 | Missing or invalid `X-XSRF-TOKEN` on a non-GET request (security.md §4.2.1). |
+            | `/problems/email-taken` | 409 | Registration with an email that already has an account (BR-09). |
+            | `/problems/rate-limited` | 429 | Too many login or registration attempts; see `Retry-After` (security.md §4.1). |
             | `/problems/not-found` | 404 | The resource does not exist (e.g. no such Pokémon; `0` and unknown ids or names). |
             | `/problems/version-conflict` | 409 | Stale `version` on a collection update (BR-08): reload and retry. |
             | `/problems/payload-too-large` | 413 | Request body over 16 KB (security.md §4.3). |
@@ -1159,9 +1162,12 @@ components:
           examples:
             - /problems/validation-error
             - /problems/unauthorized
+            - /problems/invalid-credentials
             - /problems/forbidden
             - /problems/csrf-token-invalid
             - /problems/not-found
+            - /problems/email-taken
+            - /problems/rate-limited
             - /problems/version-conflict
             - /problems/payload-too-large
             - /problems/unsupported-media-type
@@ -1220,7 +1226,7 @@ components:
               - field: size
                 message: must be between 1 and 100
     Unauthorized:
-      description: 'Authentication required or failed (`type: /problems/unauthorized`). Also returned for anonymous access to any non-public route (deny by default). No `WWW-Authenticate` challenge. The login response is deliberately generic (security.md §4.1).'
+      description: 'Authentication required or failed (`type: /problems/unauthorized`). Also returned for anonymous access to any non-public route (deny by default). No `WWW-Authenticate` challenge. A failed login is `type: /problems/invalid-credentials` with one fixed body for unknown email and wrong password (security.md §4.1).'
       content:
         application/problem+json:
           schema:
@@ -1276,7 +1282,7 @@ components:
             status: 404
             detail: The requested resource does not exist.
     Conflict:
-      description: 'Conflict: duplicate email (register) or stale `version` (update, BR-08, `type: /problems/version-conflict`).'
+      description: 'Conflict: duplicate email (register, `type: /problems/email-taken`) or stale `version` (update, BR-08, `type: /problems/version-conflict`).'
       content:
         application/problem+json:
           schema:
@@ -1294,7 +1300,7 @@ components:
           schema:
             $ref: '#/components/schemas/ProblemDetail'
     TooManyRequests:
-      description: 'Rate limit exceeded (security.md §4.1). Includes a `Retry-After` header.'
+      description: 'Rate limit exceeded (security.md §4.1, `type: /problems/rate-limited`). Includes a `Retry-After` header.'
       headers:
         Retry-After:
           description: Seconds to wait before retrying.

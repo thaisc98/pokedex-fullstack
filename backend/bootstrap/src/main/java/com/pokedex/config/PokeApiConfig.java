@@ -10,6 +10,7 @@ import com.pokedex.infrastructure.pokeapi.PokeApiHttpClient;
 import com.pokedex.infrastructure.pokeapi.PokeApiMapper;
 import com.pokedex.infrastructure.pokeapi.PokeApiResources;
 import com.pokedex.infrastructure.pokeapi.ResponseSizeLimitInterceptor;
+import com.pokedex.presentation.security.ratelimit.AuthRateLimits;
 import java.time.Duration;
 import java.util.List;
 import java.util.Objects;
@@ -82,6 +83,13 @@ public class PokeApiConfig {
                             .expireAfterWrite(ttl)
                             .build());
         }
+        // Login/registration buckets (security.md §4.1): bounded, and dropped once idle well past their window.
+        manager.registerCustomCache(
+                AuthRateLimits.CACHE,
+                Caffeine.newBuilder()
+                        .maximumSize(100_000)
+                        .expireAfterAccess(Duration.ofMinutes(10))
+                        .build());
         return manager;
     }
 
