@@ -292,7 +292,8 @@ class PokemonDetailTest {
                         CHAIN,
                         List.of(PokemonType.ELECTRIC),
                         new Height(4),
-                        null))
+                        null,
+                        ABILITIES))
                 .isInstanceOf(NullPointerException.class);
     }
 

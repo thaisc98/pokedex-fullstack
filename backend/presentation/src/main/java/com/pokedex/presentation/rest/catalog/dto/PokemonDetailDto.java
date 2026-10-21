@@ -8,6 +8,7 @@ import java.util.List;
  * @param types type slugs (openapi {@code PokemonType})
  * @param height meters
  * @param mass kilograms rounded to 0.1 (BR-02)
+ * @param abilities name + hidden flag, upstream order (same shape as the summary)
  */
 public record PokemonDetailDto(
         int id,
@@ -18,10 +19,12 @@ public record PokemonDetailDto(
         EvolutionChainDto evolution,
         List<String> types,
         double height,
-        double mass) {
+        double mass,
+        List<AbilityDto> abilities) {
 
     public PokemonDetailDto {
         stats = List.copyOf(stats);
         types = List.copyOf(types);
+        abilities = List.copyOf(abilities);
     }
 }

@@ -54,7 +54,10 @@ final class CatalogDtoMapper {
                 new EvolutionChainDto(toDto(detail.evolution().root())),
                 detail.types().stream().map(PokemonType::slug).toList(),
                 detail.height().meters(),
-                detail.mass().kilograms());
+                detail.mass().kilograms(),
+                detail.abilities().stream()
+                        .map(ability -> new AbilityDto(ability.name(), ability.hidden()))
+                        .toList());
     }
 
     static EvolutionNodeDto toDto(EvolutionNode node) {
