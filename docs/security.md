@@ -127,7 +127,7 @@ Hiding a button is a convenience. The API enforces every rule on its own.
 | Control | Implementation |
 |---|---|
 | Password storage | `DelegatingPasswordEncoder` with **BCrypt (strength 12)** behind the `PasswordHasher` port. Prefixed hashes (`{bcrypt}…`) allow changing the algorithm later |
-| Password policy (ASVS / NIST 800-63B) | **12–64 characters**, any Unicode, **no composition rules**, rejected if on a bundled common-password list (top 10k). Max 64 because BCrypt only uses the first 72 bytes |
+| Password policy (ASVS / NIST 800-63B) | **12–64 characters**, any Unicode, **no composition rules**, rejected if on a bundled common-password list (top 10k). Max 64 because BCrypt only uses the first 72 bytes. Passwords must also fit in 72 UTF-8 bytes (BCrypt ignores anything after byte 72); longer ones are rejected as too long |
 | Login errors | Same `401 ProblemDetail` for an unknown email and for a wrong password. For unknown emails a dummy BCrypt check still runs, so response timing doesn't reveal which emails exist |
 | Registration | Duplicate email → 409. Accepted, because registration has to say the email is taken. Rate-limited to prevent mass email enumeration |
 | Brute-force protection | **Bucket4j** (in memory, Caffeine-backed): 5 login attempts / minute per IP + email, 3 registrations / minute per IP → `429` with `Retry-After` |
@@ -159,6 +159,7 @@ Sources: the [Spring Security 7.1.1 CSRF reference](https://docs.spring.io/sprin
 | Logout | With CSRF on, `LogoutFilter` handles POST only; GET logout is not recommended | `POST /auth/logout` only |
 | New token after login/logout | Spring's own login and logout clear the CSRF cookie on success; the client must fetch a new token | The SPA calls `GET /auth/csrf` **after login and after logout**. Our login is a custom controller (not `formLogin`), so Spring's automatic token reset doesn't run. **Our login and logout handlers reset the token through the `CsrfTokenRepository`**, which an IT checks |
 | Missing / invalid token | `AccessDeniedException` → `AccessDeniedHandler`; the reference tests expect 403 | A custom `AccessDeniedHandler` returns **403 `ProblemDetail`** (`type: /problems/csrf-token-invalid`) for `InvalidCsrfTokenException` / `MissingCsrfTokenException`. `baseQuery` sees that type, calls `GET /auth/csrf` again, and **retries the request once** |
+| Token in the `GET /auth/csrf` body | The request attribute holds a BREACH-masked (XOR) token; `spa()` compares the `X-XSRF-TOKEN` header as plain text | `GET /auth/csrf` returns the **unmasked** token, the same value as the readable `XSRF-TOKEN` cookie. BREACH is mitigated because response compression is disabled (`server.compression.enabled: false`, tested) and the body reflects no attacker-controlled input |
 | Turning CSRF off | Only for backends with no browser traffic | **Never turned off**, and no `ignoringRequestMatchers`. The browser sends our auth cookie automatically, so CSRF protection is required |
 | Sessions | The cookie repository needs no HTTP session | `SessionCreationPolicy.STATELESS`. An IT checks that no `JSESSIONID` is ever set |
 | File uploads | Special handling needed | N/A: the app has no uploads |
@@ -213,7 +214,8 @@ Sources: the [Spring Security 7.1.1 CSRF reference](https://docs.spring.io/sprin
 - Actuator exposes **only** `health` (`show-details=never`).
 - Swagger UI and the demo data seeder are active **only** in the `dev` / `demo` profiles.
 - Containers run as a non-root user, use pinned base images, and include no build tools in the runtime image.
-- **Database least privilege (L2):** Flyway runs as the schema owner; the app connects as a user with `SELECT/INSERT/UPDATE/DELETE` only (no DDL).
+- **Database least privilege (L2):** Flyway runs as the schema owner; the app connects as a user with `SELECT/INSERT/UPDATE/DELETE` only (no DDL). The app always connects as `DB_USER` / `DB_PASSWORD`. When **both** `FLYWAY_USER` and `FLYWAY_PASSWORD` are set, Flyway migrates as that owner on the same `DB_URL`; otherwise it uses the app's credentials (local runs, Testcontainers). The tables are owned by `FLYWAY_USER`; `DB_USER` gets its privileges through default privileges.
+- **Client IP behind the proxy:** `X-Forwarded-For` is honoured only when the direct peer matches `TRUSTED_PROXIES` (a regex of proxy IPs; default: private and loopback ranges). The rate limits (§4.1) key on that IP, so the Next.js server must forward `X-Forwarded-For`. A client calling Spring directly cannot spoof its IP.
 
 ### 4.9 Security logging and monitoring (A09)
 
