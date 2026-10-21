@@ -24,6 +24,8 @@ import org.springframework.web.client.ResourceAccessException;
  */
 @Retryable(
         includes = {HttpServerErrorException.class, ResourceAccessException.class},
+        // An oversized body (security.md §4.5) arrives as an IO error but retrying cannot shrink it.
+        excludes = ResponseTooLargeException.class,
         maxRetriesString = "${pokeapi.retry.max-retries:3}",
         delayString = "${pokeapi.retry.delay:200ms}",
         multiplier = 2.0)
