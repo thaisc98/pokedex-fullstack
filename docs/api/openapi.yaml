@@ -358,6 +358,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/CollectedPokemonDto'
+        '400':
+          $ref: '#/components/responses/BadRequest'
         '401':
           $ref: '#/components/responses/Unauthorized'
         '404':
@@ -417,6 +419,8 @@ paths:
       responses:
         '204':
           description: Deleted.
+        '400':
+          $ref: '#/components/responses/BadRequest'
         '401':
           $ref: '#/components/responses/Unauthorized'
         '403':
@@ -491,7 +495,7 @@ components:
       name: pokedexId
       in: path
       required: true
-      description: 'Pokédex id (`PokedexId`): a positive integer.'
+      description: 'Pokédex id (`PokedexId`): a positive integer. `0`, negatives and non-integers → `400` `/problems/validation-error` on field `pokedexId`.'
       schema:
         type: integer
         format: int32
@@ -1144,6 +1148,9 @@ components:
             | `/problems/forbidden` | 403 | Authenticated but not allowed (e.g. a `USER` calling an `ADMIN` route). |
             | `/problems/csrf-token-invalid` | 403 | Missing or invalid `X-XSRF-TOKEN` on a non-GET request (security.md §4.2.1). |
             | `/problems/not-found` | 404 | The resource does not exist (e.g. no such Pokémon; `0` and unknown ids or names). |
+            | `/problems/version-conflict` | 409 | Stale `version` on a collection update (BR-08): reload and retry. |
+            | `/problems/payload-too-large` | 413 | Request body over 16 KB (security.md §4.3). |
+            | `/problems/unsupported-media-type` | 415 | `Content-Type` of a write is not `application/json` (security.md §4.3). |
             | `/problems/upstream-unavailable` | 503 | PokeAPI down, erroring, too large (> 1 MB) or partial; never a half-filled page (architecture.md §1.5). |
             | `/problems/internal-error` | 500 | Unexpected error. Only a `correlationId`, never details. |
 
@@ -1155,6 +1162,9 @@ components:
             - /problems/forbidden
             - /problems/csrf-token-invalid
             - /problems/not-found
+            - /problems/version-conflict
+            - /problems/payload-too-large
+            - /problems/unsupported-media-type
             - /problems/upstream-unavailable
             - /problems/internal-error
         title:
@@ -1266,19 +1276,19 @@ components:
             status: 404
             detail: The requested resource does not exist.
     Conflict:
-      description: 'Conflict: duplicate email (register) or stale `version` (update, BR-08).'
+      description: 'Conflict: duplicate email (register) or stale `version` (update, BR-08, `type: /problems/version-conflict`).'
       content:
         application/problem+json:
           schema:
             $ref: '#/components/schemas/ProblemDetail'
     PayloadTooLarge:
-      description: 'Request body exceeds the 16 KB limit (security.md §4.3).'
+      description: 'Request body exceeds the 16 KB limit (security.md §4.3). `type: /problems/payload-too-large`.'
       content:
         application/problem+json:
           schema:
             $ref: '#/components/schemas/ProblemDetail'
     UnsupportedMediaType:
-      description: '`Content-Type` is not `application/json` (security.md §4.3).'
+      description: '`Content-Type` is not `application/json` (security.md §4.3). `type: /problems/unsupported-media-type`.'
       content:
         application/problem+json:
           schema:
