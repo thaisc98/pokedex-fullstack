@@ -105,6 +105,45 @@ class ImageUrlTest {
     }
 
     @Test
+    void should_accept_a_url_of_exactly_2048_characters() {
+        String value = padTo(2048);
+
+        assertThat(new ImageUrl(value).value()).hasSize(2048);
+    }
+
+    @Test
+    void should_reject_a_url_longer_than_2048_characters() {
+        assertInvalid(padTo(2049));
+    }
+
+    @Test
+    void should_expose_a_placeholder_that_satisfies_the_rules() {
+        assertThat(ImageUrl.PLACEHOLDER.value())
+                .isEqualTo("https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items/poke-ball.png");
+        assertThat(new ImageUrl(ImageUrl.PLACEHOLDER.value())).isEqualTo(ImageUrl.PLACEHOLDER);
+    }
+
+    @Test
+    void should_fall_back_to_the_placeholder_when_the_upstream_url_is_missing_or_not_allowed() {
+        assertThat(ImageUrl.orPlaceholder(null)).isSameAs(ImageUrl.PLACEHOLDER);
+        assertThat(ImageUrl.orPlaceholder("")).isSameAs(ImageUrl.PLACEHOLDER);
+        assertThat(ImageUrl.orPlaceholder("https://evil.example/x.png")).isSameAs(ImageUrl.PLACEHOLDER);
+        assertThat(ImageUrl.orPlaceholder("http://raw.githubusercontent.com/PokeAPI/sprites/x.png"))
+                .isSameAs(ImageUrl.PLACEHOLDER);
+    }
+
+    @Test
+    void should_keep_an_allowed_upstream_url_when_falling_back() {
+        assertThat(ImageUrl.orPlaceholder(PIKACHU_SPRITE)).isEqualTo(new ImageUrl(PIKACHU_SPRITE));
+    }
+
+    private static String padTo(int length) {
+        String prefix = "https://raw.githubusercontent.com/PokeAPI/sprites/";
+        String suffix = ".png";
+        return prefix + "a".repeat(length - prefix.length() - suffix.length()) + suffix;
+    }
+
+    @Test
     void should_reject_null() {
         assertThatThrownBy(() -> new ImageUrl(null)).isInstanceOf(NullPointerException.class);
     }

@@ -35,6 +35,23 @@ class CategoryTest {
     }
 
     @Test
+    void should_accept_a_genus_of_exactly_100_characters() {
+        assertThat(new Category("a".repeat(100)).value()).hasSize(100);
+    }
+
+    @Test
+    void should_reject_a_genus_longer_than_100_characters() {
+        assertThatThrownBy(() -> new Category("a".repeat(101)))
+                .isInstanceOfSatisfying(
+                        InvalidValueException.class, e -> assertThat(e.field()).isEqualTo("category"));
+    }
+
+    @Test
+    void should_measure_the_length_after_stripping() {
+        assertThat(new Category("  " + "a".repeat(100) + "  ").value()).hasSize(100);
+    }
+
+    @Test
     void should_reject_null_in_the_constructor() {
         assertThatThrownBy(() -> new Category(null)).isInstanceOf(NullPointerException.class);
     }
