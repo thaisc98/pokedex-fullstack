@@ -6,8 +6,11 @@ import com.pokedex.domain.catalog.vo.PokedexId;
 import com.pokedex.domain.collection.CollectedPokemon;
 import com.pokedex.domain.shared.Page;
 import com.pokedex.domain.shared.VersionConflictException;
+import java.util.ArrayDeque;
 import java.util.Comparator;
+import java.util.Deque;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.TreeMap;
 
@@ -29,10 +32,24 @@ import java.util.TreeMap;
 public final class InMemoryCollectedPokemonRepository implements CollectedPokemonRepository {
 
     private final TreeMap<Integer, CollectedPokemon> rows = new TreeMap<>();
+    private final Deque<Runnable> beforeSave = new ArrayDeque<>();
+    private int failingSaves;
     private int saves;
 
     public int saveCount() {
         return saves;
+    }
+
+    /** Runs {@code action} at the start of the next {@link #save}, e.g. a concurrent request's insert. */
+    public InMemoryCollectedPokemonRepository beforeNextSave(Runnable action) {
+        beforeSave.add(Objects.requireNonNull(action));
+        return this;
+    }
+
+    /** The next {@code count} saves throw {@link VersionConflictException} without storing anything. */
+    public InMemoryCollectedPokemonRepository failNextSaves(int count) {
+        failingSaves = count;
+        return this;
     }
 
     @Override
@@ -42,6 +59,14 @@ public final class InMemoryCollectedPokemonRepository implements CollectedPokemo
 
     @Override
     public CollectedPokemon save(CollectedPokemon pokemon) {
+        Runnable hook = beforeSave.poll();
+        if (hook != null) {
+            hook.run();
+        }
+        if (failingSaves > 0) {
+            failingSaves--;
+            throw new VersionConflictException();
+        }
         CollectedPokemon stored = rows.get(pokemon.pokedexId().value());
         CollectedPokemon toStore;
         if (stored == null) {

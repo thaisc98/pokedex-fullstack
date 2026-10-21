@@ -11,8 +11,10 @@ import com.pokedex.domain.catalog.vo.Mass;
 import com.pokedex.domain.catalog.vo.PokedexId;
 import com.pokedex.domain.collection.CollectedPokemon;
 import com.pokedex.domain.collection.CustomAttributes;
+import com.pokedex.domain.collection.vo.CollectedPokemonId;
 import com.pokedex.domain.shared.NotFoundException;
 import com.pokedex.domain.shared.UpstreamUnavailableException;
+import com.pokedex.domain.shared.VersionConflictException;
 import java.io.IOException;
 import java.time.Clock;
 import java.time.Duration;
@@ -108,6 +110,42 @@ class SyncPokemonServiceTest {
 
         assertThat(repository.findByPokedexId(PIKACHU).orElseThrow().snapshot()).isEqualTo(before.snapshot());
         assertThat(repository.saveCount()).isEqualTo(1);
+    }
+
+    @Test
+    void should_retry_once_as_a_refresh_when_a_concurrent_first_sync_wins() {
+        CollectedPokemon winner = CollectedPokemon.collect(
+                CollectedPokemonId.random(), CollectionFixtures.snapshot(25, "pikachu", 60), clock);
+        repository.beforeNextSave(() -> repository.save(winner));
+
+        SyncResult result = useCase.sync(PIKACHU);
+
+        assertThat(result.created()).isFalse();
+        assertThat(result.pokemon().id()).isEqualTo(winner.id());
+        assertThat(repository.findAll(CollectionQuery.firstPage()).totalElements())
+                .isEqualTo(1);
+        assertThat(upstream.calls()).containsExactly(PIKACHU);
+    }
+
+    @Test
+    void should_retry_once_when_a_concurrent_refresh_bumps_the_version() {
+        useCase.sync(PIKACHU);
+        repository.beforeNextSave(
+                () -> repository.save(repository.findByPokedexId(PIKACHU).orElseThrow()));
+
+        SyncResult result = useCase.sync(PIKACHU);
+
+        assertThat(result.created()).isFalse();
+        assertThat(result.pokemon().version()).isEqualTo(2);
+    }
+
+    @Test
+    void should_give_up_with_a_conflict_after_one_retry() {
+        repository.failNextSaves(2);
+
+        assertThatThrownBy(() -> useCase.sync(PIKACHU)).isInstanceOf(VersionConflictException.class);
+
+        assertThat(repository.findByPokedexId(PIKACHU)).isEmpty();
     }
 
     @Test
