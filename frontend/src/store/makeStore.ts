@@ -1,5 +1,8 @@
-import { configureStore } from "@reduxjs/toolkit";
+import { combineSlices, configureStore } from "@reduxjs/toolkit";
+import { authSlice } from "@/features/auth/authSlice";
 import { baseApi } from "@/shared/api/baseApi";
+
+const rootReducer = combineSlices(authSlice, baseApi);
 
 /**
  * Creates a new store. Called once per request/browser session inside
@@ -8,13 +11,10 @@ import { baseApi } from "@/shared/api/baseApi";
  */
 export const makeStore = () =>
   configureStore({
-    reducer: {
-      [baseApi.reducerPath]: baseApi.reducer,
-    },
-    middleware: (getDefaultMiddleware) =>
-      getDefaultMiddleware().concat(baseApi.middleware),
+    reducer: rootReducer,
+    middleware: (getDefaultMiddleware) => getDefaultMiddleware().concat(baseApi.middleware),
   });
 
 export type AppStore = ReturnType<typeof makeStore>;
-export type RootState = ReturnType<AppStore["getState"]>;
+export type RootState = ReturnType<typeof rootReducer>;
 export type AppDispatch = AppStore["dispatch"];
