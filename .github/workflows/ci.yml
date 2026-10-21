@@ -158,10 +158,76 @@ jobs:
           path: ~/.m2/repository/org/owasp/dependency-check-data
           key: nvd-${{ runner.os }}-${{ github.run_id }}
 
-  # TODO(Phase 0, frontend): add once frontend/package.json and package-lock.json exist.
-  #   frontend:
-  #     - actions/setup-node (pinned SHA) with node-version-file: .nvmrc, cache: npm, cache-dependency-path: frontend/package-lock.json
-  #     - npm ci → npm run lint → npx tsc --noEmit → npm test → npm run build   (working-directory: frontend)
-  #   frontend-audit:
-  #     - npm ci → npm audit --audit-level=high   (docs/security.md §4.10)
-  #     - CycloneDX SBOM for the frontend; no artifact upload (public repo)
+  frontend:
+    name: Frontend (lint, typecheck, test, build)
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    defaults:
+      run:
+        working-directory: frontend
+    env:
+      NEXT_TELEMETRY_DISABLED: "1"
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Set up Node (version from .nvmrc, npm cache)
+        uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+
+      # npm ci installs exactly what the committed lockfile says (docs/security.md §4.10).
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Typecheck
+        run: npm run typecheck
+
+      - name: Unit and component tests
+        run: npm test
+
+      - name: Build
+        run: npm run build
+
+  frontend-audit:
+    name: Frontend audit (npm audit + SBOM)
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    defaults:
+      run:
+        working-directory: frontend
+    env:
+      NEXT_TELEMETRY_DISABLED: "1"
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Set up Node (version from .nvmrc, npm cache)
+        uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+
+      # Nothing is built or run here, so lifecycle scripts are skipped.
+      - name: Install dependencies (no lifecycle scripts)
+        run: npm ci --ignore-scripts
+
+      # Production dependencies only. Dev-tool findings are reviewed by hand and listed as accepted risks
+      # in docs/security.md §4.10 (e.g. braces <= 3.0.3 via eslint-config-next, GHSA-vfj7-8cjw-p6xm).
+      - name: npm audit (production dependencies, high and above)
+        run: npm audit --omit=dev --audit-level=high
+
+      # CycloneDX SBOM of the production dependency tree. The tool version is pinned exactly.
+      # Public repo: the SBOM stays on the runner (no artifact upload).
+      - name: CycloneDX SBOM
+        run: npx --yes @cyclonedx/cyclonedx-npm@6.0.1 --omit dev --output-file sbom.json

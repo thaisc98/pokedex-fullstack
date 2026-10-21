@@ -1,6 +1,4 @@
 # Dependabot: keeps dependencies (and the commit SHAs pinned in workflows) up to date.
-# The npm (frontend/) entry is added once frontend/package.json exists; adding it earlier makes
-# Dependabot report "dependency file not found".
 
 version: 2
 updates:
@@ -39,6 +37,35 @@ updates:
         update-types: ["version-update:semver-major", "version-update:semver-minor"]
     groups:
       maven-minor-and-patch:
+        update-types: ["minor", "patch"]
+
+  # Frontend packages (frontend/package.json + package-lock.json).
+  - package-ecosystem: npm
+    directory: /frontend
+    schedule:
+      interval: weekly
+      day: monday
+    open-pull-requests-limit: 5
+    commit-message:
+      prefix: "chore(deps)"
+    labels:
+      - dependencies
+      - javascript
+    ignore:
+      # The stack is pinned to Next.js 16, React 19 and HeroUI v3 (AGENTS.md); a major upgrade needs an ADR.
+      # Minor and patch releases still come through (they carry security fixes).
+      - dependency-name: "next"
+        update-types: ["version-update:semver-major"]
+      - dependency-name: "react"
+        update-types: ["version-update:semver-major"]
+      - dependency-name: "react-dom"
+        update-types: ["version-update:semver-major"]
+      - dependency-name: "@heroui/react"
+        update-types: ["version-update:semver-major"]
+      - dependency-name: "@heroui/styles"
+        update-types: ["version-update:semver-major"]
+    groups:
+      npm-minor-and-patch:
         update-types: ["minor", "patch"]
 
   # Images in docker-compose.yml (tag + digest), e.g. postgres.
