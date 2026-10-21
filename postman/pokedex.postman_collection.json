@@ -1,0 +1,1299 @@
+{
+  "info": {
+    "_postman_id": "317edba0-1dff-4c26-bb40-bcf43ccca92a",
+    "name": "Pokédex API (local)",
+    "description": "All 12 endpoints of docs/api/openapi.yaml.\n\nStart the stack (`docker compose up -d --build`, see README), select the **Pokédex local** environment (or keep the collection variables), and run the folders in order (Runner works too).\n\nCookies and CSRF are handled by the collection scripts: no manual copying. Each run uses a new email; clear the `email` variable to get another one.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "event": [
+    {
+      "listen": "prerequest",
+      "script": {
+        "type": "text/javascript",
+        "exec": [
+          "// Cookie auth + CSRF, done for you (docs/security.md §4.2.1).",
+          "// The backend keeps the JWT in the `access_token` cookie and wants the `XSRF-TOKEN` cookie value echoed in the",
+          "// `X-XSRF-TOKEN` header on every non-GET request. Values are captured from Set-Cookie (see the test script).",
+          "const xsrf = pm.collectionVariables.get('xsrfToken');",
+          "const jwt = pm.collectionVariables.get('accessToken');",
+          "const cookies = [];",
+          "if (xsrf) cookies.push('XSRF-TOKEN=' + xsrf);",
+          "if (jwt) cookies.push('access_token=' + jwt);",
+          "if (cookies.length) pm.request.headers.upsert({ key: 'Cookie', value: cookies.join('; ') });",
+          "if (pm.request.method !== 'GET' && xsrf) pm.request.headers.upsert({ key: 'X-XSRF-TOKEN', value: xsrf });"
+        ]
+      }
+    },
+    {
+      "listen": "test",
+      "script": {
+        "type": "text/javascript",
+        "exec": [
+          "// Capture fresh cookies from every response: the backend issues a new XSRF-TOKEN after login, logout and writes.",
+          "pm.response.headers.each(h => {",
+          "  if (h.key.toLowerCase() !== 'set-cookie') return;",
+          "  const [pair, ...attrs] = h.value.split(';');",
+          "  const i = pair.indexOf('=');",
+          "  const name = pair.slice(0, i).trim(), value = pair.slice(i + 1).trim();",
+          "  const cleared = !value || attrs.some(a => a.trim().toLowerCase() === 'max-age=0');",
+          "  if (name === 'XSRF-TOKEN') pm.collectionVariables.set('xsrfToken', cleared ? '' : value);",
+          "  if (name === 'access_token') pm.collectionVariables.set('accessToken', cleared ? '' : value);",
+          "});"
+        ]
+      }
+    }
+  ],
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:8080"
+    },
+    {
+      "key": "password",
+      "value": "correct horse battery"
+    },
+    {
+      "key": "email",
+      "value": ""
+    },
+    {
+      "key": "pokedexId",
+      "value": "25"
+    },
+    {
+      "key": "version",
+      "value": "0"
+    },
+    {
+      "key": "staleVersion",
+      "value": "0"
+    },
+    {
+      "key": "xsrfToken",
+      "value": ""
+    },
+    {
+      "key": "accessToken",
+      "value": ""
+    }
+  ],
+  "item": [
+    {
+      "name": "0. Setup",
+      "item": [
+        {
+          "name": "Get CSRF token",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/auth/csrf",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "auth",
+                "csrf"
+              ]
+            },
+            "description": "Run first. Stores the CSRF token and picks a fresh email for this run."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 200', () => pm.response.to.have.status(200));",
+                  "pm.collectionVariables.set('xsrfToken', pm.response.json().token);",
+                  "if (!pm.collectionVariables.get('email')) pm.collectionVariables.set('email', 'trainer.' + Date.now() + '@example.com');"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "1. Catalog (public)",
+      "item": [
+        {
+          "name": "List Pokémon (page 0, size 20)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/pokemon?page=0&size=20",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "pokemon"
+              ],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "0"
+                },
+                {
+                  "key": "size",
+                  "value": "20"
+                }
+              ]
+            },
+            "description": ""
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 200', () => pm.response.to.have.status(200));",
+                  "pm.test('has content', () => pm.expect(pm.response.json().content.length).to.be.above(0));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Pokémon detail by name (Pikachu → normalized)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/pokemon/Pikachu",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "pokemon",
+                "Pikachu"
+              ]
+            },
+            "description": ""
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 200', () => pm.response.to.have.status(200));",
+                  "pm.test('evolution present', () => pm.expect(pm.response.json().evolution).to.exist);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Pokémon detail by id (Eevee, 8 branches)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/pokemon/133",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "pokemon",
+                "133"
+              ]
+            },
+            "description": ""
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 200', () => pm.response.to.have.status(200));",
+                  "pm.test('8 branches', () => pm.expect(pm.response.json().evolution.root.evolvesTo.length).to.eql(8));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Unknown Pokémon → 404",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/pokemon/does-not-exist",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "pokemon",
+                "does-not-exist"
+              ]
+            },
+            "description": ""
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 404', () => pm.response.to.have.status(404));",
+                  "pm.test('problem type /problems/not-found', () => pm.expect(pm.response.json().type).to.eql('/problems/not-found'));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Invalid name → 400",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/pokemon/pika_chu",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "pokemon",
+                "pika_chu"
+              ]
+            },
+            "description": ""
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 400', () => pm.response.to.have.status(400));",
+                  "pm.test('problem type /problems/validation-error', () => pm.expect(pm.response.json().type).to.eql('/problems/validation-error'));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Invalid page size → 400",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/pokemon?size=101",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "pokemon"
+              ],
+              "query": [
+                {
+                  "key": "size",
+                  "value": "101"
+                }
+              ]
+            },
+            "description": ""
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 400', () => pm.response.to.have.status(400));"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "2. Auth",
+      "item": [
+        {
+          "name": "Register",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/auth/register",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "auth",
+                "register"
+              ]
+            },
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"{{email}}\",\n  \"password\": \"{{password}}\",\n  \"displayName\": \"Ash Ketchum\"\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 201', () => pm.response.to.have.status(201));",
+                  "pm.test('role USER', () => pm.expect(pm.response.json().role).to.eql('USER'));"
+                ]
+              }
+            },
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "// If no CSRF token yet (fresh run, or cleared by login/logout), fetch one first.",
+                  "if (!pm.collectionVariables.get('xsrfToken')) {",
+                  "  pm.sendRequest({ url: pm.collectionVariables.get('baseUrl') + '/api/v1/auth/csrf', method: 'GET' }, (err, res) => {",
+                  "    if (!err) pm.collectionVariables.set('xsrfToken', res.json().token);",
+                  "    const x = pm.collectionVariables.get('xsrfToken');",
+                  "    pm.request.headers.upsert({ key: 'X-XSRF-TOKEN', value: x });",
+                  "    const jwt = pm.collectionVariables.get('accessToken');",
+                  "    pm.request.headers.upsert({ key: 'Cookie', value: 'XSRF-TOKEN=' + x + (jwt ? '; access_token=' + jwt : '') });",
+                  "  });",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Register same email again → 409",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/auth/register",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "auth",
+                "register"
+              ]
+            },
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"{{email}}\",\n  \"password\": \"{{password}}\",\n  \"displayName\": \"Ash Ketchum\"\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 409', () => pm.response.to.have.status(409));",
+                  "pm.test('problem type /problems/email-taken', () => pm.expect(pm.response.json().type).to.eql('/problems/email-taken'));"
+                ]
+              }
+            },
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "// If no CSRF token yet (fresh run, or cleared by login/logout), fetch one first.",
+                  "if (!pm.collectionVariables.get('xsrfToken')) {",
+                  "  pm.sendRequest({ url: pm.collectionVariables.get('baseUrl') + '/api/v1/auth/csrf', method: 'GET' }, (err, res) => {",
+                  "    if (!err) pm.collectionVariables.set('xsrfToken', res.json().token);",
+                  "    const x = pm.collectionVariables.get('xsrfToken');",
+                  "    pm.request.headers.upsert({ key: 'X-XSRF-TOKEN', value: x });",
+                  "    const jwt = pm.collectionVariables.get('accessToken');",
+                  "    pm.request.headers.upsert({ key: 'Cookie', value: 'XSRF-TOKEN=' + x + (jwt ? '; access_token=' + jwt : '') });",
+                  "  });",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Login with wrong password → 401",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/auth/login",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "auth",
+                "login"
+              ]
+            },
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"{{email}}\",\n  \"password\": \"definitely-not-it\"\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 401', () => pm.response.to.have.status(401));",
+                  "pm.test('problem type /problems/invalid-credentials', () => pm.expect(pm.response.json().type).to.eql('/problems/invalid-credentials'));"
+                ]
+              }
+            },
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "// If no CSRF token yet (fresh run, or cleared by login/logout), fetch one first.",
+                  "if (!pm.collectionVariables.get('xsrfToken')) {",
+                  "  pm.sendRequest({ url: pm.collectionVariables.get('baseUrl') + '/api/v1/auth/csrf', method: 'GET' }, (err, res) => {",
+                  "    if (!err) pm.collectionVariables.set('xsrfToken', res.json().token);",
+                  "    const x = pm.collectionVariables.get('xsrfToken');",
+                  "    pm.request.headers.upsert({ key: 'X-XSRF-TOKEN', value: x });",
+                  "    const jwt = pm.collectionVariables.get('accessToken');",
+                  "    pm.request.headers.upsert({ key: 'Cookie', value: 'XSRF-TOKEN=' + x + (jwt ? '; access_token=' + jwt : '') });",
+                  "  });",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Login",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/auth/login",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "auth",
+                "login"
+              ]
+            },
+            "description": "Sets the access_token cookie (60 min). Login also resets the CSRF token; the next request fetches a new one.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"{{email}}\",\n  \"password\": \"{{password}}\"\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 200', () => pm.response.to.have.status(200));",
+                  "pm.test('access_token cookie captured', () => pm.expect(pm.collectionVariables.get('accessToken')).to.not.be.empty);"
+                ]
+              }
+            },
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "// If no CSRF token yet (fresh run, or cleared by login/logout), fetch one first.",
+                  "if (!pm.collectionVariables.get('xsrfToken')) {",
+                  "  pm.sendRequest({ url: pm.collectionVariables.get('baseUrl') + '/api/v1/auth/csrf', method: 'GET' }, (err, res) => {",
+                  "    if (!err) pm.collectionVariables.set('xsrfToken', res.json().token);",
+                  "    const x = pm.collectionVariables.get('xsrfToken');",
+                  "    pm.request.headers.upsert({ key: 'X-XSRF-TOKEN', value: x });",
+                  "    const jwt = pm.collectionVariables.get('accessToken');",
+                  "    pm.request.headers.upsert({ key: 'Cookie', value: 'XSRF-TOKEN=' + x + (jwt ? '; access_token=' + jwt : '') });",
+                  "  });",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Me",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/auth/me",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "auth",
+                "me"
+              ]
+            },
+            "description": ""
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 200', () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "3. Collection (logged in)",
+      "item": [
+        {
+          "name": "Sync a Pokémon (201 new / 200 refreshed)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/collection",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "collection"
+              ]
+            },
+            "description": "Change pokedexId in the body to collect another Pokémon. Re-syncing refreshes PokeAPI data and keeps your custom fields.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"pokedexId\": 25\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('201 or 200', () => pm.expect(pm.response.code).to.be.oneOf([200, 201]));",
+                  "pm.collectionVariables.set('version', pm.response.json().version);"
+                ]
+              }
+            },
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "// If no CSRF token yet (fresh run, or cleared by login/logout), fetch one first.",
+                  "if (!pm.collectionVariables.get('xsrfToken')) {",
+                  "  pm.sendRequest({ url: pm.collectionVariables.get('baseUrl') + '/api/v1/auth/csrf', method: 'GET' }, (err, res) => {",
+                  "    if (!err) pm.collectionVariables.set('xsrfToken', res.json().token);",
+                  "    const x = pm.collectionVariables.get('xsrfToken');",
+                  "    pm.request.headers.upsert({ key: 'X-XSRF-TOKEN', value: x });",
+                  "    const jwt = pm.collectionVariables.get('accessToken');",
+                  "    pm.request.headers.upsert({ key: 'Cookie', value: 'XSRF-TOKEN=' + x + (jwt ? '; access_token=' + jwt : '') });",
+                  "  });",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "List collection",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/collection?page=0&size=20",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "collection"
+              ],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "0"
+                },
+                {
+                  "key": "size",
+                  "value": "20"
+                }
+              ]
+            },
+            "description": ""
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 200', () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "List collection filtered by tag",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/collection?tag=starter",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "collection"
+              ],
+              "query": [
+                {
+                  "key": "tag",
+                  "value": "starter"
+                }
+              ]
+            },
+            "description": ""
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 200', () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "List collection searched by name",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/collection?q=pika",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "collection"
+              ],
+              "query": [
+                {
+                  "key": "q",
+                  "value": "pika"
+                }
+              ]
+            },
+            "description": ""
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 200', () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Get one collected Pokémon",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/collection/{{pokedexId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "collection",
+                "{{pokedexId}}"
+              ]
+            },
+            "description": ""
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 200', () => pm.response.to.have.status(200));",
+                  "pm.collectionVariables.set('version', pm.response.json().version);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Update custom attributes",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/collection/{{pokedexId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "collection",
+                "{{pokedexId}}"
+              ]
+            },
+            "description": "Full replace of customAttributes. `version` must be the current one (optimistic locking).",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"customAttributes\": {\n    \"localizedNames\": [\n      {\n        \"lang\": \"ja\",\n        \"value\": \"ピカチュウ\"\n      },\n      {\n        \"lang\": \"es\",\n        \"value\": \"Pikachu\"\n      }\n    ],\n    \"geo\": {\n      \"region\": \"Kanto\",\n      \"habitat\": \"forest\",\n      \"coordinates\": {\n        \"latitude\": 35.68,\n        \"longitude\": 139.69\n      }\n    },\n    \"tags\": [\n      \" Starter \",\n      \"electric\",\n      \"ELECTRIC\"\n    ]\n  },\n  \"version\": {{version}}\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 200', () => pm.response.to.have.status(200));",
+                  "pm.test('tags normalized', () => pm.expect(pm.response.json().custom.tags).to.have.members(['starter','electric']));",
+                  "pm.collectionVariables.set('staleVersion', pm.collectionVariables.get('version'));",
+                  "pm.collectionVariables.set('version', pm.response.json().version);"
+                ]
+              }
+            },
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "// If no CSRF token yet (fresh run, or cleared by login/logout), fetch one first.",
+                  "if (!pm.collectionVariables.get('xsrfToken')) {",
+                  "  pm.sendRequest({ url: pm.collectionVariables.get('baseUrl') + '/api/v1/auth/csrf', method: 'GET' }, (err, res) => {",
+                  "    if (!err) pm.collectionVariables.set('xsrfToken', res.json().token);",
+                  "    const x = pm.collectionVariables.get('xsrfToken');",
+                  "    pm.request.headers.upsert({ key: 'X-XSRF-TOKEN', value: x });",
+                  "    const jwt = pm.collectionVariables.get('accessToken');",
+                  "    pm.request.headers.upsert({ key: 'Cookie', value: 'XSRF-TOKEN=' + x + (jwt ? '; access_token=' + jwt : '') });",
+                  "  });",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Update with stale version → 409",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/collection/{{pokedexId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "collection",
+                "{{pokedexId}}"
+              ]
+            },
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"customAttributes\": {\n    \"localizedNames\": [],\n    \"geo\": null,\n    \"tags\": []\n  },\n  \"version\": {{staleVersion}}\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 409', () => pm.response.to.have.status(409));",
+                  "pm.test('problem type /problems/version-conflict', () => pm.expect(pm.response.json().type).to.eql('/problems/version-conflict'));"
+                ]
+              }
+            },
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "// If no CSRF token yet (fresh run, or cleared by login/logout), fetch one first.",
+                  "if (!pm.collectionVariables.get('xsrfToken')) {",
+                  "  pm.sendRequest({ url: pm.collectionVariables.get('baseUrl') + '/api/v1/auth/csrf', method: 'GET' }, (err, res) => {",
+                  "    if (!err) pm.collectionVariables.set('xsrfToken', res.json().token);",
+                  "    const x = pm.collectionVariables.get('xsrfToken');",
+                  "    pm.request.headers.upsert({ key: 'X-XSRF-TOKEN', value: x });",
+                  "    const jwt = pm.collectionVariables.get('accessToken');",
+                  "    pm.request.headers.upsert({ key: 'Cookie', value: 'XSRF-TOKEN=' + x + (jwt ? '; access_token=' + jwt : '') });",
+                  "  });",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Update with invalid latitude → 400",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/collection/{{pokedexId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "collection",
+                "{{pokedexId}}"
+              ]
+            },
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"customAttributes\": {\n    \"localizedNames\": [],\n    \"geo\": {\n      \"coordinates\": {\n        \"latitude\": 91,\n        \"longitude\": 0\n      }\n    },\n    \"tags\": []\n  },\n  \"version\": {{version}}\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 400', () => pm.response.to.have.status(400));",
+                  "pm.test('problem type /problems/validation-error', () => pm.expect(pm.response.json().type).to.eql('/problems/validation-error'));"
+                ]
+              }
+            },
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "// If no CSRF token yet (fresh run, or cleared by login/logout), fetch one first.",
+                  "if (!pm.collectionVariables.get('xsrfToken')) {",
+                  "  pm.sendRequest({ url: pm.collectionVariables.get('baseUrl') + '/api/v1/auth/csrf', method: 'GET' }, (err, res) => {",
+                  "    if (!err) pm.collectionVariables.set('xsrfToken', res.json().token);",
+                  "    const x = pm.collectionVariables.get('xsrfToken');",
+                  "    pm.request.headers.upsert({ key: 'X-XSRF-TOKEN', value: x });",
+                  "    const jwt = pm.collectionVariables.get('accessToken');",
+                  "    pm.request.headers.upsert({ key: 'Cookie', value: 'XSRF-TOKEN=' + x + (jwt ? '; access_token=' + jwt : '') });",
+                  "  });",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Delete as USER → 403",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/collection/{{pokedexId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "collection",
+                "{{pokedexId}}"
+              ]
+            },
+            "description": "Only ADMIN can delete. To test the ADMIN path: run the README 'Make a user an ADMIN' command for {{email}}, then run 2. Auth → Login again and folder 4."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 403', () => pm.response.to.have.status(403));",
+                  "pm.test('problem type /problems/forbidden', () => pm.expect(pm.response.json().type).to.eql('/problems/forbidden'));"
+                ]
+              }
+            },
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "// If no CSRF token yet (fresh run, or cleared by login/logout), fetch one first.",
+                  "if (!pm.collectionVariables.get('xsrfToken')) {",
+                  "  pm.sendRequest({ url: pm.collectionVariables.get('baseUrl') + '/api/v1/auth/csrf', method: 'GET' }, (err, res) => {",
+                  "    if (!err) pm.collectionVariables.set('xsrfToken', res.json().token);",
+                  "    const x = pm.collectionVariables.get('xsrfToken');",
+                  "    pm.request.headers.upsert({ key: 'X-XSRF-TOKEN', value: x });",
+                  "    const jwt = pm.collectionVariables.get('accessToken');",
+                  "    pm.request.headers.upsert({ key: 'Cookie', value: 'XSRF-TOKEN=' + x + (jwt ? '; access_token=' + jwt : '') });",
+                  "  });",
+                  "}"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "4. Admin (after promoting your user, see description)",
+      "item": [
+        {
+          "name": "Login again (to get the ADMIN role in the token)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/auth/login",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "auth",
+                "login"
+              ]
+            },
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"{{email}}\",\n  \"password\": \"{{password}}\"\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 200', () => pm.response.to.have.status(200));"
+                ]
+              }
+            },
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "// If no CSRF token yet (fresh run, or cleared by login/logout), fetch one first.",
+                  "if (!pm.collectionVariables.get('xsrfToken')) {",
+                  "  pm.sendRequest({ url: pm.collectionVariables.get('baseUrl') + '/api/v1/auth/csrf', method: 'GET' }, (err, res) => {",
+                  "    if (!err) pm.collectionVariables.set('xsrfToken', res.json().token);",
+                  "    const x = pm.collectionVariables.get('xsrfToken');",
+                  "    pm.request.headers.upsert({ key: 'X-XSRF-TOKEN', value: x });",
+                  "    const jwt = pm.collectionVariables.get('accessToken');",
+                  "    pm.request.headers.upsert({ key: 'Cookie', value: 'XSRF-TOKEN=' + x + (jwt ? '; access_token=' + jwt : '') });",
+                  "  });",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Me (role should be ADMIN)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/auth/me",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "auth",
+                "me"
+              ]
+            },
+            "description": ""
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 200', () => pm.response.to.have.status(200));",
+                  "pm.test('role ADMIN', () => pm.expect(pm.response.json().role).to.eql('ADMIN'));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Delete as ADMIN → 204",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/collection/{{pokedexId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "collection",
+                "{{pokedexId}}"
+              ]
+            },
+            "description": ""
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 204', () => pm.response.to.have.status(204));"
+                ]
+              }
+            },
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "// If no CSRF token yet (fresh run, or cleared by login/logout), fetch one first.",
+                  "if (!pm.collectionVariables.get('xsrfToken')) {",
+                  "  pm.sendRequest({ url: pm.collectionVariables.get('baseUrl') + '/api/v1/auth/csrf', method: 'GET' }, (err, res) => {",
+                  "    if (!err) pm.collectionVariables.set('xsrfToken', res.json().token);",
+                  "    const x = pm.collectionVariables.get('xsrfToken');",
+                  "    pm.request.headers.upsert({ key: 'X-XSRF-TOKEN', value: x });",
+                  "    const jwt = pm.collectionVariables.get('accessToken');",
+                  "    pm.request.headers.upsert({ key: 'Cookie', value: 'XSRF-TOKEN=' + x + (jwt ? '; access_token=' + jwt : '') });",
+                  "  });",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Get after delete → 404",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/collection/{{pokedexId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "collection",
+                "{{pokedexId}}"
+              ]
+            },
+            "description": ""
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 404', () => pm.response.to.have.status(404));"
+                ]
+              }
+            }
+          ]
+        }
+      ],
+      "description": "Promote your user first (README → 'Make a user an ADMIN', with the email shown in the collection variable `email`), then run this folder."
+    },
+    {
+      "name": "5. Logout",
+      "item": [
+        {
+          "name": "Logout",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/auth/logout",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "auth",
+                "logout"
+              ]
+            },
+            "description": ""
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 204', () => pm.response.to.have.status(204));"
+                ]
+              }
+            },
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "// If no CSRF token yet (fresh run, or cleared by login/logout), fetch one first.",
+                  "if (!pm.collectionVariables.get('xsrfToken')) {",
+                  "  pm.sendRequest({ url: pm.collectionVariables.get('baseUrl') + '/api/v1/auth/csrf', method: 'GET' }, (err, res) => {",
+                  "    if (!err) pm.collectionVariables.set('xsrfToken', res.json().token);",
+                  "    const x = pm.collectionVariables.get('xsrfToken');",
+                  "    pm.request.headers.upsert({ key: 'X-XSRF-TOKEN', value: x });",
+                  "    const jwt = pm.collectionVariables.get('accessToken');",
+                  "    pm.request.headers.upsert({ key: 'Cookie', value: 'XSRF-TOKEN=' + x + (jwt ? '; access_token=' + jwt : '') });",
+                  "  });",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Me after logout → 401",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/auth/me",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "auth",
+                "me"
+              ]
+            },
+            "description": ""
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 401', () => pm.response.to.have.status(401));"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
