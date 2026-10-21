@@ -114,6 +114,8 @@ docker compose exec postgres sh -c 'psql -U "$POSTGRES_USER" -d "$POSTGRES_DB" -
 
 Log out and in again so the new role is in your token.
 
+**Postman:** import `postman/pokedex.postman_collection.json` and `postman/local.postman_environment.json`, select the **Pokédex local** environment, and run the folders in order (0 → 5). Cookies and CSRF are handled by the collection scripts. Folder 4 (ADMIN) needs the command above for the email shown in the collection variable `email`, then "Login again".
+
 ### 3. Run the tests
 
 ```bash
