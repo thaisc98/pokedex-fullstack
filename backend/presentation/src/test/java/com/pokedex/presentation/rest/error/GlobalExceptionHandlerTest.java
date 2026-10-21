@@ -2,6 +2,8 @@ package com.pokedex.presentation.rest.error;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import com.pokedex.domain.shared.ForbiddenException;
+import com.pokedex.domain.shared.VersionConflictException;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.TypeMismatchException;
@@ -35,5 +37,27 @@ class GlobalExceptionHandlerTest {
         assertThat(problem.getProperties())
                 .containsEntry(
                         "errors", List.of(new GlobalExceptionHandler.FieldViolation("request", "must be an integer")));
+    }
+
+    @Test
+    void should_map_a_version_conflict_to_409_with_its_problem_type() {
+        ResponseEntity<ProblemDetail> response = handler.handleDomain(new VersionConflictException());
+
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.CONFLICT);
+        ProblemDetail problem = response.getBody();
+        assertThat(problem).isNotNull();
+        assertThat(problem.getType()).isEqualTo(java.net.URI.create("/problems/version-conflict"));
+        assertThat(problem.getStatus()).isEqualTo(409);
+    }
+
+    @Test
+    void should_map_a_forbidden_operation_to_403_with_its_problem_type() {
+        ResponseEntity<ProblemDetail> response = handler.handleDomain(new ForbiddenException());
+
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.FORBIDDEN);
+        ProblemDetail problem = response.getBody();
+        assertThat(problem).isNotNull();
+        assertThat(problem.getType()).isEqualTo(java.net.URI.create("/problems/forbidden"));
+        assertThat(problem.getStatus()).isEqualTo(403);
     }
 }
