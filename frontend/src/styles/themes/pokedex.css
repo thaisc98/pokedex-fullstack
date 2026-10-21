@@ -1,0 +1,8 @@
+/*
+ * Pokédex theme: overrides for HeroUI v3 CSS variables (docs/ui-ux.md §6.2).
+ *
+ * P0 scaffold: intentionally empty, so the HeroUI defaults apply.
+ * P5 adds the brand accent (light + dark) and the 18 Pokémon type tokens
+ * (--type-*, bridged with `@theme inline { --color-type-*: var(--type-*); }`),
+ * each pair checked for >= 4.5:1 contrast in both themes.
+ */

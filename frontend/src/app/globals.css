@@ -1,0 +1,6 @@
+/* docs/ui-ux.md §6.1: layer order, then Tailwind, then HeroUI, then our theme overrides. */
+@layer theme, base, components, utilities;
+
+@import "tailwindcss";
+@import "@heroui/styles";
+@import "../styles/themes/pokedex.css" layer(theme);
