@@ -193,6 +193,47 @@ class PokeApiCatalogAdapterTest {
                 .hasMessage("PokeAPI is unavailable");
     }
 
+    @Test
+    void should_fail_with_upstream_unavailable_and_keep_the_interrupt_flag_when_interrupted() {
+        stubFirstThree();
+        Thread.currentThread().interrupt();
+        try {
+            assertThatThrownBy(() -> adapter.fetchPage(new PageRequest(0, 3)))
+                    .isInstanceOf(UpstreamUnavailableException.class)
+                    .hasCauseInstanceOf(IllegalStateException.class);
+            assertThat(Thread.currentThread().isInterrupted()).isTrue();
+        } finally {
+            Thread.interrupted();
+        }
+    }
+
+    @Test
+    void should_propagate_a_jvm_error_from_an_item_fetch_unchanged() {
+        stubFirstThree();
+        client.pokemon(2, () -> {
+            throw new OutOfMemoryError("simulated");
+        });
+
+        assertThatThrownBy(() -> adapter.fetchPage(new PageRequest(0, 3)))
+                .isInstanceOf(OutOfMemoryError.class)
+                .hasMessage("simulated");
+    }
+
+    @Test
+    void should_wrap_a_checked_failure_from_an_item_fetch() {
+        stubFirstThree();
+        client.species(1, () -> sneakyThrow(new java.io.IOException("socket closed")));
+
+        assertThatThrownBy(() -> adapter.fetchPage(new PageRequest(0, 3)))
+                .isInstanceOf(UpstreamUnavailableException.class)
+                .hasRootCauseInstanceOf(java.io.IOException.class);
+    }
+
+    @SuppressWarnings("unchecked")
+    static <T, E extends Throwable> T sneakyThrow(Throwable throwable) throws E {
+        throw (E) throwable;
+    }
+
     private void stubFirstThree() {
         client.list(0, 3, () -> PokeApiFixtures.list(0, 3));
         for (int id = 1; id <= 3; id++) {

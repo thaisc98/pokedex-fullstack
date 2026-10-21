@@ -75,6 +75,20 @@ class PokeApiMapperTest {
     }
 
     @Test
+    void should_skip_incomplete_genus_entries_and_use_the_first_complete_english_one() {
+        PokeApiSpeciesDto species = PokeApiFixtures.parse("""
+                {"id": 1, "genera": [
+                  {"genus": "No language"},
+                  {"language": {"name": "en", "url": "x"}},
+                  {"genus": "Seed Pokémon", "language": {"name": "en", "url": "x"}}
+                ]}
+                """, PokeApiSpeciesDto.class);
+
+        assertThat(mapper.toSummary(PokeApiFixtures.pokemon(1), species).category())
+                .isEqualTo(new Category("Seed Pokémon"));
+    }
+
+    @Test
     void should_fall_back_to_unknown_category_when_genera_are_missing() {
         PokeApiSpeciesDto species = PokeApiFixtures.parse("{\"id\": 1}", PokeApiSpeciesDto.class);
 

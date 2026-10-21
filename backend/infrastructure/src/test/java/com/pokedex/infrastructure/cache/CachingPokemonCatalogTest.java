@@ -73,6 +73,21 @@ class CachingPokemonCatalogTest {
         assertThat(cache.get(PageRequest.ofPage(0))).isNull();
     }
 
+    @Test
+    void should_rethrow_the_cache_wrapper_when_the_loader_fails_with_a_checked_exception() {
+        IOException checked = new IOException("socket closed");
+        CachingPokemonCatalog sneaky = new CachingPokemonCatalog(request -> sneakyThrow(checked), cache);
+
+        assertThatThrownBy(() -> sneaky.fetchPage(PageRequest.ofPage(0)))
+                .isInstanceOf(Cache.ValueRetrievalException.class)
+                .hasCause(checked);
+    }
+
+    @SuppressWarnings("unchecked")
+    private static <T, E extends Throwable> T sneakyThrow(Throwable throwable) throws E {
+        throw (E) throwable;
+    }
+
     private static PokemonSummary summary(int id) {
         return new PokemonSummary(
                 new PokedexId(id),
