@@ -3,45 +3,42 @@ package com.pokedex.security;
 import static io.restassured.RestAssured.given;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.nullValue;
 import static org.hamcrest.Matchers.startsWith;
 
-import io.restassured.RestAssured;
+import com.pokedex.support.AbstractIntegrationIT;
 import java.util.Set;
 import java.util.TreeSet;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping;
 
 /**
  * Over-the-wire authorization matrix for the <b>default</b> profile (security.md §3.2, BR-10), with the exact
  * problem {@code type} each denial returns.
  *
- * <p>Deny by default: anything not listed as public is {@code denyAll()}. For an anonymous caller Spring Security
- * turns that into the authentication entry point → <b>401</b> {@code /problems/unauthorized}. A write without a
- * CSRF token is stopped earlier by the CSRF filter → <b>403</b> {@code /problems/csrf-token-invalid}
- * (security.md §4.2.1). {@code /problems/forbidden} (authenticated but not allowed) cannot be produced until
- * identity exists, so it has no row yet.
- *
- * <p>springdoc ({@code /v3/api-docs/**}, {@code /swagger-ui/**}) is enabled in {@code dev}/{@code demo} only
- * (security.md §3.2). In the default profile it falls under "anything else: denied", so 401 like any other
- * non-public route. The demo-profile counterpart lives in {@code OpenApiContractIT}.
- *
- * <p>The public catalog rows ({@code GET /api/v1/pokemon} and {@code GET /api/v1/pokemon/{idOrName}} → 200) are
- * covered with a stubbed PokeAPI by the anonymous-access tests in {@code ListPokemonIT} and
- * {@code GetPokemonDetailIT}; this class makes no upstream call. Its own Spring context is fine.
+ * <ul>
+ *   <li>Deny by default: anything not listed is {@code denyAll()}. For an anonymous caller Spring Security turns that
+ *       into the authentication entry point → <b>401</b> {@code /problems/unauthorized}; for an authenticated
+ *       {@code USER} it is <b>403</b> {@code /problems/forbidden}.
+ *   <li>A write without a CSRF token is stopped earlier by the CSRF filter → <b>403</b>
+ *       {@code /problems/csrf-token-invalid} (security.md §4.2.1).
+ *   <li>springdoc ({@code /v3/api-docs/**}, {@code /swagger-ui/**}) is enabled in {@code dev}/{@code demo} only. In
+ *       the default profile it is "anything else": 401. The demo counterpart is {@code OpenApiContractIT}.
+ *   <li>The public catalog rows ({@code GET /api/v1/pokemon[/{idOrName}]} → 200) need a stubbed PokeAPI and are
+ *       covered by the anonymous-access tests in {@code ListPokemonIT} and {@code GetPokemonDetailIT}.
+ *   <li>ADMIN-only rows ({@code DELETE /collection/{id}}) arrive with the Collection; the ADMIN user will be
+ *       inserted by the test (JdbcTemplate + a BCrypt hash computed in the test).
+ * </ul>
  */
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @DisplayName("Security - authorization matrix (default profile)")
-class AuthorizationMatrixIT {
+class AuthorizationMatrixIT extends AbstractIntegrationIT {
 
-    static final String PROBLEM_JSON = "application/problem+json";
+    static final String PASSWORD = "Matrix-Row-Password-2026";
 
     /**
      * Every handler the application serves in the default profile, as {@code "METHOD /path"}. A new controller
@@ -51,26 +48,26 @@ class AuthorizationMatrixIT {
             // anonymous allowed: ListPokemonIT.should_allow_anonymous_access_without_cookie_or_credentials
             "GET /api/v1/pokemon",
             // anonymous allowed: GetPokemonDetailIT.should_allow_anonymous_access_to_detail
-            "GET /api/v1/pokemon/{idOrName}");
-
-    @Value("${local.server.port}")
-    int port;
+            "GET /api/v1/pokemon/{idOrName}",
+            // identity: rows below (anonymous + USER)
+            "GET /api/v1/auth/csrf",
+            "POST /api/v1/auth/register",
+            "POST /api/v1/auth/login",
+            "POST /api/v1/auth/logout",
+            "GET /api/v1/auth/me");
 
     @Autowired
     @Qualifier("requestMappingHandlerMapping") RequestMappingHandlerMapping handlerMapping;
 
-    @BeforeEach
-    void configureRestAssured() {
-        RestAssured.port = port;
-        RestAssured.basePath = "";
-    }
+    // ------------------------------------------------------------ ANONYMOUS
 
     @ParameterizedTest(name = "anonymous GET {0} -> 401 /problems/unauthorized")
     @CsvSource({
+        // authenticated per security.md §3.2
+        "/api/v1/auth/me",
         // not built yet, authenticated per security.md §3.2
         "/api/v1/collection",
         "/api/v1/collection/1",
-        "/api/v1/auth/me",
         // springdoc must not be reachable in the default profile
         "/v3/api-docs",
         "/v3/api-docs/swagger-config",
@@ -88,11 +85,14 @@ class AuthorizationMatrixIT {
                 .contentType(startsWith(PROBLEM_JSON))
                 .body("type", equalTo("/problems/unauthorized"))
                 .body("status", equalTo(401))
-                .header("WWW-Authenticate", org.hamcrest.Matchers.nullValue());
+                .header("WWW-Authenticate", nullValue());
     }
 
     @ParameterizedTest(name = "anonymous {0} {1} without CSRF token -> 403 /problems/csrf-token-invalid")
     @CsvSource({
+        "POST,   /api/v1/auth/register",
+        "POST,   /api/v1/auth/login",
+        "POST,   /api/v1/auth/logout",
         "POST,   /api/v1/collection",
         "PUT,    /api/v1/collection/1",
         "DELETE, /api/v1/collection/1",
@@ -109,6 +109,60 @@ class AuthorizationMatrixIT {
                 .body("type", equalTo("/problems/csrf-token-invalid"))
                 .body("status", equalTo(403));
     }
+
+    @Test
+    void should_let_anonymous_fetch_csrf_token() {
+        new Browser().fetchCsrf().then().statusCode(200);
+    }
+
+    @ParameterizedTest(name = "anonymous POST {0} with CSRF reaches the endpoint (empty body -> 400)")
+    @CsvSource({"/api/v1/auth/register", "/api/v1/auth/login"})
+    void should_let_anonymous_reach_register_and_login(String path) {
+        // Reaching validation (400) proves the route is public: not 401, not 403.
+        new Browser()
+                .write("POST", path, "{}")
+                .then()
+                .statusCode(400)
+                .contentType(startsWith(PROBLEM_JSON))
+                .body("type", equalTo("/problems/validation-error"));
+    }
+
+    @Test
+    void should_deny_anonymous_logout_with_unauthorized_problem() {
+        new Browser().logout().then().statusCode(401).body("type", equalTo("/problems/unauthorized"));
+    }
+
+    // ------------------------------------------------------------ USER
+
+    @Test
+    void should_let_user_read_own_profile() {
+        Browser user = loggedInUser();
+
+        user.get(Browser.ME_PATH).then().statusCode(200).body("role", equalTo("USER"));
+    }
+
+    @Test
+    void should_let_user_fetch_csrf_token() {
+        loggedInUser().fetchCsrf().then().statusCode(200);
+    }
+
+    @Test
+    void should_let_user_log_out() {
+        loggedInUser().logout().then().statusCode(204);
+    }
+
+    @ParameterizedTest(name = "USER GET {0} -> 403 /problems/forbidden")
+    @CsvSource({"/api/v1/does-not-exist", "/v3/api-docs", "/swagger-ui/index.html"})
+    void should_deny_user_anything_not_listed_with_forbidden_problem(String path) {
+        loggedInUser()
+                .get(path)
+                .then()
+                .statusCode(403)
+                .contentType(startsWith(PROBLEM_JSON))
+                .body("type", equalTo("/problems/forbidden"));
+    }
+
+    // ------------------------------------------------------------ completeness
 
     @Test
     void should_have_a_matrix_row_for_every_served_endpoint() {
@@ -132,5 +186,11 @@ class AuthorizationMatrixIT {
                 .as("every served endpoint needs a row in the authorization matrix (AGENTS.md security rules)")
                 .isNotEmpty()
                 .isSubsetOf(ENDPOINTS_WITH_A_ROW);
+    }
+
+    private static Browser loggedInUser() {
+        Browser browser = new Browser();
+        browser.registerAndLogin(uniqueEmail("matrix-user"), PASSWORD);
+        return browser;
     }
 }
