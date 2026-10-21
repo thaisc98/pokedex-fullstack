@@ -4,12 +4,18 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
+import org.springframework.security.authentication.ProviderManager;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter;
+import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationProvider;
 import org.springframework.security.oauth2.server.resource.authentication.JwtGrantedAuthoritiesConverter;
+import org.springframework.security.oauth2.server.resource.web.authentication.BearerTokenAuthenticationConverter;
+import org.springframework.security.oauth2.server.resource.web.authentication.BearerTokenAuthenticationFilter;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.AuthenticationEntryPointFailureHandler;
 import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
 import org.springframework.security.web.csrf.CsrfTokenRepository;
 import org.springframework.security.web.firewall.RequestRejectedHandler;
@@ -29,6 +35,9 @@ import org.springframework.security.web.util.matcher.RequestMatcher;
  *       are denied like any other unlisted route.
  *   <li>Authentication: the HS256 JWT in the {@code access_token} cookie, validated by the {@code JwtDecoder} bean
  *       (built in bootstrap); its {@code roles} claim becomes {@code ROLE_*} authorities. No Authorization header.
+ *       The {@link BearerTokenAuthenticationFilter} is added by hand instead of through {@code oauth2ResourceServer()}:
+ *       that DSL exempts every request carrying a bearer token from CSRF, which is only safe for header tokens. Our
+ *       token is a cookie the browser sends by itself, so CSRF must apply to it.
  *   <li>Stateless: no HTTP session, no saved request, so no {@code JSESSIONID}.
  *   <li>CSRF stays enabled with {@code csrf.spa()} ({@code XSRF-TOKEN} cookie + {@code X-XSRF-TOKEN} header). The
  *       same {@link CsrfTokenRepository} is a bean so login and logout can reset the token.
@@ -67,6 +76,7 @@ public class SecurityConfig {
     SecurityFilterChain apiSecurityFilterChain(
             HttpSecurity http,
             CsrfTokenRepository csrfTokenRepository,
+            JwtDecoder jwtDecoder,
             @Value("${pokedex.security.api-docs-public:false}") boolean apiDocsPublic)
             throws Exception {
         ProblemDetailSecurityHandler problems = new ProblemDetailSecurityHandler();
@@ -87,16 +97,26 @@ public class SecurityConfig {
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .requestCache(cache -> cache.requestCache(new NullRequestCache()))
                 .csrf(csrf -> csrf.spa().csrfTokenRepository(csrfTokenRepository))
-                .oauth2ResourceServer(oauth -> oauth.bearerTokenResolver(new CookieBearerTokenResolver(publicRoutes()))
-                        .authenticationEntryPoint(problems)
-                        .accessDeniedHandler(problems)
-                        .jwt(jwt -> jwt.jwtAuthenticationConverter(rolesClaimConverter())))
+                .addFilter(cookieTokenFilter(jwtDecoder, problems))
                 .httpBasic(AbstractHttpConfigurer::disable)
                 .formLogin(AbstractHttpConfigurer::disable)
                 .logout(AbstractHttpConfigurer::disable)
                 .exceptionHandling(
                         errors -> errors.authenticationEntryPoint(problems).accessDeniedHandler(problems));
         return http.build();
+    }
+
+    /** Authenticates a request from its {@code access_token} cookie; an invalid token is a 401 problem. */
+    private static BearerTokenAuthenticationFilter cookieTokenFilter(
+            JwtDecoder jwtDecoder, ProblemDetailSecurityHandler problems) {
+        JwtAuthenticationProvider provider = new JwtAuthenticationProvider(jwtDecoder);
+        provider.setJwtAuthenticationConverter(rolesClaimConverter());
+        BearerTokenAuthenticationConverter fromCookie = new BearerTokenAuthenticationConverter();
+        fromCookie.setBearerTokenResolver(new CookieBearerTokenResolver(publicRoutes()));
+        BearerTokenAuthenticationFilter filter =
+                new BearerTokenAuthenticationFilter(new ProviderManager(provider), fromCookie);
+        filter.setAuthenticationFailureHandler(new AuthenticationEntryPointFailureHandler(problems));
+        return filter;
     }
 
     /** Routes where the access-token cookie is not even read (a stale cookie must not block them). */

@@ -155,12 +155,13 @@ public class AuthController {
         String password = required(body.password(), "password");
         rateLimits.login().consume(clientIp(request) + "|" + email.strip().toLowerCase(Locale.ROOT));
         AuthenticationResult result = authenticateUser.authenticate(new AuthenticateUserCommand(email, password));
+        // Both cookies go straight to the servlet response: a ResponseEntity Set-Cookie header would replace the
+        // CSRF reset cookie written by the repository instead of adding to it.
         csrfTokens.saveToken(null, request, response);
-        return ResponseEntity.ok()
-                .header(
-                        HttpHeaders.SET_COOKIE,
-                        cookies.issue(result.accessToken().value()).toString())
-                .body(LoginResponse.from(result));
+        response.addHeader(
+                HttpHeaders.SET_COOKIE,
+                cookies.issue(result.accessToken().value()).toString());
+        return ResponseEntity.ok(LoginResponse.from(result));
     }
 
     @PostMapping("/logout")
@@ -178,9 +179,8 @@ public class AuthController {
             @Parameter(hidden = true) HttpServletRequest request,
             @Parameter(hidden = true) HttpServletResponse response) {
         csrfTokens.saveToken(null, request, response);
-        return ResponseEntity.noContent()
-                .header(HttpHeaders.SET_COOKIE, cookies.clear().toString())
-                .build();
+        response.addHeader(HttpHeaders.SET_COOKIE, cookies.clear().toString());
+        return ResponseEntity.noContent().build();
     }
 
     @GetMapping("/me")
