@@ -1,7 +1,10 @@
-# Verified false positives (gitleaks fingerprints: commit:file:rule:line). Each entry is a fake test value,
-# reviewed by hand. Add a line here only after checking the value is not a real secret; never allowlist by path.
-# PasswordPolicyTest: "qwertyuiop123" is a sample common password for the policy test.
+# Verified false positives, ignored by exact gitleaks fingerprint (commit:file:rule:line), never by path or rule.
+# Add a line only after checking by hand that the value is not a real secret. Do not quote values in comments.
+# PasswordPolicyTest line 36: sample common password used by the password-policy test.
 a0dee8cb01f91d53bba18c342c03fa0dadf3d936:backend/domain/src/test/java/com/pokedex/domain/identity/PasswordPolicyTest.java:generic-api-key:36
-# JwtSecretKeyTest: "0123456789abcdef..." are dummy 32-/31-byte strings for the >= 256-bit secret check.
+# JwtSecretKeyTest lines 19 and 47: dummy 32-byte and 31-byte strings for the minimum JWT secret length check.
 b2380c2cf22d622088f283e8d61846fc3fea7947:backend/infrastructure/src/test/java/com/pokedex/infrastructure/security/JwtSecretKeyTest.java:generic-api-key:19
 b2380c2cf22d622088f283e8d61846fc3fea7947:backend/infrastructure/src/test/java/com/pokedex/infrastructure/security/JwtSecretKeyTest.java:generic-api-key:47
+# The first version of this file quoted those test values in its comments (commit 8068767), lines 3 and 5.
+8068767154dcd6e90a5866a75572e0aa1cfc62a4:.gitleaksignore:generic-api-key:3
+8068767154dcd6e90a5866a75572e0aa1cfc62a4:.gitleaksignore:generic-api-key:5
