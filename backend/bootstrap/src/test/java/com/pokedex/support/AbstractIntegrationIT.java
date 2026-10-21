@@ -9,6 +9,8 @@ import io.restassured.config.RestAssuredConfig;
 import io.restassured.path.json.config.JsonPathConfig;
 import io.restassured.response.Response;
 import io.restassured.specification.RequestSpecification;
+import java.time.OffsetDateTime;
+import java.time.ZoneOffset;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
@@ -27,6 +29,8 @@ import org.springframework.cache.Cache;
 import org.springframework.cache.CacheManager;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.testcontainers.postgresql.PostgreSQLContainer;
 import org.testcontainers.utility.DockerImageName;
 import tools.jackson.databind.json.JsonMapper;
@@ -71,8 +75,9 @@ public abstract class AbstractIntegrationIT {
     @Autowired
     private ObjectProvider<CacheManager> cacheManagers;
 
+    /** Also callable mid-test, e.g. to simulate a cache entry expiring between two calls. */
     @BeforeEach
-    void clearAllCaches() {
+    protected void clearAllCaches() {
         cacheManagers
                 .orderedStream()
                 .forEach(manager -> manager.getCacheNames().stream()
@@ -88,6 +93,45 @@ public abstract class AbstractIntegrationIT {
         // Numbers as BigDecimal so decimal assertions (6.9 kg) are exact, never float-rounded by the test itself.
         RestAssured.config = RestAssuredConfig.config()
                 .jsonConfig(JsonConfig.jsonConfig().numberReturnType(JsonPathConfig.NumberReturnType.BIG_DECIMAL));
+    }
+
+    @Autowired
+    private ObjectProvider<JdbcTemplate> jdbc;
+
+    /** Password of every user created by {@link #loggedInUser()} and {@link #loggedInAdmin()}. */
+    public static final String TEST_USER_PASSWORD = "Test-User-Password-2026";
+
+    /** A fresh {@code USER}, registered and logged in through the API. */
+    protected static Browser loggedInUser() {
+        Browser browser = new Browser();
+        browser.registerAndLogin(uniqueEmail("user"), TEST_USER_PASSWORD);
+        return browser;
+    }
+
+    /**
+     * A fresh {@code ADMIN}, logged in through the API. There is no API to create one (security.md §3.1: admins are
+     * seeded), so the row is inserted straight into {@code app_user} (architecture §2.7 columns) with a BCrypt hash
+     * computed here, prefixed {@code {bcrypt}} for the {@code DelegatingPasswordEncoder} (security.md §4.1). Cost 4
+     * keeps the test fast; BCrypt verification accepts any cost.
+     */
+    protected Browser loggedInAdmin() {
+        String email = uniqueEmail("admin");
+        String hash = "{bcrypt}" + new BCryptPasswordEncoder(4).encode(TEST_USER_PASSWORD);
+        jdbc.getObject()
+                .update(
+                        "INSERT INTO app_user (id, email, password_hash, display_name, role, created_at)"
+                                + " VALUES (?, ?, ?, ?, ?, ?)",
+                        UUID.randomUUID(),
+                        email,
+                        hash,
+                        "Test Admin",
+                        "ADMIN",
+                        OffsetDateTime.now(ZoneOffset.UTC));
+        Browser browser = new Browser();
+        Response login = browser.login(email, TEST_USER_PASSWORD);
+        assertThat(login.statusCode()).as("admin login").isEqualTo(200);
+        assertThat(login.jsonPath().getString("user.role")).isEqualTo("ADMIN");
+        return browser;
     }
 
     /** A unique, valid, lowercase email for this test run. */
@@ -134,6 +178,11 @@ public abstract class AbstractIntegrationIT {
             return track(request().when().get(path));
         }
 
+        /** GET with query parameters, URL-encoded by RestAssured (so {@code %}, {@code _} and {@code \} arrive literally). */
+        public Response get(String path, Map<String, ?> query) {
+            return track(request().queryParams(query).when().get(path));
+        }
+
         /** A write with {@code X-XSRF-TOKEN} = current {@code XSRF-TOKEN} cookie (fetched first if missing). */
         public Response write(String method, String path, @Nullable Object body) {
             if (cookie("XSRF-TOKEN") == null) {
@@ -151,6 +200,18 @@ public abstract class AbstractIntegrationIT {
             if (body != null) {
                 spec = spec.contentType("application/json").body(body instanceof String s ? s : json(body));
             }
+            return track(spec.when().request(method, path));
+        }
+
+        /** A write with the CSRF header and an explicit {@code Content-Type} (for 413 / 415 cases). */
+        public Response writeRaw(String method, String path, String body, String contentType) {
+            if (cookie("XSRF-TOKEN") == null) {
+                fetchCsrf();
+            }
+            RequestSpecification spec = request()
+                    .header("X-XSRF-TOKEN", cookie("XSRF-TOKEN"))
+                    .contentType(contentType)
+                    .body(body);
             return track(spec.when().request(method, path));
         }
 

@@ -58,13 +58,13 @@ import org.springframework.test.context.DynamicPropertySource;
  *
  * <p>Abstract, so Failsafe does not run it on its own.
  */
-abstract class AbstractPokeApiIT extends AbstractIntegrationIT {
+public abstract class AbstractPokeApiIT extends AbstractIntegrationIT {
 
     /** Property name the backend must read the PokeAPI base URL from (security.md §4.5). */
-    static final String POKEAPI_BASE_URL_PROPERTY = "pokeapi.base-url";
+    public static final String POKEAPI_BASE_URL_PROPERTY = "pokeapi.base-url";
 
-    static final String API_PREFIX = "/api/v2";
-    static final String CATALOG_PATH = "/api/v1/pokemon";
+    public static final String API_PREFIX = "/api/v2";
+    public static final String CATALOG_PATH = "/api/v1/pokemon";
 
     /** Recorded fixtures live in the infrastructure module (owned by the test engineer). */
     private static final Path FIXTURES = Path.of(System.getProperty("basedir", System.getProperty("user.dir")))
@@ -72,14 +72,15 @@ abstract class AbstractPokeApiIT extends AbstractIntegrationIT {
             .normalize();
 
     /** One PokeAPI stand-in for the whole JVM; its port never changes, so a shared context stays valid. */
-    static final WireMockServer POKEAPI = new WireMockServer(wireMockConfig().dynamicPort());
+    public static final WireMockServer POKEAPI =
+            new WireMockServer(wireMockConfig().dynamicPort());
 
     static {
         POKEAPI.start();
     }
 
     @DynamicPropertySource
-    static void pointPokeApiAtWireMock(DynamicPropertyRegistry registry) {
+    public static void pointPokeApiAtWireMock(DynamicPropertyRegistry registry) {
         registry.add(POKEAPI_BASE_URL_PROPERTY, () -> POKEAPI.baseUrl() + API_PREFIX);
     }
 
@@ -91,7 +92,7 @@ abstract class AbstractPokeApiIT extends AbstractIntegrationIT {
 
     // ---------------------------------------------------------------- fixtures
 
-    static String fixture(String relativePath) {
+    public static String fixture(String relativePath) {
         Path file = FIXTURES.resolve(relativePath);
         try {
             return Files.readString(file, StandardCharsets.UTF_8);
@@ -103,7 +104,7 @@ abstract class AbstractPokeApiIT extends AbstractIntegrationIT {
     // ---------------------------------------------------------------- stubs
 
     /** {@code GET /api/v2/pokemon?offset=&limit=} (trailing slash tolerated). */
-    static void stubList(int offset, int limit, ResponseDefinitionBuilder response) {
+    public static void stubList(int offset, int limit, ResponseDefinitionBuilder response) {
         POKEAPI.stubFor(get(urlPathMatching(API_PREFIX + "/pokemon/?"))
                 .withQueryParam("offset", WireMock.equalTo(String.valueOf(offset)))
                 .withQueryParam("limit", WireMock.equalTo(String.valueOf(limit)))
@@ -111,27 +112,27 @@ abstract class AbstractPokeApiIT extends AbstractIntegrationIT {
     }
 
     /** Serves the recorded list page {@code pokemon-list/offset-<o>-limit-<l>.json} for the same query. */
-    static void stubRecordedList(int offset, int limit) {
+    public static void stubRecordedList(int offset, int limit) {
         stubList(offset, limit, okJson(fixture("pokemon-list/offset-%d-limit-%d.json".formatted(offset, limit))));
     }
 
     /** {@code GET /api/v2/pokemon/{id}} (trailing slash tolerated). */
-    static void stubPokemon(int id, ResponseDefinitionBuilder response) {
+    public static void stubPokemon(int id, ResponseDefinitionBuilder response) {
         POKEAPI.stubFor(
                 get(urlPathMatching(API_PREFIX + "/pokemon/" + id + "/?")).willReturn(response));
     }
 
-    static void stubRecordedPokemon(int id) {
+    public static void stubRecordedPokemon(int id) {
         stubPokemon(id, okJson(fixture("pokemon/%d.json".formatted(id))));
     }
 
     /** {@code GET /api/v2/pokemon-species/{id}} (trailing slash tolerated). */
-    static void stubSpecies(int id, ResponseDefinitionBuilder response) {
+    public static void stubSpecies(int id, ResponseDefinitionBuilder response) {
         POKEAPI.stubFor(get(urlPathMatching(API_PREFIX + "/pokemon-species/" + id + "/?"))
                 .willReturn(response));
     }
 
-    static void stubRecordedSpecies(int id) {
+    public static void stubRecordedSpecies(int id) {
         stubSpecies(id, okJson(fixture("pokemon-species/%d.json".formatted(id))));
     }
 
@@ -139,30 +140,30 @@ abstract class AbstractPokeApiIT extends AbstractIntegrationIT {
      * {@code GET /api/v2/pokemon/{name}} (trailing slash tolerated). PokeAPI accepts a name or an id here; the
      * app may call it with the normalised name after it passed {@code PokemonName} validation (security.md §4.5).
      */
-    static void stubPokemonByName(String name, ResponseDefinitionBuilder response) {
+    public static void stubPokemonByName(String name, ResponseDefinitionBuilder response) {
         POKEAPI.stubFor(
                 get(urlPathMatching(API_PREFIX + "/pokemon/" + name + "/?")).willReturn(response));
     }
 
     /** {@code GET /api/v2/evolution-chain/{id}} (trailing slash tolerated). */
-    static void stubEvolutionChain(int id, ResponseDefinitionBuilder response) {
+    public static void stubEvolutionChain(int id, ResponseDefinitionBuilder response) {
         POKEAPI.stubFor(get(urlPathMatching(API_PREFIX + "/evolution-chain/" + id + "/?"))
                 .willReturn(response));
     }
 
-    static void stubRecordedEvolutionChain(int id) {
+    public static void stubRecordedEvolutionChain(int id) {
         stubEvolutionChain(id, okJson(fixture("evolution-chain/%d.json".formatted(id))));
     }
 
     /** PokeAPI's real 404: {@code 404 application/json {"status":404,"message":"Not Found"}}. */
-    static ResponseDefinitionBuilder pokeApiNotFound() {
+    public static ResponseDefinitionBuilder pokeApiNotFound() {
         return aResponse()
                 .withStatus(404)
                 .withHeader("Content-Type", "application/json; charset=utf-8")
                 .withBody(fixture("errors/not-found.json"));
     }
 
-    static ResponseDefinitionBuilder status(int code) {
+    public static ResponseDefinitionBuilder status(int code) {
         return aResponse()
                 .withStatus(code)
                 .withHeader("Content-Type", "application/json")
@@ -171,10 +172,10 @@ abstract class AbstractPokeApiIT extends AbstractIntegrationIT {
 
     // ---------------------------------------------------------------- requests and problem assertions
 
-    static final String UPSTREAM_UNAVAILABLE_TYPE = "/problems/upstream-unavailable";
-    static final String VALIDATION_ERROR_TYPE = "/problems/validation-error";
+    public static final String UPSTREAM_UNAVAILABLE_TYPE = "/problems/upstream-unavailable";
+    public static final String VALIDATION_ERROR_TYPE = "/problems/validation-error";
 
-    static Response requestPage(int page, int size) {
+    public static Response requestPage(int page, int size) {
         return given().queryParam("page", page)
                 .queryParam("size", size)
                 .when()
@@ -188,7 +189,7 @@ abstract class AbstractPokeApiIT extends AbstractIntegrationIT {
      * 503 {@code ProblemDetail} with the exact {@code type} {@value #UPSTREAM_UNAVAILABLE_TYPE}, and no stack
      * trace, exception name, internal topology or partial page in the body (security.md §4.6, architecture §1.5).
      */
-    static void assertUpstreamUnavailableProblem(Response response) {
+    public static void assertUpstreamUnavailableProblem(Response response) {
         response.then()
                 .statusCode(503)
                 .contentType(startsWith(PROBLEM_JSON))
