@@ -15,10 +15,10 @@ export function PokemonCard({ pokemon, priority = false }: { pokemon: PokemonSum
   return (
     <AppLink
       href={`/pokemon/${pokemon.name}`}
-      className="group block h-full rounded-3xl text-foreground no-underline hover:no-underline"
+      className="group block h-full w-full rounded-3xl text-foreground no-underline hover:no-underline"
     >
       <Card
-        className="h-full gap-2 border border-transparent transition-colors group-hover:border-accent group-hover:bg-surface-secondary"
+        className="h-full w-full gap-2 border border-transparent transition-colors group-hover:border-accent group-hover:bg-surface-secondary"
       >
         <div className="flex justify-center rounded-2xl bg-default">
           <Sprite src={pokemon.sprite} alt="" size={96} priority={priority} className="[image-rendering:pixelated]" />
