@@ -28,6 +28,8 @@ pokeapi:
     max-retries: 3
     delay: 200ms
   max-concurrency: 10
+  # security.md §4.5: larger responses are rejected (503 upstream-unavailable).
+  max-response-bytes: 1048576
   cache:
     max-pages: 500
     ttl: 24h
