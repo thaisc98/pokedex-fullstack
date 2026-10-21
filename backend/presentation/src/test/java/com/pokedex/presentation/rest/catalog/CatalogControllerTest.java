@@ -13,6 +13,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import com.pokedex.application.catalog.port.in.GetPokemonDetailUseCase;
 import com.pokedex.application.catalog.port.in.ListPokemonUseCase;
 import com.pokedex.domain.catalog.PokemonSummary;
 import com.pokedex.domain.shared.Page;
@@ -43,6 +44,9 @@ class CatalogControllerTest {
 
     @MockitoBean
     private ListPokemonUseCase listPokemon;
+
+    @MockitoBean
+    private GetPokemonDetailUseCase getPokemonDetail;
 
     @Test
     void should_return_the_page_as_the_contract_envelope() throws Exception {
