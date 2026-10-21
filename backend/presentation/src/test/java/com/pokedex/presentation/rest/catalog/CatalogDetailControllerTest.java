@@ -1,5 +1,7 @@
 package com.pokedex.presentation.rest.catalog;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.not;
 import static org.mockito.ArgumentMatchers.any;
@@ -17,6 +19,7 @@ import com.pokedex.application.catalog.port.in.ListPokemonUseCase;
 import com.pokedex.domain.catalog.vo.PokedexId;
 import com.pokedex.domain.catalog.vo.PokemonName;
 import com.pokedex.domain.catalog.vo.PokemonRef;
+import com.pokedex.domain.shared.InvalidValueException;
 import com.pokedex.domain.shared.NotFoundException;
 import com.pokedex.domain.shared.UpstreamUnavailableException;
 import com.pokedex.presentation.security.SecurityConfig;
@@ -28,6 +31,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
+import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
@@ -97,7 +101,7 @@ class CatalogDetailControllerTest {
                 .andExpect(status().isNotFound())
                 .andExpect(jsonPath("$.type").value("/problems/not-found"))
                 .andExpect(jsonPath("$.title").value("Not found"))
-                .andExpect(content().string(not(containsString("missingno"))));
+                .andExpect(jsonPath("$.detail").value(not(containsString("missingno"))));
     }
 
     @ParameterizedTest
@@ -114,13 +118,28 @@ class CatalogDetailControllerTest {
 
     @Test
     void should_reject_matrix_parameters_instead_of_silently_dropping_them() throws Exception {
-        // Spring would match {idOrName} = "pika" and drop ";drop"; the raw segment must be validated instead.
+        // Spring MVC would bind {idOrName} = "pika" and drop ";drop". StrictHttpFirewall rejects the URL first;
+        // its rejection is answered as a validation ProblemDetail, and the use case is never reached.
         mockMvc.perform(get("/api/v1/pokemon/pika;drop"))
                 .andExpect(status().isBadRequest())
+                .andExpect(content().contentTypeCompatibleWith(PROBLEM_JSON))
                 .andExpect(jsonPath("$.type").value("/problems/validation-error"))
-                .andExpect(jsonPath("$.errors[0].field").value("idOrName"))
+                .andExpect(jsonPath("$.status").value(400))
+                .andExpect(jsonPath("$.errors[0].field").value("path"))
                 .andExpect(content().string(not(containsString("drop"))));
 
+        verify(getPokemonDetail, never()).get(any());
+    }
+
+    @Test
+    void should_reject_a_raw_uri_with_a_semicolon_even_if_it_reaches_the_controller() {
+        // Defence in depth: the firewall normally stops this first (see the test above).
+        CatalogController controller = new CatalogController(listPokemon, getPokemonDetail);
+        MockHttpServletRequest request = new MockHttpServletRequest("GET", "/api/v1/pokemon/pika;drop");
+
+        assertThatThrownBy(() -> controller.detail("pika", request))
+                .isInstanceOfSatisfying(
+                        InvalidValueException.class, e -> assertThat(e.field()).isEqualTo("idOrName"));
         verify(getPokemonDetail, never()).get(any());
     }
 
