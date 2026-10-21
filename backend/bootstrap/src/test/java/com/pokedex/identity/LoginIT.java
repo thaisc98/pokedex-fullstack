@@ -111,7 +111,8 @@ class LoginIT extends AbstractIntegrationIT {
                 .then()
                 .statusCode(401)
                 .contentType(startsWith(PROBLEM_JSON))
-                .body("status", equalTo(401));
+                .body("status", equalTo(401))
+                .body("type", equalTo("/problems/invalid-credentials"));
         unknownEmail.then().statusCode(401).contentType(startsWith(PROBLEM_JSON));
         assertThat(unknownEmail.asString())
                 .as("same body, so the response does not reveal which emails exist (security.md §4.1)")
@@ -169,13 +170,20 @@ class LoginIT extends AbstractIntegrationIT {
         String email = uniqueEmail("brute");
         browser.register(email, PASSWORD, "Brute").then().statusCode(201);
         for (int attempt = 1; attempt <= 5; attempt++) {
-            browser.login(email, "Wrong-Password-" + attempt).then().statusCode(401);
+            browser.login(email, "Wrong-Password-" + attempt)
+                    .then()
+                    .statusCode(401)
+                    .body("type", equalTo("/problems/invalid-credentials"));
         }
 
         // Even the correct password is throttled now.
         Response sixth = browser.login(email, PASSWORD);
 
-        sixth.then().statusCode(429).contentType(startsWith(PROBLEM_JSON)).body("status", equalTo(429));
+        sixth.then()
+                .statusCode(429)
+                .contentType(startsWith(PROBLEM_JSON))
+                .body("status", equalTo(429))
+                .body("type", equalTo("/problems/rate-limited"));
         assertThat(sixth.getHeader("Retry-After"))
                 .as("Retry-After header")
                 .isNotNull()

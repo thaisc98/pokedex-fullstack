@@ -86,12 +86,14 @@ class RegisterIT extends AbstractIntegrationIT {
                 .then()
                 .statusCode(409)
                 .contentType(startsWith(PROBLEM_JSON))
-                .body("status", equalTo(409));
+                .body("status", equalTo(409))
+                .body("type", equalTo("/problems/email-taken"));
         browser.register(email.toUpperCase(), PASSWORD, "BROCK")
                 .then()
                 .statusCode(409)
                 .contentType(startsWith(PROBLEM_JSON))
-                .body("status", equalTo(409));
+                .body("status", equalTo(409))
+                .body("type", equalTo("/problems/email-taken"));
     }
 
     @ParameterizedTest(name = "password ''{0}'' -> 400")
@@ -165,7 +167,11 @@ class RegisterIT extends AbstractIntegrationIT {
 
         Response fourth = browser.register(uniqueEmail("burst4"), PASSWORD, "Burst 4");
 
-        fourth.then().statusCode(429).contentType(startsWith(PROBLEM_JSON)).body("status", equalTo(429));
+        fourth.then()
+                .statusCode(429)
+                .contentType(startsWith(PROBLEM_JSON))
+                .body("status", equalTo(429))
+                .body("type", equalTo("/problems/rate-limited"));
         assertThat(fourth.getHeader("Retry-After"))
                 .as("Retry-After header")
                 .isNotNull()
