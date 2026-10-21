@@ -1,6 +1,5 @@
 package com.pokedex.infrastructure.persistence;
 
-import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyChar;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -18,7 +17,6 @@ import jakarta.persistence.criteria.Expression;
 import jakarta.persistence.criteria.Path;
 import jakarta.persistence.criteria.Predicate;
 import jakarta.persistence.criteria.Root;
-import java.util.Set;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -81,7 +79,6 @@ class CollectionSpecificationsTest {
 
         CollectionSpecifications.matching(new Tag("fire"), "char").toPredicate(root, query, cb);
 
-        verify(cb).and(member, like);
-        assertThat(Set.of(member, like)).hasSize(2);
+        verify(cb).and(new Predicate[] {member, like});
     }
 }

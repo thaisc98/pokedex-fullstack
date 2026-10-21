@@ -10,6 +10,9 @@ import com.pokedex.domain.collection.CustomAttributes;
 import com.pokedex.domain.collection.vo.Coordinates;
 import com.pokedex.domain.collection.vo.GeoMetadata;
 import com.pokedex.infrastructure.persistence.entity.CollectedPokemonEntity;
+import com.pokedex.infrastructure.persistence.entity.LocalizedNameEmbeddable;
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.UUID;
 import org.junit.jupiter.api.Test;
@@ -109,6 +112,23 @@ class CollectedPokemonEntityMapperTest {
         assertThat(managed.getId()).isEqualTo(id);
         assertThat(managed.getVersion()).isEqualTo(4L);
         assertSameState(mapper.toDomain(managed), changed);
+    }
+
+    @Test
+    void should_truncate_timestamps_to_microseconds_like_postgres() {
+        Instant nanos = Instant.parse("2026-10-21T10:00:00.123456789Z");
+        CollectedPokemon pokemon = CollectedPokemon.rehydrate(
+                com.pokedex.domain.collection.vo.CollectedPokemonId.random(),
+                CollectedPokemonFixtures.PIKACHU,
+                CustomAttributes.EMPTY,
+                0,
+                nanos,
+                nanos);
+
+        CollectedPokemonEntity entity = mapper.toNewEntity(pokemon);
+
+        assertThat(entity.getSyncedAt()).isEqualTo(nanos.truncatedTo(ChronoUnit.MICROS));
+        assertThat(entity.getUpdatedAt()).isEqualTo(nanos.truncatedTo(ChronoUnit.MICROS));
     }
 
     @Test

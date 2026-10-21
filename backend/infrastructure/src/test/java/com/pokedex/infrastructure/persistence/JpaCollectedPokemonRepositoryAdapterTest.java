@@ -37,6 +37,7 @@ import org.springframework.transaction.support.TransactionTemplate;
  * {@code CollectedPokemonRepository} adapter: the port contract (insert / version-checked update / conflict
  * translation / two-step paging without N+1). The SQL itself is covered by the PostgreSQL ITs.
  */
+@SuppressWarnings("unchecked")
 class JpaCollectedPokemonRepositoryAdapterTest {
 
     private final SpringDataCollectedPokemonRepository springData = mock(SpringDataCollectedPokemonRepository.class);
