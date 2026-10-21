@@ -33,9 +33,9 @@ import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandl
  * (security.md §3.2). In the default profile it falls under "anything else: denied", so 401 like any other
  * non-public route. The demo-profile counterpart lives in {@code OpenApiContractIT}.
  *
- * <p>The public catalog row ({@code GET /api/v1/pokemon} → 200) is covered with a stubbed PokeAPI in
- * {@code ListPokemonIT.should_allow_anonymous_access_without_cookie_or_credentials}; this class makes no upstream
- * call. Its own Spring context is fine.
+ * <p>The public catalog rows ({@code GET /api/v1/pokemon} and {@code GET /api/v1/pokemon/{idOrName}} → 200) are
+ * covered with a stubbed PokeAPI by the anonymous-access tests in {@code ListPokemonIT} and
+ * {@code GetPokemonDetailIT}; this class makes no upstream call. Its own Spring context is fine.
  */
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @DisplayName("Security - authorization matrix (default profile)")
@@ -47,7 +47,11 @@ class AuthorizationMatrixIT {
      * Every handler the application serves in the default profile, as {@code "METHOD /path"}. A new controller
      * method without a row here fails {@link #should_have_a_matrix_row_for_every_served_endpoint()}.
      */
-    static final Set<String> ENDPOINTS_WITH_A_ROW = Set.of("GET /api/v1/pokemon");
+    static final Set<String> ENDPOINTS_WITH_A_ROW = Set.of(
+            // anonymous allowed: ListPokemonIT.should_allow_anonymous_access_without_cookie_or_credentials
+            "GET /api/v1/pokemon",
+            // anonymous allowed: GetPokemonDetailIT.should_allow_anonymous_access_to_detail
+            "GET /api/v1/pokemon/{idOrName}");
 
     @Value("${local.server.port}")
     int port;

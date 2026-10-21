@@ -107,6 +107,15 @@ class OpenApiContractIT {
                 .hasToString("{content=[array, {abilities=[array, {hidden=scalar, name=scalar}], category=scalar,"
                         + " id=scalar, mass=scalar, name=scalar, sprite=scalar}], page=scalar, size=scalar,"
                         + " totalElements=scalar, totalPages=scalar}");
+        assertThat(operations(contract, base))
+                .as("US02 detail is in the contract, so the check covers it as soon as the app serves it")
+                .containsKey("GET /api/v1/pokemon/{}");
+        assertThat(String.valueOf(
+                        operations(contract, base).get("GET /api/v1/pokemon/{}").successShape()))
+                .as("detail shape reaches the evolution tree and every trigger variant")
+                .contains("artwork=scalar", "evolution={root={evolvesTo=[array,", "speciesId=scalar")
+                .contains("{item=scalar, kind=scalar}", "{kind=scalar, minLevel=scalar}")
+                .contains("{kind=scalar, name=scalar}", "{kind=scalar}");
         assertThat(mismatches(contract, base, contract)).isEmpty();
     }
 
@@ -247,6 +256,19 @@ class OpenApiContractIT {
             return "recursive";
         }
         Map<String, Object> schema = merged(doc, rawSchema);
+        // A real choice between several schemas (e.g. EvolutionTrigger's four `kind`s): compare every option.
+        for (String alternative : List.of("oneOf", "anyOf")) {
+            List<Object> options = nonNullOptions(doc, schema, alternative);
+            if (options.size() > 1) {
+                return Map.of(
+                        alternative,
+                        options.stream()
+                                .map(o -> shape(doc, asMap(o), depth + 1))
+                                .map(String::valueOf)
+                                .sorted()
+                                .toList());
+            }
+        }
         Object type = schema.get("type");
         boolean isArray = "array".equals(type) || (type instanceof Collection<?> c && c.contains("array"));
         if (isArray) {
@@ -263,13 +285,16 @@ class OpenApiContractIT {
 
     private static Map<String, Object> merged(Map<String, Object> doc, Map<String, Object> rawSchema) {
         Map<String, Object> schema = resolve(doc, rawSchema);
-        for (String alternative : List.of("oneOf", "anyOf")) {
-            List<Object> options = asList(schema.get(alternative)).stream()
-                    .map(o -> (Object) resolve(doc, asMap(o)))
-                    .filter(o -> !"null".equals(asMap(o).get("type")))
-                    .toList();
-            if (options.size() == 1) {
-                schema = asMap(options.getFirst());
+        // Unwrap "X or null" (possibly nested, e.g. trigger: oneOf[EvolutionTrigger, null]) until stable.
+        boolean unwrapped = true;
+        for (int hops = 0; unwrapped && hops < 10; hops++) {
+            unwrapped = false;
+            for (String alternative : List.of("oneOf", "anyOf")) {
+                List<Object> options = nonNullOptions(doc, schema, alternative);
+                if (options.size() == 1) {
+                    schema = asMap(options.getFirst());
+                    unwrapped = true;
+                }
             }
         }
         List<Object> allOf = asList(schema.get("allOf"));
@@ -290,6 +315,13 @@ class OpenApiContractIT {
         }
         result.put("properties", properties);
         return result;
+    }
+
+    private static List<Object> nonNullOptions(Map<String, Object> doc, Map<String, Object> schema, String key) {
+        return asList(schema.get(key)).stream()
+                .map(o -> (Object) resolve(doc, asMap(o)))
+                .filter(o -> !"null".equals(asMap(o).get("type")))
+                .toList();
     }
 
     /** Follows a local {@code $ref} such as {@code #/components/schemas/PageResponse}. */

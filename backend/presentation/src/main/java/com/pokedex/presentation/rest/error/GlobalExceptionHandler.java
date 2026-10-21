@@ -2,6 +2,7 @@ package com.pokedex.presentation.rest.error;
 
 import com.pokedex.domain.shared.DomainException;
 import com.pokedex.domain.shared.InvalidValueException;
+import com.pokedex.domain.shared.NotFoundException;
 import com.pokedex.domain.shared.UpstreamUnavailableException;
 import java.net.URI;
 import java.util.List;
@@ -29,6 +30,7 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExcep
 public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 
     static final URI VALIDATION_ERROR = URI.create("/problems/validation-error");
+    static final URI NOT_FOUND = URI.create("/problems/not-found");
     static final URI UPSTREAM_UNAVAILABLE = URI.create("/problems/upstream-unavailable");
     static final URI INTERNAL_ERROR = URI.create("/problems/internal-error");
 
@@ -42,6 +44,13 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         return switch (exception) {
             case InvalidValueException invalid ->
                 validationProblem(new FieldViolation(invalid.field(), invalid.getMessage()));
+            case NotFoundException notFound -> {
+                ProblemDetail problem = ProblemDetail.forStatusAndDetail(
+                        HttpStatus.NOT_FOUND, "The requested resource does not exist.");
+                problem.setType(NOT_FOUND);
+                problem.setTitle("Not found");
+                yield ResponseEntity.status(HttpStatus.NOT_FOUND).body(problem);
+            }
             case UpstreamUnavailableException unavailable -> {
                 String correlationId = correlationId();
                 LOG.warn("Upstream unavailable [correlationId={}]", correlationId, unavailable);

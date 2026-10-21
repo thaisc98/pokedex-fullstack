@@ -4,6 +4,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import com.pokedex.application.catalog.port.in.GetPokemonDetailUseCase;
 import com.pokedex.application.catalog.port.in.ListPokemonUseCase;
 import com.pokedex.presentation.rest.catalog.CatalogController;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -24,6 +25,9 @@ class ApiDocsDeniedByDefaultTest {
 
     @MockitoBean
     private ListPokemonUseCase listPokemon;
+
+    @MockitoBean
+    private GetPokemonDetailUseCase getPokemonDetail;
 
     @ParameterizedTest
     @ValueSource(

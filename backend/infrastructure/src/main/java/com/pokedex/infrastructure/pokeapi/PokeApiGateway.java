@@ -1,5 +1,6 @@
 package com.pokedex.infrastructure.pokeapi;
 
+import com.pokedex.infrastructure.pokeapi.dto.PokeApiEvolutionChainDto;
 import com.pokedex.infrastructure.pokeapi.dto.PokeApiListDto;
 import com.pokedex.infrastructure.pokeapi.dto.PokeApiPokemonDto;
 import com.pokedex.infrastructure.pokeapi.dto.PokeApiSpeciesDto;
@@ -30,7 +31,7 @@ import org.springframework.web.client.ResourceAccessException;
         delayString = "${pokeapi.retry.delay:200ms}",
         multiplier = 2.0)
 @ConcurrencyLimit(limitString = "${pokeapi.max-concurrency:10}")
-public class PokeApiGateway {
+public class PokeApiGateway implements PokeApiResources {
 
     private final PokeApiHttpClient client;
 
@@ -38,15 +39,28 @@ public class PokeApiGateway {
         this.client = Objects.requireNonNull(client, "client");
     }
 
+    @Override
     public PokeApiListDto list(long offset, int limit) {
         return client.list(offset, limit);
     }
 
+    @Override
     public PokeApiPokemonDto pokemon(int id) {
         return client.pokemon(id);
     }
 
+    @Override
+    public PokeApiPokemonDto pokemonByName(String name) {
+        return client.pokemonByName(name);
+    }
+
+    @Override
     public PokeApiSpeciesDto species(int id) {
         return client.species(id);
+    }
+
+    @Override
+    public PokeApiEvolutionChainDto evolutionChain(int id) {
+        return client.evolutionChain(id);
     }
 }
