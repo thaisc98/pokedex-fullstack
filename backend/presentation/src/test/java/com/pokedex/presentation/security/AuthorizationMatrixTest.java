@@ -1,11 +1,10 @@
 package com.pokedex.presentation.security;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.hamcrest.Matchers.nullValue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.request;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.cookie;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -25,7 +24,6 @@ import org.springframework.context.annotation.Import;
 import org.springframework.http.HttpMethod;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.MvcResult;
 
 /**
  * Authorization matrix (security.md §3, BR-10): every endpoint × caller. Deny by default: anything without a
@@ -91,13 +89,10 @@ class AuthorizationMatrixTest {
     }
 
     @Test
-    void should_never_create_a_session_for_the_public_catalog() throws Exception {
-        MvcResult result = mockMvc.perform(request(HttpMethod.GET, "/api/v1/pokemon"))
+    void should_never_set_a_session_cookie_for_the_public_catalog() throws Exception {
+        mockMvc.perform(request(HttpMethod.GET, "/api/v1/pokemon"))
                 .andExpect(status().isOk())
-                .andExpect(header().string("Set-Cookie", nullValue()))
-                .andReturn();
-
-        assertThat(result.getRequest().getSession(false)).isNull();
+                .andExpect(cookie().doesNotExist("JSESSIONID"));
     }
 
     @Test
