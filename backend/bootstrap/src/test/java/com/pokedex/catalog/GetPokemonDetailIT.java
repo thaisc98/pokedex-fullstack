@@ -184,10 +184,10 @@ class GetPokemonDetailIT extends AbstractPokeApiIT {
         assertLevelUpWithoutMinLevel(json, branch + "[3].trigger"); // espeon: friendship + day
         assertLevelUpWithoutMinLevel(json, branch + "[4].trigger"); // umbreon: friendship + night
         assertLevelUpWithoutMinLevel(json, branch + "[7].trigger"); // sylveon: fairy move + affection
-        // Leafeon / Glaceon: PokeAPI lists level-up (special rock) and use-item (leaf/ice stone, is_default).
-        // Which detail wins is an open question for the human; either reading is accepted until it is decided.
-        assertThat(json.getString(branch + "[5].trigger.kind")).isIn("level-up", "use-item");
-        assertThat(json.getString(branch + "[6].trigger.kind")).isIn("level-up", "use-item");
+        // Leafeon / Glaceon list several evolution_details: level-up near a special rock (first) and use-item
+        // leaf/ice stone (is_default: true). Lead decision: the is_default entry wins, else the first.
+        assertUseItem(json, branch + "[5].trigger", "leaf-stone");
+        assertUseItem(json, branch + "[6].trigger", "ice-stone");
     }
 
     // ------------------------------------------------------------ mr-mime: hyphenated name, 3 stages, min level
