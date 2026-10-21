@@ -2,8 +2,10 @@
 #   cp .env.example .env   # then fill in the values
 #   docker compose up -d
 #
-# Grows phase by phase (see docs/roadmap.md): P0 = PostgreSQL only.
-# P6 adds backend + frontend (Next.js standalone) and the "offline" profile (WireMock + recorded PokeAPI fixtures).
+#   open http://localhost:3000 (UI) · http://localhost:8080/swagger-ui (API, demo profile)
+#
+# Services: postgres → backend (Spring Boot, Flyway migrates on start) → frontend (Next.js standalone).
+# Still to come (docs/roadmap.md P6): the "offline" profile (WireMock + recorded PokeAPI fixtures) and demo seed data.
 #
 # Security (docs/security.md §4.8, §4.10):
 #   - Credentials come only from .env (git-ignored); compose refuses to start if they are missing.
@@ -35,6 +37,46 @@ services:
       timeout: 5s
       retries: 10
       start_period: 10s
+    security_opt:
+      - no-new-privileges:true
+
+  backend:
+    build:
+      context: ./backend
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      SPRING_PROFILES_ACTIVE: ${SPRING_PROFILES_ACTIVE:-demo}
+      DB_URL: ${DB_URL:?set DB_URL in .env}
+      # TEMPORARY: the least-privilege app role (DB_USER/DB_PASSWORD) isn't created by Compose yet, so the
+      # app connects as the schema owner for local testing. Switch to DB_USER/DB_PASSWORD once it exists.
+      DB_USER: ${FLYWAY_USER:?set FLYWAY_USER in .env}
+      DB_PASSWORD: ${FLYWAY_PASSWORD:?set FLYWAY_PASSWORD in .env}
+      JWT_SECRET: ${JWT_SECRET:?set JWT_SECRET in .env (openssl rand -base64 48)}
+      JWT_ISSUER: ${JWT_ISSUER:-pokedex-api}
+      JWT_AUDIENCE: ${JWT_AUDIENCE:-pokedex-web}
+      POKEAPI_BASE_URL: ${POKEAPI_BASE_URL:-https://pokeapi.co/api/v2}
+    ports:
+      # Direct API access for manual testing (curl, Swagger UI). The browser app goes through the frontend.
+      - "127.0.0.1:${BACKEND_PORT:-8080}:8080"
+    security_opt:
+      - no-new-privileges:true
+
+  frontend:
+    build:
+      context: ./frontend
+      args:
+        BACKEND_INTERNAL_URL: http://backend:8080
+    restart: unless-stopped
+    depends_on:
+      backend:
+        condition: service_healthy
+    environment:
+      BACKEND_INTERNAL_URL: http://backend:8080
+    ports:
+      - "127.0.0.1:${FRONTEND_PORT:-3000}:3000"
     security_opt:
       - no-new-privileges:true
 
