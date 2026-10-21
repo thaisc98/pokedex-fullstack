@@ -1134,7 +1134,27 @@ components:
           type: string
           format: uri-reference
           default: 'about:blank'
-          description: 'Problem type URI, e.g. `/problems/csrf-token-invalid`, `/problems/validation-error`.'
+          description: |
+            Problem type URI (relative to the API origin). Known types:
+
+            | `type` | Status | When |
+            |---|---|---|
+            | `/problems/validation-error` | 400 | Invalid input; `errors[]` lists the fields. |
+            | `/problems/unauthorized` | 401 | Authentication required or failed. Anonymous access to a non-public route also gets this (deny by default). |
+            | `/problems/forbidden` | 403 | Authenticated but not allowed (e.g. a `USER` calling an `ADMIN` route). |
+            | `/problems/csrf-token-invalid` | 403 | Missing or invalid `X-XSRF-TOKEN` on a non-GET request (security.md §4.2.1). |
+            | `/problems/upstream-unavailable` | 503 | PokeAPI down, erroring, too large (> 1 MB) or partial; never a half-filled page (architecture.md §1.5). |
+            | `/problems/internal-error` | 500 | Unexpected error. Only a `correlationId`, never details. |
+
+            Clients must treat unknown types as generic errors for their `status`;
+            more types may be added (not a closed enum).
+          examples:
+            - /problems/validation-error
+            - /problems/unauthorized
+            - /problems/forbidden
+            - /problems/csrf-token-invalid
+            - /problems/upstream-unavailable
+            - /problems/internal-error
         title:
           type: string
           description: Short, human-readable summary of the problem type.
@@ -1174,29 +1194,64 @@ components:
   # ---------------------------------------------------------------- Responses
   responses:
     BadRequest:
-      description: 'Invalid request (validation, malformed path/query, or disallowed field change — BR-06).'
+      description: 'Invalid request (validation, malformed path/query, or disallowed field change — BR-06). `type: /problems/validation-error`.'
       content:
         application/problem+json:
           schema:
             $ref: '#/components/schemas/ProblemDetail'
+          example:
+            type: /problems/validation-error
+            title: Validation failed
+            status: 400
+            detail: One or more fields are invalid.
+            errors:
+              - field: size
+                message: must be between 1 and 100
     Unauthorized:
-      description: 'Authentication required or failed. The login response is deliberately generic (security.md §4.1).'
+      description: 'Authentication required or failed (`type: /problems/unauthorized`). Also returned for anonymous access to any non-public route (deny by default). No `WWW-Authenticate` challenge. The login response is deliberately generic (security.md §4.1).'
       content:
         application/problem+json:
           schema:
             $ref: '#/components/schemas/ProblemDetail'
+          example:
+            type: /problems/unauthorized
+            title: Unauthorized
+            status: 401
+            detail: Authentication is required to access this resource.
     Forbidden:
-      description: 'Authenticated but not authorized (e.g. a `USER` attempting a `DELETE`).'
+      description: 'Authenticated but not authorized (`type: /problems/forbidden`), e.g. a `USER` attempting a `DELETE`.'
       content:
         application/problem+json:
           schema:
             $ref: '#/components/schemas/ProblemDetail'
+          example:
+            type: /problems/forbidden
+            title: Forbidden
+            status: 403
+            detail: You are not allowed to access this resource.
     CsrfForbidden:
       description: 'Missing or invalid CSRF token (`type: /problems/csrf-token-invalid`). The SPA fetches a fresh token and retries once.'
       content:
         application/problem+json:
           schema:
             $ref: '#/components/schemas/ProblemDetail'
+          example:
+            type: /problems/csrf-token-invalid
+            title: Invalid CSRF token
+            status: 403
+            detail: The CSRF token is missing or invalid. Fetch a new token and retry.
+    InternalServerError:
+      description: 'Unexpected error (`type: /problems/internal-error`). Details go to the log only; the body carries a `correlationId` (security.md §4.6). Any operation can return it.'
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/ProblemDetail'
+          example:
+            type: /problems/internal-error
+            title: Internal server error
+            status: 500
+            detail: An unexpected error occurred.
+            correlationId: 3f2b8c1e-9d4a-4e7b-8a61-2c5d0f9e7a10
     NotFound:
       description: Resource not found.
       content:
@@ -1235,8 +1290,14 @@ components:
           schema:
             $ref: '#/components/schemas/ProblemDetail'
     UpstreamUnavailable:
-      description: 'PokeAPI is unavailable or returned a partial page (architecture.md §1.5). We never return half-filled results.'
+      description: 'PokeAPI is unavailable, returned a response over 1 MB (security.md §4.5), or would have produced a partial page (architecture.md §1.5). `type: /problems/upstream-unavailable`. We never return half-filled results.'
       content:
         application/problem+json:
           schema:
             $ref: '#/components/schemas/ProblemDetail'
+          example:
+            type: /problems/upstream-unavailable
+            title: Upstream service unavailable
+            status: 503
+            detail: The Pokémon catalog is temporarily unavailable. Please try again later.
+            correlationId: 3f2b8c1e-9d4a-4e7b-8a61-2c5d0f9e7a10
