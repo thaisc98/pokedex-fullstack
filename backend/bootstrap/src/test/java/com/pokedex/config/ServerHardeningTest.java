@@ -17,11 +17,13 @@ import org.junit.jupiter.api.Test;
 import org.springframework.boot.SpringBootConfiguration;
 import org.springframework.boot.autoconfigure.ImportAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.context.TestComponent;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.boot.tomcat.autoconfigure.servlet.TomcatServletWebServerAutoConfiguration;
 import org.springframework.boot.webmvc.autoconfigure.DispatcherServletAutoConfiguration;
 import org.springframework.boot.webmvc.autoconfigure.WebMvcAutoConfiguration;
 import org.springframework.cache.concurrent.ConcurrentMapCache;
+import org.springframework.context.annotation.Import;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -33,14 +35,23 @@ import org.springframework.web.bind.annotation.RestController;
  */
 class ServerHardeningTest {
 
+    /**
+     * The probe's own minimal Boot app (web only, no database). Marked {@code @TestComponent}, so the full application's
+     * component scan in the ITs skips it and the authorization matrix never sees the probe endpoints.
+     */
     @SpringBootConfiguration(proxyBeanMethods = false)
+    @TestComponent
+    @Import(ProbeController.class)
     @ImportAutoConfiguration({
         TomcatServletWebServerAutoConfiguration.class,
         DispatcherServletAutoConfiguration.class,
         WebMvcAutoConfiguration.class
     })
+    static class Probe {}
+
+    @TestComponent
     @RestController
-    static class Probe {
+    static class ProbeController {
 
         private final RateLimiter registrations =
                 new RateLimiter(new ConcurrentMapCache("rate-limit"), "register", 3, Duration.ofMinutes(1));
