@@ -5,6 +5,7 @@ import static com.pokedex.domain.catalog.EvolutionChainTest.root;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
+import com.pokedex.domain.catalog.vo.Ability;
 import com.pokedex.domain.catalog.vo.BaseStat;
 import com.pokedex.domain.catalog.vo.Description;
 import com.pokedex.domain.catalog.vo.EvolutionTrigger;
@@ -28,6 +29,8 @@ class PokemonDetailTest {
 
     private static final ImageUrl ARTWORK = new ImageUrl(
             "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/25.png");
+    private static final List<Ability> ABILITIES =
+            List.of(new Ability("static", false), new Ability("lightning-rod", true));
     private static final EvolutionChain CHAIN = new EvolutionChain(root(
             172,
             "pichu",
@@ -57,7 +60,8 @@ class PokemonDetailTest {
                 CHAIN,
                 List.of(PokemonType.ELECTRIC),
                 new Height(4),
-                new Mass(60));
+                new Mass(60),
+                ABILITIES);
     }
 
     @Test
@@ -87,7 +91,8 @@ class PokemonDetailTest {
                 new EvolutionChain(root(6, "charizard")),
                 List.of(PokemonType.FIRE, PokemonType.FLYING),
                 new Height(17),
-                new Mass(905));
+                new Mass(905),
+                List.of(new Ability("blaze", false), new Ability("solar-power", true)));
 
         assertThat(detail.stats()).containsExactlyElementsOf(reversed);
         assertThat(detail.types()).containsExactly(PokemonType.FIRE, PokemonType.FLYING);
@@ -143,7 +148,8 @@ class PokemonDetailTest {
                 CHAIN,
                 types,
                 new Height(4),
-                new Mass(60));
+                new Mass(60),
+                ABILITIES);
 
         stats.clear();
         types.add(PokemonType.FAIRY);
@@ -152,6 +158,67 @@ class PokemonDetailTest {
         assertThat(detail.types()).containsExactly(PokemonType.ELECTRIC);
         assertThatThrownBy(() -> detail.types().add(PokemonType.FIRE))
                 .isInstanceOf(UnsupportedOperationException.class);
+    }
+
+    @Test
+    void should_carry_the_abilities_in_upstream_order() {
+        assertThat(pikachu().abilities())
+                .containsExactly(new Ability("static", false), new Ability("lightning-rod", true));
+    }
+
+    @Test
+    void should_allow_an_empty_ability_list() {
+        PokemonDetail detail = new PokemonDetail(
+                new PokedexId(25),
+                new PokemonName("pikachu"),
+                ARTWORK,
+                sixStats(),
+                Description.EMPTY,
+                CHAIN,
+                List.of(PokemonType.ELECTRIC),
+                new Height(4),
+                new Mass(60),
+                List.of());
+
+        assertThat(detail.abilities()).isEmpty();
+    }
+
+    @Test
+    void should_copy_and_freeze_the_abilities() {
+        List<Ability> abilities = new ArrayList<>(ABILITIES);
+        PokemonDetail detail = new PokemonDetail(
+                new PokedexId(25),
+                new PokemonName("pikachu"),
+                ARTWORK,
+                sixStats(),
+                Description.EMPTY,
+                CHAIN,
+                List.of(PokemonType.ELECTRIC),
+                new Height(4),
+                new Mass(60),
+                abilities);
+
+        abilities.clear();
+
+        assertThat(detail.abilities()).hasSize(2);
+        assertThatThrownBy(() -> detail.abilities().add(new Ability("pressure", false)))
+                .isInstanceOf(UnsupportedOperationException.class);
+    }
+
+    @Test
+    void should_reject_null_abilities() {
+        assertThatThrownBy(() -> new PokemonDetail(
+                        new PokedexId(25),
+                        new PokemonName("pikachu"),
+                        ARTWORK,
+                        sixStats(),
+                        Description.EMPTY,
+                        CHAIN,
+                        List.of(PokemonType.ELECTRIC),
+                        new Height(4),
+                        new Mass(60),
+                        null))
+                .isInstanceOf(NullPointerException.class);
     }
 
     @Test
@@ -165,7 +232,8 @@ class PokemonDetailTest {
                         CHAIN,
                         List.of(PokemonType.ELECTRIC),
                         new Height(4),
-                        new Mass(60)))
+                        new Mass(60),
+                        ABILITIES))
                 .isInstanceOf(NullPointerException.class);
         assertThatThrownBy(() -> new PokemonDetail(
                         new PokedexId(25),
@@ -176,7 +244,8 @@ class PokemonDetailTest {
                         CHAIN,
                         List.of(PokemonType.ELECTRIC),
                         new Height(4),
-                        new Mass(60)))
+                        new Mass(60),
+                        ABILITIES))
                 .isInstanceOf(NullPointerException.class);
         assertThatThrownBy(() -> new PokemonDetail(
                         new PokedexId(25),
@@ -187,7 +256,8 @@ class PokemonDetailTest {
                         CHAIN,
                         List.of(PokemonType.ELECTRIC),
                         new Height(4),
-                        new Mass(60)))
+                        new Mass(60),
+                        ABILITIES))
                 .isInstanceOf(NullPointerException.class);
         assertThatThrownBy(() -> new PokemonDetail(
                         new PokedexId(25),
@@ -198,7 +268,8 @@ class PokemonDetailTest {
                         null,
                         List.of(PokemonType.ELECTRIC),
                         new Height(4),
-                        new Mass(60)))
+                        new Mass(60),
+                        ABILITIES))
                 .isInstanceOf(NullPointerException.class);
         assertThatThrownBy(() -> new PokemonDetail(
                         new PokedexId(25),
@@ -209,7 +280,8 @@ class PokemonDetailTest {
                         CHAIN,
                         null,
                         new Height(4),
-                        new Mass(60)))
+                        new Mass(60),
+                        ABILITIES))
                 .isInstanceOf(NullPointerException.class);
         assertThatThrownBy(() -> new PokemonDetail(
                         new PokedexId(25),
@@ -234,7 +306,8 @@ class PokemonDetailTest {
                 CHAIN,
                 List.of(PokemonType.ELECTRIC),
                 new Height(4),
-                new Mass(60));
+                new Mass(60),
+                ABILITIES);
     }
 
     private static PokemonDetail withTypes(List<PokemonType> types) {
@@ -247,7 +320,8 @@ class PokemonDetailTest {
                 CHAIN,
                 types,
                 new Height(4),
-                new Mass(60));
+                new Mass(60),
+                ABILITIES);
     }
 
     private static PokemonDetail withArtworkAndDescription(ImageUrl artwork, Description description) {
@@ -260,6 +334,7 @@ class PokemonDetailTest {
                 CHAIN,
                 List.of(PokemonType.ELECTRIC),
                 new Height(4),
-                new Mass(60));
+                new Mass(60),
+                ABILITIES);
     }
 }
