@@ -1,0 +1,33 @@
+spring:
+  application:
+    name: pokedex
+  threads:
+    virtual:
+      enabled: true
+  http:
+    clients:
+      # Never follow upstream redirects (security.md §4.5).
+      redirects: dont-follow
+    serviceclient:
+      pokeapi:
+        base-url: ${pokeapi.base-url}
+        connect-timeout: 2s
+        read-timeout: 5s
+
+server:
+  error:
+    include-stacktrace: never
+    include-message: never
+    include-binding-errors: never
+    include-exception: false
+
+# PokeAPI (security.md §4.5: the base URL comes from configuration only).
+pokeapi:
+  base-url: https://pokeapi.co/api/v2
+  retry:
+    max-retries: 3
+    delay: 200ms
+  max-concurrency: 10
+  cache:
+    max-pages: 500
+    ttl: 24h
