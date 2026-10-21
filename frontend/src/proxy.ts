@@ -41,6 +41,14 @@ function buildCsp(nonce: string, { isDev, https }: { isDev: boolean; https: bool
 }
 
 export function proxy(request: NextRequest) {
+  if (request.nextUrl.pathname.startsWith("/api/")) {
+    // /api/* is rewritten to Spring. On its own the rewrite forwards no X-Forwarded-For
+    // (verified against a local echo backend), so Spring would see only this server's IP.
+    // Here Next has already filled X-Forwarded-For with the client's socket address (or kept
+    // the value an upstream proxy set); we pass exactly that along, unchanged.
+    // Spring sets its own security headers on API responses.
+    return NextResponse.next({ request: { headers: new Headers(request.headers) } });
+  }
   const nonce = createNonce();
   const https = isHttps(request);
   const csp = buildCsp(nonce, { isDev: process.env.NODE_ENV === "development", https });
@@ -79,8 +87,8 @@ export function proxy(request: NextRequest) {
 export const config = {
   matcher: [
     /*
-     * All paths except /api (Spring sets its own headers), static files, the image
-     * optimizer and the favicon. Prefetches skip the proxy (Next.js CSP guide).
+     * Pages: all paths except /api, static files, the image optimizer and the favicon.
+     * Prefetches skip the proxy (Next.js CSP guide). /api gets its own entry (X-Forwarded-For).
      */
     {
       source: "/((?!api|_next/static|_next/image|favicon.ico).*)",
@@ -89,5 +97,6 @@ export const config = {
         { type: "header", key: "purpose", value: "prefetch" },
       ],
     },
+    "/api/:path*",
   ],
 };

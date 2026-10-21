@@ -87,8 +87,11 @@ export default async function PokemonDetailPage(props: PageProps<"/pokemon/[idOr
             </div>
           </dl>
 
+          {/* TODO(backend): render <AbilityList abilities={pokemon.abilities} /> here once
+              `abilities` is added to PokemonDetailDto in docs/api/openapi.yaml. */}
+
           <div className="pt-2">
-            <AddToCollectionButton />
+            <AddToCollectionButton pokedexId={pokemon.id} name={name} />
           </div>
 
           <section aria-labelledby="about-heading" className="flex flex-col gap-2 pt-2">

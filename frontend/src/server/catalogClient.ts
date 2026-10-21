@@ -1,5 +1,7 @@
 import "server-only";
 
+import { headers } from "next/headers";
+
 import type { PokemonDetail, PokemonPage } from "@/features/catalog/types";
 import type { CatalogParams } from "@/features/catalog/lib/catalogParams";
 import type { ProblemDetail } from "@/shared/lib/problemCopy";
@@ -30,13 +32,31 @@ function baseUrl(): string {
 
 const ID_OR_NAME = /^[A-Za-z0-9-]{1,50}$/;
 
+/**
+ * Headers for the server-to-server call. We pass along the X-Forwarded-For value of the
+ * incoming request (Next.js fills it with the socket address when no proxy in front set it),
+ * so the backend can rate-limit per real client IP. We never add or invent addresses here.
+ * Never forwarded: cookies or Authorization (the catalog is public; architecture.md §3.1).
+ */
+async function upstreamHeaders(): Promise<HeadersInit> {
+  const result: Record<string, string> = { Accept: "application/json, application/problem+json" };
+  try {
+    const forwardedFor = (await headers()).get("x-forwarded-for");
+    if (forwardedFor) result["X-Forwarded-For"] = forwardedFor;
+  } catch {
+    // Outside a request scope (e.g. a build-time call): nothing to forward.
+  }
+  return result;
+}
+
 async function getJson<T>(path: string): Promise<T> {
   let response: Response;
   try {
     response = await fetch(`${baseUrl()}/api/v1${path}`, {
-      headers: { Accept: "application/json, application/problem+json" },
-      // Public data: a short Next.js data cache on top of the API's Caffeine cache.
-      next: { revalidate: 300 },
+      headers: await upstreamHeaders(),
+      // No Next.js data cache: the headers differ per client, and the API's Caffeine cache
+      // already makes repeat calls cheap.
+      cache: "no-store",
       signal: AbortSignal.timeout(15_000),
     });
   } catch {
