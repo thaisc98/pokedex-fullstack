@@ -2,9 +2,8 @@
 
 import { Avatar, Button, Chip, Dropdown, Header, Label, Separator, Skeleton } from "@heroui/react";
 import { usePathname } from "next/navigation";
-import { useAppSelector } from "@/store/hooks";
 import { AppButtonLink } from "@/shared/ui/AppLink";
-import { selectAuthChecked, selectUser } from "./authSlice";
+import { useSession } from "./useSession";
 import { useSignOut } from "./useSignOut";
 
 function initials(name: string) {
@@ -18,8 +17,7 @@ function initials(name: string) {
 
 /** Header auth area (ui-ux.md §3.2): Log in / Register, or the user menu with role + Log out. */
 export function UserMenu() {
-  const checked = useAppSelector(selectAuthChecked);
-  const user = useAppSelector(selectUser);
+  const { ready: checked, user } = useSession();
   const pathname = usePathname();
   const { signOut } = useSignOut();
 

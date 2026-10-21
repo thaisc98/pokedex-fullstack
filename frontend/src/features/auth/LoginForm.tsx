@@ -32,6 +32,7 @@ export function LoginForm() {
 
   const { control, handleSubmit, setError, formState } = useForm<Values>({
     resolver: zodResolver(schema),
+    shouldFocusError: false, // the ErrorSummary takes focus instead
     defaultValues: { email: "", password: "" },
   });
 

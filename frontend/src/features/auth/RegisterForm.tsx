@@ -41,6 +41,8 @@ export function RegisterForm() {
 
   const { control, handleSubmit, setError, formState } = useForm<Values>({
     resolver: zodResolver(schema),
+    // The ErrorSummary takes focus on a failed submit (ui-ux.md §4), not the first field.
+    shouldFocusError: false,
     defaultValues: { displayName: "", email: "", password: "" },
   });
 

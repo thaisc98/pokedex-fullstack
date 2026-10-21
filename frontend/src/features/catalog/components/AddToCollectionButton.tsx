@@ -3,11 +3,10 @@
 import { Button, Skeleton, toast } from "@heroui/react";
 import { usePathname, useRouter } from "next/navigation";
 import { useState } from "react";
-import { selectAuthChecked, selectUser } from "@/features/auth/authSlice";
+import { useSession } from "@/features/auth/useSession";
 import { useSyncMutation } from "@/features/collection/collectionApi";
 import { isApiError } from "@/shared/api/apiError";
 import { problemCopy } from "@/shared/lib/problemCopy";
-import { useAppSelector } from "@/store/hooks";
 
 type Props = { pokedexId: number; name: string };
 
@@ -18,8 +17,7 @@ type Props = { pokedexId: number; name: string };
 export function AddToCollectionButton({ pokedexId, name }: Props) {
   const router = useRouter();
   const pathname = usePathname();
-  const checked = useAppSelector(selectAuthChecked);
-  const user = useAppSelector(selectUser);
+  const { ready: checked, user } = useSession();
   const [sync, { isLoading }] = useSyncMutation();
   const [inCollection, setInCollection] = useState(false);
   const [error, setError] = useState<string | null>(null);

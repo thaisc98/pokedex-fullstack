@@ -48,6 +48,8 @@ export function FormTextField<T extends FieldValues>({
           isInvalid={fieldState.invalid}
           isRequired={isRequired}
           validationBehavior="aria"
+          // Our forms sit on Card/Surface; the primary field color matches the surface in dark mode.
+          variant="secondary"
           fullWidth
         >
           <Label>{label}</Label>

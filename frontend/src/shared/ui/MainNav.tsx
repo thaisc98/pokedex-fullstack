@@ -2,16 +2,15 @@
 
 import { Button, Chip, Drawer, Separator } from "@heroui/react";
 import { usePathname } from "next/navigation";
-import { selectUser } from "@/features/auth/authSlice";
+import { useSession } from "@/features/auth/useSession";
 import { useSignOut } from "@/features/auth/useSignOut";
-import { useAppSelector } from "@/store/hooks";
 import { AppButtonLink, AppLink } from "./AppLink";
 
 type NavItem = { href: string; label: string };
 
 /** Catalog always; Collection only when signed in (ui-ux.md §3.2). */
 function useNavItems(): NavItem[] {
-  const user = useAppSelector(selectUser);
+  const { user } = useSession();
   return user
     ? [
         { href: "/pokemon", label: "Catalog" },
@@ -55,7 +54,7 @@ export function MainNav({ className = "" }: { className?: string }) {
 export function MobileMenu({ className = "" }: { className?: string }) {
   const pathname = usePathname();
   const items = useNavItems();
-  const user = useAppSelector(selectUser);
+  const { user } = useSession();
   const { signOut } = useSignOut();
   return (
     <div className={className}>

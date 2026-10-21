@@ -61,6 +61,7 @@ export function EditForm({ item, onDone, onCancel, onReloadLatest, onRemoved }: 
 
   const { control, handleSubmit, setError, formState } = useForm<EditValues>({
     resolver: zodResolver(editSchema) as unknown as Resolver<EditValues>,
+    shouldFocusError: false, // the ErrorSummary takes focus instead
     defaultValues: fromItem(item.custom),
   });
   const names = useFieldArray({ control, name: "localizedNames" });
@@ -256,6 +257,7 @@ function CoordinateField({
           onBlur={field.onBlur}
           isInvalid={fieldState.invalid}
           validationBehavior="aria"
+          variant="secondary"
           formatOptions={{ maximumFractionDigits: 6 }}
           name={name}
           fullWidth
@@ -317,6 +319,7 @@ function TagsField({
           onChange={setDraft}
           isInvalid={Boolean(error) || draftInvalid}
           validationBehavior="aria"
+          variant="secondary"
           className="min-w-56 flex-1"
           onKeyDown={(event) => {
             if (event.key === "Enter" || event.key === ",") {

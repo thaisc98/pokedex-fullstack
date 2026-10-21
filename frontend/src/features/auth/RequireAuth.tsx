@@ -2,16 +2,14 @@
 
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useEffect, type ReactNode } from "react";
-import { useAppSelector } from "@/store/hooks";
-import { selectAuthChecked, selectUser } from "./authSlice";
+import { useSession } from "./useSession";
 
 /**
  * Client-side guard for protected pages (UX only; the API enforces every rule).
  * Shows `fallback` until the session is known; signed out → /login?from=<here>.
  */
 export function RequireAuth({ children, fallback }: { children: ReactNode; fallback: ReactNode }) {
-  const checked = useAppSelector(selectAuthChecked);
-  const user = useAppSelector(selectUser);
+  const { ready: checked, user } = useSession();
   const router = useRouter();
   const pathname = usePathname();
   const search = useSearchParams().toString();
