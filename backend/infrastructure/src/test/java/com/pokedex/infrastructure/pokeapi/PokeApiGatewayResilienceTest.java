@@ -108,6 +108,32 @@ class PokeApiGatewayResilienceTest {
     }
 
     @Test
+    void should_not_retry_an_oversized_response_even_when_reported_as_an_io_error() {
+        // RestClient wraps an IOException from an interceptor (Content-Length over the cap) in
+        // ResourceAccessException, which is otherwise retryable. Retrying cannot shrink the body.
+        AtomicInteger attempts = new AtomicInteger();
+        PokeApiGateway gateway = gatewayAnswering(() -> {
+            attempts.incrementAndGet();
+            throw new ResourceAccessException("I/O error", new ResponseTooLargeException());
+        });
+
+        assertThatThrownBy(() -> gateway.list(0, 3)).isInstanceOf(ResourceAccessException.class);
+        assertThat(attempts).hasValue(1);
+    }
+
+    @Test
+    void should_not_retry_an_oversized_streamed_body() {
+        AtomicInteger attempts = new AtomicInteger();
+        PokeApiGateway gateway = gatewayAnswering(() -> {
+            attempts.incrementAndGet();
+            throw new RestClientException("Error while extracting response", new ResponseTooLargeException());
+        });
+
+        assertThatThrownBy(() -> gateway.list(0, 3)).isInstanceOf(RestClientException.class);
+        assertThat(attempts).hasValue(1);
+    }
+
+    @Test
     void should_not_retry_on_an_unreadable_body() {
         AtomicInteger attempts = new AtomicInteger();
         PokeApiGateway gateway = gatewayAnswering(() -> {
