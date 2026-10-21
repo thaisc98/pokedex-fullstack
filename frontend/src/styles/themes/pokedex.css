@@ -1,8 +1,111 @@
 /*
  * Pokédex theme: overrides for HeroUI v3 CSS variables (docs/ui-ux.md §6.2).
  *
- * P0 scaffold: intentionally empty, so the HeroUI defaults apply.
- * P5 adds the brand accent (light + dark) and the 18 Pokémon type tokens
- * (--type-*, bridged with `@theme inline { --color-type-*: var(--type-*); }`),
- * each pair checked for >= 4.5:1 contrast in both themes.
+ * Imported after @heroui/styles in the `base` layer (see app/globals.css) so these
+ * declarations win over HeroUI's defaults, which also live in `base`.
+ *
+ * Contrast (WCAG 2.2 AA, checked with the WCAG relative-luminance formula):
+ *   light accent oklch(0.55 0.21 27) ≈ #d01d21: white text 5.41:1, on page bg 4.96:1
+ *   dark  accent oklch(0.72 0.17 25) ≈ #fd736d: dark text 6.62:1, on page bg 7.30:1
+ *   type chips: every --type-* / --type-*-foreground pair ≥ 5.4:1 (values below).
+ *   Type chips carry their own background, so the same pairs hold in both themes.
  */
+
+/* ── Brand + type tokens shared by both themes ───────────────────────────── */
+:root {
+  --radius: 0.75rem;
+
+  /* Text colors used on type chips */
+  --type-ink-dark: oklch(0.2103 0.0059 285.89); /* ≈ #18181b */
+  --type-ink-light: oklch(100% 0 0);
+
+  /* 18 Pokémon types. Ratio = text on background. */
+  --type-normal: #a8a77a;   --type-normal-foreground: var(--type-ink-dark);   /* 7.15 */
+  --type-fire: #ee8130;     --type-fire-foreground: var(--type-ink-dark);     /* 6.60 */
+  --type-water: #6390f0;    --type-water-foreground: var(--type-ink-dark);    /* 5.72 */
+  --type-electric: #f7d02c; --type-electric-foreground: var(--type-ink-dark); /* 11.82 */
+  --type-grass: #7ac74c;    --type-grass-foreground: var(--type-ink-dark);    /* 8.52 */
+  --type-ice: #96d9d6;      --type-ice-foreground: var(--type-ink-dark);      /* 11.13 */
+  --type-fighting: #c22e28; --type-fighting-foreground: var(--type-ink-light); /* 5.65 */
+  --type-poison: #a33ea1;   --type-poison-foreground: var(--type-ink-light);  /* 5.58 */
+  --type-ground: #e2bf65;   --type-ground-foreground: var(--type-ink-dark);   /* 10.02 */
+  --type-flying: #a98ff3;   --type-flying-foreground: var(--type-ink-dark);   /* 6.67 */
+  --type-psychic: #f95587;  --type-psychic-foreground: var(--type-ink-dark);  /* 5.63 */
+  --type-bug: #a6b91a;      --type-bug-foreground: var(--type-ink-dark);      /* 8.08 */
+  --type-rock: #b6a136;     --type-rock-foreground: var(--type-ink-dark);     /* 6.87 */
+  --type-ghost: #735797;    --type-ghost-foreground: var(--type-ink-light);   /* 5.93 */
+  --type-dragon: #6f35fc;   --type-dragon-foreground: var(--type-ink-light);  /* 5.85 */
+  --type-dark: #705746;     --type-dark-foreground: var(--type-ink-light);    /* 6.69 */
+  --type-steel: #b7b7ce;    --type-steel-foreground: var(--type-ink-dark);    /* 9.01 */
+  --type-fairy: #d685ad;    --type-fairy-foreground: var(--type-ink-dark);    /* 6.60 */
+}
+
+/* ── Light ───────────────────────────────────────────────────────────────── */
+:root,
+.light,
+[data-theme="light"] {
+  --accent: oklch(0.55 0.21 27);
+  --accent-foreground: oklch(100% 0 0);
+  --focus: var(--accent);
+  --link: var(--accent);
+}
+
+/* ── Dark ────────────────────────────────────────────────────────────────── */
+.dark,
+[data-theme="dark"] {
+  --accent: oklch(0.72 0.17 25);
+  --accent-foreground: oklch(0.2103 0.0059 285.89);
+  --focus: var(--accent);
+  --link: var(--accent);
+}
+
+/* Bridge to Tailwind: bg-type-fire, text-type-fire-foreground, … */
+@theme inline {
+  --color-type-normal: var(--type-normal);
+  --color-type-normal-foreground: var(--type-normal-foreground);
+  --color-type-fire: var(--type-fire);
+  --color-type-fire-foreground: var(--type-fire-foreground);
+  --color-type-water: var(--type-water);
+  --color-type-water-foreground: var(--type-water-foreground);
+  --color-type-electric: var(--type-electric);
+  --color-type-electric-foreground: var(--type-electric-foreground);
+  --color-type-grass: var(--type-grass);
+  --color-type-grass-foreground: var(--type-grass-foreground);
+  --color-type-ice: var(--type-ice);
+  --color-type-ice-foreground: var(--type-ice-foreground);
+  --color-type-fighting: var(--type-fighting);
+  --color-type-fighting-foreground: var(--type-fighting-foreground);
+  --color-type-poison: var(--type-poison);
+  --color-type-poison-foreground: var(--type-poison-foreground);
+  --color-type-ground: var(--type-ground);
+  --color-type-ground-foreground: var(--type-ground-foreground);
+  --color-type-flying: var(--type-flying);
+  --color-type-flying-foreground: var(--type-flying-foreground);
+  --color-type-psychic: var(--type-psychic);
+  --color-type-psychic-foreground: var(--type-psychic-foreground);
+  --color-type-bug: var(--type-bug);
+  --color-type-bug-foreground: var(--type-bug-foreground);
+  --color-type-rock: var(--type-rock);
+  --color-type-rock-foreground: var(--type-rock-foreground);
+  --color-type-ghost: var(--type-ghost);
+  --color-type-ghost-foreground: var(--type-ghost-foreground);
+  --color-type-dragon: var(--type-dragon);
+  --color-type-dragon-foreground: var(--type-dragon-foreground);
+  --color-type-dark: var(--type-dark);
+  --color-type-dark-foreground: var(--type-dark-foreground);
+  --color-type-steel: var(--type-steel);
+  --color-type-steel-foreground: var(--type-steel-foreground);
+  --color-type-fairy: var(--type-fairy);
+  --color-type-fairy-foreground: var(--type-fairy-foreground);
+}
+
+/* Respect reduced motion for our own transitions too (HeroUI handles its own). */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+  }
+}
