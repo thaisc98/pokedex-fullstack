@@ -225,7 +225,8 @@ class UpdateCollectedPokemonIT extends AbstractCollectionIT {
         user.writeRaw("PUT", COLLECTION_PATH + "/" + id, body, "application/json")
                 .then()
                 .statusCode(413)
-                .contentType(startsWith(PROBLEM_JSON));
+                .contentType(startsWith(PROBLEM_JSON))
+                .body("type", equalTo("/problems/payload-too-large"));
     }
 
     @Test
@@ -237,7 +238,8 @@ class UpdateCollectedPokemonIT extends AbstractCollectionIT {
         user.writeRaw("PUT", COLLECTION_PATH + "/" + id, "tags=a", "text/plain")
                 .then()
                 .statusCode(415)
-                .contentType(startsWith(PROBLEM_JSON));
+                .contentType(startsWith(PROBLEM_JSON))
+                .body("type", equalTo("/problems/unsupported-media-type"));
         assertThat(version(get(user, id).jsonPath().getMap("$"))).isEqualTo(version(created));
     }
 

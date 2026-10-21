@@ -164,6 +164,36 @@ class ReadCollectionIT extends AbstractCollectionIT {
                 .body("type", equalTo("/problems/not-found"));
     }
 
+    @ParameterizedTest(name = "{0} /collection/{1} -> 400 on pokedexId")
+    @CsvSource({
+        "GET, 0",
+        "GET, -1",
+        "GET, abc",
+        "PUT, 0",
+        "PUT, -1",
+        "PUT, abc",
+        "DELETE, 0",
+        "DELETE, -1",
+        "DELETE, abc"
+    })
+    void should_reject_invalid_pokedex_id_in_path_with_validation_problem(String method, String pokedexId) {
+        // Lead decision: PokedexIdPathParam (minimum 1) violations are 400 validation-error on every item route.
+        // DELETE runs as ADMIN so the role check cannot answer first.
+        Browser browser = "DELETE".equals(method) ? loggedInAdmin() : loggedInUser();
+        String path = COLLECTION_PATH + "/" + pokedexId;
+        Response response = switch (method) {
+            case "GET" -> browser.get(path);
+            case "PUT" -> browser.write("PUT", path, update(customWithTags("x"), 0));
+            default -> browser.write("DELETE", path, null);
+        };
+
+        response.then()
+                .statusCode(400)
+                .contentType(startsWith(PROBLEM_JSON))
+                .body("type", equalTo("/problems/validation-error"))
+                .body("errors.field", hasItem("pokedexId"));
+    }
+
     @ParameterizedTest(name = "anonymous GET {0} -> 401")
     @ValueSource(strings = {COLLECTION_PATH, COLLECTION_PATH + "/1"})
     void should_reject_anonymous_reads_with_401(String path) {
