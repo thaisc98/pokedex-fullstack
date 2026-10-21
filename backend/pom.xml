@@ -38,7 +38,7 @@
         <spotless.version>3.10.4</spotless.version>
         <palantir.version>2.102.0</palantir.version>
         <archunit.version>1.5.1</archunit.version>
-        <jspecify.version>1.0.0</jspecify.version>
+        <jspecify.version>1.0.1</jspecify.version>
         <!-- JaCoCo gate defaults; domain/application/presentation/infrastructure override them. -->
         <coverage.line.min>0.00</coverage.line.min>
         <coverage.branch.min>0.00</coverage.branch.min>
