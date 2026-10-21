@@ -10,7 +10,10 @@ import org.jspecify.annotations.Nullable;
  * caught.
  */
 public abstract sealed class DomainException extends RuntimeException
-        permits ForbiddenException,
+        permits AuthenticationFailedException,
+                AuthenticationRequiredException,
+                EmailAlreadyRegisteredException,
+                ForbiddenException,
                 InvalidValueException,
                 NotFoundException,
                 UpstreamUnavailableException,
