@@ -40,6 +40,19 @@ class PokeApiDetailMapperTest {
         assertThat(detail.stats()).extracting(BaseStat::value).containsExactly(35, 55, 40, 50, 50, 90);
         assertThat(detail.height().meters()).isEqualTo(0.4);
         assertThat(detail.mass().kilograms()).isEqualTo(6.0);
+        assertThat(detail.abilities())
+                .containsExactly(
+                        new com.pokedex.domain.catalog.vo.Ability("static", false),
+                        new com.pokedex.domain.catalog.vo.Ability("lightning-rod", true));
+    }
+
+    @Test
+    void should_map_the_same_abilities_as_the_summary() {
+        PokemonDetail detail = pikachu(PokeApiFixtures.pokemon(25), PokeApiFixtures.species(25));
+
+        assertThat(detail.abilities())
+                .isEqualTo(mapper.toSummary(PokeApiFixtures.pokemon(25), PokeApiFixtures.species(25))
+                        .abilities());
     }
 
     @Test

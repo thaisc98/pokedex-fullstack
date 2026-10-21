@@ -1,5 +1,6 @@
 package com.pokedex.domain.catalog;
 
+import com.pokedex.domain.catalog.vo.Ability;
 import com.pokedex.domain.catalog.vo.BaseStat;
 import com.pokedex.domain.catalog.vo.Description;
 import com.pokedex.domain.catalog.vo.Height;
@@ -17,8 +18,8 @@ import java.util.Objects;
 import java.util.Set;
 
 /**
- * The US02 detail (architecture.md §0.1): exactly one value for each of the six base stats, one or two distinct
- * types, both in upstream order.
+ * The US02 detail (architecture.md §0.1, ui-ux §5.2): exactly one value for each of the six base stats, one or two distinct
+ * types, and the abilities (name + hidden flag, as in the summary), all in upstream order.
  */
 public record PokemonDetail(
         PokedexId id,
@@ -29,7 +30,8 @@ public record PokemonDetail(
         EvolutionChain evolution,
         List<PokemonType> types,
         Height height,
-        Mass mass) {
+        Mass mass,
+        List<Ability> abilities) {
 
     public PokemonDetail {
         Objects.requireNonNull(id, "id");
@@ -41,6 +43,7 @@ public record PokemonDetail(
         Objects.requireNonNull(mass, "mass");
         stats = List.copyOf(Objects.requireNonNull(stats, "stats"));
         types = List.copyOf(Objects.requireNonNull(types, "types"));
+        abilities = List.copyOf(Objects.requireNonNull(abilities, "abilities"));
 
         Set<StatName> statNames = EnumSet.noneOf(StatName.class);
         stats.forEach(stat -> statNames.add(stat.name()));

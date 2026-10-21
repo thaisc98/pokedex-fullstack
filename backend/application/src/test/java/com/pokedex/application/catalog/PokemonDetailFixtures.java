@@ -3,6 +3,7 @@ package com.pokedex.application.catalog;
 import com.pokedex.domain.catalog.EvolutionChain;
 import com.pokedex.domain.catalog.EvolutionNode;
 import com.pokedex.domain.catalog.PokemonDetail;
+import com.pokedex.domain.catalog.vo.Ability;
 import com.pokedex.domain.catalog.vo.BaseStat;
 import com.pokedex.domain.catalog.vo.Description;
 import com.pokedex.domain.catalog.vo.EvolutionTrigger;
@@ -51,6 +52,7 @@ public final class PokemonDetailFixtures {
                 chain,
                 List.of(PokemonType.ELECTRIC),
                 new Height(4),
-                new Mass(60));
+                new Mass(60),
+                List.of(new Ability("static", false), new Ability("lightning-rod", true)));
     }
 }
