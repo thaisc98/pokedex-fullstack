@@ -12,6 +12,12 @@
 
     <artifactId>pokedex-domain</artifactId>
     <name>pokedex-domain</name>
+
+    <properties>
+        <!-- JaCoCo gate (testing-strategy §3). -->
+        <coverage.line.min>0.95</coverage.line.min>
+        <coverage.branch.min>0.90</coverage.branch.min>
+    </properties>
     <description>Entities, value objects, business rules, sealed domain exceptions. JDK only.</description>
 
     <dependencies>

@@ -12,6 +12,12 @@
 
     <artifactId>pokedex-infrastructure</artifactId>
     <name>pokedex-infrastructure</name>
+
+    <properties>
+        <!-- JaCoCo gate (testing-strategy §3). -->
+        <coverage.line.min>0.80</coverage.line.min>
+        <coverage.branch.min>0.75</coverage.branch.min>
+    </properties>
     <description>Outbound adapters (PokeAPI client, JPA, cache, JWT, BCrypt). Depends on application.
                  PokeAPI client, Caffeine cache decorator; JPA, JWT and BCrypt arrive with their stories.</description>
 

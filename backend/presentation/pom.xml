@@ -12,6 +12,12 @@
 
     <artifactId>pokedex-presentation</artifactId>
     <name>pokedex-presentation</name>
+
+    <properties>
+        <!-- JaCoCo gate (testing-strategy §3). -->
+        <coverage.line.min>0.85</coverage.line.min>
+        <coverage.branch.min>0.80</coverage.branch.min>
+    </properties>
     <description>REST controllers, request/response DTOs, error handler, SecurityFilterChain.
                  Depends on application; must never depend on infrastructure.</description>
 
