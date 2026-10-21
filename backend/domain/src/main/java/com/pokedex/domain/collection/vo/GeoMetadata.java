@@ -3,7 +3,10 @@ package com.pokedex.domain.collection.vo;
 import com.pokedex.domain.shared.InvalidValueException;
 import org.jspecify.annotations.Nullable;
 
-/** Optional geographic metadata: region and habitat (≤ 60 characters, blank means absent) and coordinates. */
+/**
+ * Optional geographic metadata. Region and habitat are each absent ({@code null}) or 1-60 characters after
+ * stripping; a present but blank value is rejected. Coordinates are optional.
+ */
 public record GeoMetadata(
         @Nullable String region,
         @Nullable String habitat,
@@ -21,12 +24,13 @@ public record GeoMetadata(
     }
 
     private static @Nullable String optionalText(@Nullable String raw, String field) {
-        if (raw == null || raw.isBlank()) {
+        if (raw == null) {
             return null;
         }
         String text = raw.strip();
-        if (text.codePointCount(0, text.length()) > MAX_LENGTH) {
-            throw new InvalidValueException(field, "must be at most 60 characters");
+        int length = text.codePointCount(0, text.length());
+        if (length < 1 || length > MAX_LENGTH) {
+            throw new InvalidValueException(field, "must be 1-60 characters");
         }
         return text;
     }
