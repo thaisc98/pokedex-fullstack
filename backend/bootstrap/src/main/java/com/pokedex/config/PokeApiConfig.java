@@ -7,6 +7,7 @@ import com.pokedex.infrastructure.pokeapi.PokeApiCatalogAdapter;
 import com.pokedex.infrastructure.pokeapi.PokeApiGateway;
 import com.pokedex.infrastructure.pokeapi.PokeApiHttpClient;
 import com.pokedex.infrastructure.pokeapi.PokeApiMapper;
+import com.pokedex.infrastructure.pokeapi.ResponseSizeLimitInterceptor;
 import java.time.Duration;
 import java.util.List;
 import java.util.Objects;
@@ -16,6 +17,7 @@ import org.springframework.cache.caffeine.CaffeineCacheManager;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.resilience.annotation.EnableResilientMethods;
+import org.springframework.web.client.support.RestClientHttpServiceGroupConfigurer;
 import org.springframework.web.service.registry.ImportHttpServices;
 
 /**
@@ -29,12 +31,24 @@ import org.springframework.web.service.registry.ImportHttpServices;
  *       and {@code @ConcurrencyLimit}.
  *   <li>The port bean is the cache decorator around the adapter; the adapter itself is not a bean.
  *   <li>The page cache lives in a Caffeine {@link CacheManager} with a size cap and a TTL.
+ *   <li>Every PokeAPI response is size-capped by {@link ResponseSizeLimitInterceptor}.
  * </ul>
  */
 @Configuration(proxyBeanMethods = false)
 @EnableResilientMethods
-@ImportHttpServices(group = "pokeapi", types = PokeApiHttpClient.class)
+@ImportHttpServices(group = PokeApiConfig.POKEAPI_GROUP, types = PokeApiHttpClient.class)
 public class PokeApiConfig {
+
+    static final String POKEAPI_GROUP = "pokeapi";
+
+    /** security.md §4.5: every PokeAPI response is capped at {@code pokeapi.max-response-bytes} (1 MB). */
+    @Bean
+    RestClientHttpServiceGroupConfigurer pokeApiResponseSizeLimit(
+            @Value("${pokeapi.max-response-bytes:1048576}") long maxResponseBytes) {
+        ResponseSizeLimitInterceptor limit = new ResponseSizeLimitInterceptor(maxResponseBytes);
+        return groups ->
+                groups.filterByName(POKEAPI_GROUP).forEachClient((group, builder) -> builder.requestInterceptor(limit));
+    }
 
     @Bean
     PokeApiGateway pokeApiGateway(PokeApiHttpClient pokeApiHttpClient) {

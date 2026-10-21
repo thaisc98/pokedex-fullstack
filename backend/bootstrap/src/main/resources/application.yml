@@ -14,6 +14,18 @@ spring:
         connect-timeout: 2s
         read-timeout: 5s
 
+# OpenAPI docs and Swagger UI are off by default; only the demo profile turns them on (security.md §3.2).
+springdoc:
+  api-docs:
+    enabled: false
+  swagger-ui:
+    enabled: false
+
+pokedex:
+  security:
+    # Only application-demo.yml sets this to true. Otherwise the springdoc routes stay denied (401).
+    api-docs-public: false
+
 server:
   error:
     include-stacktrace: never
@@ -28,6 +40,8 @@ pokeapi:
     max-retries: 3
     delay: 200ms
   max-concurrency: 10
+  # security.md §4.5: larger responses are rejected (503 upstream-unavailable).
+  max-response-bytes: 1048576
   cache:
     max-pages: 500
     ttl: 24h
