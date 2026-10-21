@@ -31,14 +31,13 @@ import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandl
  *       the default profile it is "anything else": 401. The demo counterpart is {@code OpenApiContractIT}.
  *   <li>The public catalog rows ({@code GET /api/v1/pokemon[/{idOrName}]} → 200) need a stubbed PokeAPI and are
  *       covered by the anonymous-access tests in {@code ListPokemonIT} and {@code GetPokemonDetailIT}.
- *   <li>ADMIN-only rows ({@code DELETE /collection/{id}}) arrive with the Collection; the ADMIN user will be
- *       inserted by the test (JdbcTemplate + a BCrypt hash computed in the test).
+ *   <li>Collection rows run without PokeAPI: an authorised call either reaches validation (400) or misses a record
+ *       that no test syncs (404), which proves it passed authorization without changing data. The ADMIN is inserted
+ *       by the test ({@code loggedInAdmin()}: JdbcTemplate + a BCrypt hash computed in the test).
  * </ul>
  */
 @DisplayName("Security - authorization matrix (default profile)")
 class AuthorizationMatrixIT extends AbstractIntegrationIT {
-
-    static final String PASSWORD = "Matrix-Row-Password-2026";
 
     /**
      * Every handler the application serves in the default profile, as {@code "METHOD /path"}. A new controller
@@ -54,7 +53,19 @@ class AuthorizationMatrixIT extends AbstractIntegrationIT {
             "POST /api/v1/auth/register",
             "POST /api/v1/auth/login",
             "POST /api/v1/auth/logout",
-            "GET /api/v1/auth/me");
+            "GET /api/v1/auth/me",
+            // collection: rows below (anonymous + USER + ADMIN)
+            "GET /api/v1/collection",
+            "POST /api/v1/collection",
+            "GET /api/v1/collection/{pokedexId}",
+            "PUT /api/v1/collection/{pokedexId}",
+            "DELETE /api/v1/collection/{pokedexId}");
+
+    /** A pokedexId no test ever syncs, so authorised calls end in 404 instead of touching data. */
+    static final String MISSING = "/api/v1/collection/999999999";
+
+    static final String VALID_UPDATE =
+            "{\"customAttributes\":{\"localizedNames\":[],\"geo\":null,\"tags\":[]},\"version\":0}";
 
     @Autowired
     @Qualifier("requestMappingHandlerMapping") RequestMappingHandlerMapping handlerMapping;
@@ -65,7 +76,7 @@ class AuthorizationMatrixIT extends AbstractIntegrationIT {
     @CsvSource({
         // authenticated per security.md §3.2
         "/api/v1/auth/me",
-        // not built yet, authenticated per security.md §3.2
+        // authenticated per security.md §3.2
         "/api/v1/collection",
         "/api/v1/collection/1",
         // springdoc must not be reachable in the default profile
@@ -162,6 +173,56 @@ class AuthorizationMatrixIT extends AbstractIntegrationIT {
                 .body("type", equalTo("/problems/forbidden"));
     }
 
+    // ------------------------------------------------------------ Collection: anonymous, USER, ADMIN
+
+    @ParameterizedTest(name = "anonymous {0} {1} with CSRF -> 401")
+    @CsvSource({"POST, /api/v1/collection", "PUT, " + MISSING, "DELETE, " + MISSING})
+    void should_deny_anonymous_collection_writes_with_unauthorized_problem(String method, String path) {
+        new Browser()
+                .write(method, path, "DELETE".equals(method) ? null : VALID_UPDATE)
+                .then()
+                .statusCode(401)
+                .body("type", equalTo("/problems/unauthorized"));
+    }
+
+    @Test
+    void should_let_user_list_and_get_collection() {
+        Browser user = loggedInUser();
+
+        user.get("/api/v1/collection").then().statusCode(200);
+        user.get(MISSING).then().statusCode(404).body("type", equalTo("/problems/not-found"));
+    }
+
+    @Test
+    void should_let_user_sync_and_update_collection() {
+        Browser user = loggedInUser();
+
+        user.write("POST", "/api/v1/collection", "{}").then().statusCode(400);
+        user.write("PUT", MISSING, VALID_UPDATE).then().statusCode(404);
+    }
+
+    @Test
+    void should_forbid_user_delete_with_forbidden_problem() {
+        loggedInUser()
+                .write("DELETE", MISSING, null)
+                .then()
+                .statusCode(403)
+                .contentType(startsWith(PROBLEM_JSON))
+                .body("type", equalTo("/problems/forbidden"));
+    }
+
+    @Test
+    void should_let_admin_use_every_collection_endpoint() {
+        Browser admin = loggedInAdmin();
+
+        admin.get(Browser.ME_PATH).then().statusCode(200).body("role", equalTo("ADMIN"));
+        admin.get("/api/v1/collection").then().statusCode(200);
+        admin.get(MISSING).then().statusCode(404);
+        admin.write("POST", "/api/v1/collection", "{}").then().statusCode(400);
+        admin.write("PUT", MISSING, VALID_UPDATE).then().statusCode(404);
+        admin.write("DELETE", MISSING, null).then().statusCode(404).body("type", equalTo("/problems/not-found"));
+    }
+
     // ------------------------------------------------------------ completeness
 
     @Test
@@ -186,11 +247,5 @@ class AuthorizationMatrixIT extends AbstractIntegrationIT {
                 .as("every served endpoint needs a row in the authorization matrix (AGENTS.md security rules)")
                 .isNotEmpty()
                 .isSubsetOf(ENDPOINTS_WITH_A_ROW);
-    }
-
-    private static Browser loggedInUser() {
-        Browser browser = new Browser();
-        browser.registerAndLogin(uniqueEmail("matrix-user"), PASSWORD);
-        return browser;
     }
 }
