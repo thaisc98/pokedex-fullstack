@@ -41,11 +41,18 @@ class GeoMetadataTest {
 
     @ParameterizedTest
     @ValueSource(strings = {"", " ", "\t"})
-    void should_treat_blank_text_as_absent(String blank) {
-        GeoMetadata geo = new GeoMetadata(blank, blank, null);
+    void should_reject_a_present_but_blank_region(String blank) {
+        assertThatThrownBy(() -> new GeoMetadata(blank, null, null))
+                .isInstanceOfSatisfying(
+                        InvalidValueException.class, e -> assertThat(e.field()).isEqualTo("geo.region"));
+    }
 
-        assertThat(geo.region()).isNull();
-        assertThat(geo.habitat()).isNull();
+    @ParameterizedTest
+    @ValueSource(strings = {"", " ", "\t"})
+    void should_reject_a_present_but_blank_habitat(String blank) {
+        assertThatThrownBy(() -> new GeoMetadata(null, blank, null))
+                .isInstanceOfSatisfying(
+                        InvalidValueException.class, e -> assertThat(e.field()).isEqualTo("geo.habitat"));
     }
 
     @Test
@@ -72,7 +79,7 @@ class GeoMetadataTest {
 
     @Test
     void should_report_empty_when_nothing_is_set() {
-        assertThat(new GeoMetadata(" ", null, null).isEmpty()).isTrue();
+        assertThat(new GeoMetadata(null, null, null).isEmpty()).isTrue();
         assertThat(new GeoMetadata(null, null, new Coordinates(0, 0)).isEmpty()).isFalse();
     }
 }
