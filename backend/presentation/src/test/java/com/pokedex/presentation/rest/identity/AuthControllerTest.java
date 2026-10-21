@@ -318,6 +318,25 @@ class AuthControllerTest {
                 .andExpect(cookie().maxAge("XSRF-TOKEN", 0));
     }
 
+    /**
+     * Regression: Spring's {@code oauth2ResourceServer()} DSL exempts every request that carries a bearer token from
+     * CSRF. That is right for header tokens but wrong for ours: the browser sends the cookie automatically.
+     */
+    @Test
+    void should_still_require_csrf_when_the_access_token_cookie_is_present() throws Exception {
+        mockMvc.perform(post("/api/v1/auth/logout").cookie(new Cookie("access_token", "a.b.c")))
+                .andExpect(status().isForbidden())
+                .andExpect(jsonPath("$.type").value("/problems/csrf-token-invalid"));
+    }
+
+    @Test
+    void should_answer_401_problem_for_an_invalid_access_token_cookie() throws Exception {
+        mockMvc.perform(get("/api/v1/auth/me").cookie(new Cookie("access_token", "a.b.c")))
+                .andExpect(status().isUnauthorized())
+                .andExpect(header().doesNotExist("WWW-Authenticate"))
+                .andExpect(jsonPath("$.type").value("/problems/unauthorized"));
+    }
+
     // ------------------------------------------------------------ authorization rows (security.md §3.2)
 
     @ParameterizedTest(name = "anonymous {0} {1} -> {2}")
