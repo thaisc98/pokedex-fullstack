@@ -179,6 +179,30 @@ class PokeApiGatewayResilienceTest {
         return context.getBean(PokeApiGateway.class);
     }
 
-    @EnableResilientMethods
+    @Test
+    void should_retry_the_name_lookup_and_evolution_chain_calls_but_not_a_404() {
+        AtomicInteger attempts = new AtomicInteger();
+        FakePokeApiHttpClient client = new FakePokeApiHttpClient()
+                .pokemonNamed("pikachu", () -> {
+                    attempts.incrementAndGet();
+                    throw new ResourceAccessException("reset");
+                })
+                .evolutionChain(10, () -> {
+                    attempts.incrementAndGet();
+                    throw new ResourceAccessException("reset");
+                });
+        PokeApiGateway gateway = proxied(client);
+
+        assertThatThrownBy(() -> gateway.pokemonByName("pikachu")).isInstanceOf(ResourceAccessException.class);
+        assertThatThrownBy(() -> gateway.evolutionChain(10)).isInstanceOf(ResourceAccessException.class);
+        assertThat(attempts).hasValue(8);
+
+        // unstubbed -> PokeAPI-style 404: a client error, never retried
+        assertThatThrownBy(() -> gateway.pokemon(99999)).isInstanceOf(HttpClientErrorException.NotFound.class);
+        assertThat(client.calls()).filteredOn("pokemon/99999"::equals).hasSize(1);
+    }
+
+    // Class-based proxy, as in bootstrap: the gateway also implements PokeApiResources.
+    @EnableResilientMethods(proxyTargetClass = true)
     static class ResilienceConfig {}
 }
