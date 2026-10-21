@@ -8,7 +8,11 @@ package com.pokedex.domain.shared;
  * caught.
  */
 public abstract sealed class DomainException extends RuntimeException
-        permits InvalidValueException, UpstreamUnavailableException {
+        permits AuthenticationFailedException,
+                AuthenticationRequiredException,
+                EmailAlreadyRegisteredException,
+                InvalidValueException,
+                UpstreamUnavailableException {
 
     private static final long serialVersionUID = 1L;
 
