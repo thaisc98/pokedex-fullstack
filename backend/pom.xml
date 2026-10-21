@@ -39,6 +39,10 @@
         <palantir.version>2.102.0</palantir.version>
         <archunit.version>1.5.1</archunit.version>
         <jspecify.version>1.0.1</jspecify.version>
+        <!-- springdoc-openapi 3.x is the Spring Boot 4 line (springdoc.org FAQ "compatibility matrix");
+             3.1.0 moved to Boot 4.1.0. 3.1.1 = <release> on Maven Central, verified 2026-10-20. -->
+        <springdoc.version>3.1.1</springdoc.version>
+
         <!-- JaCoCo gate defaults; domain/application/presentation/infrastructure override them. -->
         <coverage.line.min>0.00</coverage.line.min>
         <coverage.branch.min>0.00</coverage.branch.min>

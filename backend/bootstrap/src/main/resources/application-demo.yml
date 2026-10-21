@@ -1,0 +1,18 @@
+# Demo profile: OpenAPI docs at /v3/api-docs and Swagger UI at /swagger-ui (security.md §3.2).
+springdoc:
+  api-docs:
+    enabled: true
+    path: /v3/api-docs
+  swagger-ui:
+    enabled: true
+    path: /swagger-ui
+  # Document only what each operation declares, so the generated responses equal docs/api/openapi.yaml
+  # (otherwise every @RestControllerAdvice response, e.g. 500, is added to every operation).
+  override-with-generic-response: false
+  default-produces-media-type: application/json
+  paths-to-match: /api/**
+
+pokedex:
+  security:
+    # Anonymous GET on the springdoc routes. Never set this outside the demo profile.
+    api-docs-public: true
