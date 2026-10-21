@@ -168,6 +168,33 @@ abstract class AbstractPokeApiIT {
         stubSpecies(id, okJson(fixture("pokemon-species/%d.json".formatted(id))));
     }
 
+    /**
+     * {@code GET /api/v2/pokemon/{name}} (trailing slash tolerated). PokeAPI accepts a name or an id here; the
+     * app may call it with the normalised name after it passed {@code PokemonName} validation (security.md §4.5).
+     */
+    static void stubPokemonByName(String name, ResponseDefinitionBuilder response) {
+        POKEAPI.stubFor(
+                get(urlPathMatching(API_PREFIX + "/pokemon/" + name + "/?")).willReturn(response));
+    }
+
+    /** {@code GET /api/v2/evolution-chain/{id}} (trailing slash tolerated). */
+    static void stubEvolutionChain(int id, ResponseDefinitionBuilder response) {
+        POKEAPI.stubFor(get(urlPathMatching(API_PREFIX + "/evolution-chain/" + id + "/?"))
+                .willReturn(response));
+    }
+
+    static void stubRecordedEvolutionChain(int id) {
+        stubEvolutionChain(id, okJson(fixture("evolution-chain/%d.json".formatted(id))));
+    }
+
+    /** PokeAPI's real 404: {@code 404 application/json {"status":404,"message":"Not Found"}}. */
+    static ResponseDefinitionBuilder pokeApiNotFound() {
+        return aResponse()
+                .withStatus(404)
+                .withHeader("Content-Type", "application/json; charset=utf-8")
+                .withBody(fixture("errors/not-found.json"));
+    }
+
     static ResponseDefinitionBuilder status(int code) {
         return aResponse()
                 .withStatus(code)
