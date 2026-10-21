@@ -44,4 +44,5 @@ pokeapi:
   max-response-bytes: 1048576
   cache:
     max-pages: 500
+    max-resources: 2000
     ttl: 24h
