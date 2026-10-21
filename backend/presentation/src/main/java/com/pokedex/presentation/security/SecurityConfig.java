@@ -56,6 +56,8 @@ public class SecurityConfig {
     static final String LOGOUT = "/api/v1/auth/logout";
     static final String ME = "/api/v1/auth/me";
     static final String CSRF = "/api/v1/auth/csrf";
+    static final String COLLECTION = "/api/v1/collection";
+    static final String COLLECTION_ITEM = "/api/v1/collection/*";
 
     /**
      * The default StrictHttpFirewall stays as is; URLs it refuses get a 400 validation ProblemDetail (Spring
@@ -89,6 +91,13 @@ public class SecurityConfig {
                     auth.requestMatchers(HttpMethod.POST, REGISTER, LOGIN).permitAll();
                     auth.requestMatchers(HttpMethod.GET, ME).authenticated();
                     auth.requestMatchers(HttpMethod.POST, LOGOUT).authenticated();
+                    // Collection (BR-10): shared team dataset; reads, sync and update need USER, delete needs ADMIN.
+                    // The ADMIN token carries USER too (Role.impliedRoles); DELETE is checked again in the use case.
+                    auth.requestMatchers(HttpMethod.GET, COLLECTION, COLLECTION_ITEM)
+                            .hasRole("USER");
+                    auth.requestMatchers(HttpMethod.POST, COLLECTION).hasRole("USER");
+                    auth.requestMatchers(HttpMethod.PUT, COLLECTION_ITEM).hasRole("USER");
+                    auth.requestMatchers(HttpMethod.DELETE, COLLECTION_ITEM).hasRole("ADMIN");
                     if (apiDocsPublic) {
                         auth.requestMatchers(HttpMethod.GET, API_DOCS_PATHS).permitAll();
                     }
