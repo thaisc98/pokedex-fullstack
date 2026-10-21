@@ -47,6 +47,16 @@ pokedex:
       registrations-per-minute: 3
 
 server:
+  # Client IP for the rate limits (security.md §4.1): X-Forwarded-For is honoured only when the direct peer is a
+  # trusted proxy (the Next.js server). TRUSTED_PROXIES is a regex of proxy IPs; the default is the private and
+  # loopback ranges, like Tomcat's own default. A client calling Spring directly cannot spoof its IP.
+  forward-headers-strategy: native
+  tomcat:
+    remoteip:
+      internal-proxies: '${TRUSTED_PROXIES:10\.\d+\.\d+\.\d+|192\.168\.\d+\.\d+|169\.254\.\d+\.\d+|127\.\d+\.\d+\.\d+|172\.(1[6-9]|2[0-9]|3[0-1])\.\d+\.\d+|100\.(6[4-9]|[7-9][0-9]|1[0-1][0-9]|12[0-7])\.\d+\.\d+|0:0:0:0:0:0:0:1|::1}'
+  # BREACH (security.md §4.2.1): GET /auth/csrf returns the unmasked CSRF token, so responses are never compressed.
+  compression:
+    enabled: false
   error:
     include-stacktrace: never
     include-message: never
