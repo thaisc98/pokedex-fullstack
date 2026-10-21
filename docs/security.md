@@ -233,7 +233,12 @@ Sources: the [Spring Security 7.1.1 CSRF reference](https://docs.spring.io/sprin
 - Dependency versions managed by the Spring Boot parent. Plugins pinned. Maven wrapper with `distributionSha256Sum`.
 - **OWASP Dependency-Check** Maven plugin in CI: fails on CVSS ≥ 7.
 - **CycloneDX** SBOM generated for backend and frontend.
-- Frontend: `npm ci` with the committed lockfile, `npm audit --audit-level=high` in CI.
+- Frontend: `npm ci` with the committed lockfile; CI runs `npm audit --omit=dev --audit-level=high` (production dependencies). Findings in dev-only tooling are reviewed by hand and listed below as accepted risks.
+- Accepted risks (dev-only, revisit when a patch ships):
+
+  | Package | Path | Advisory | Why accepted |
+  |---|---|---|---|
+  | `braces` ≤ 3.0.3 | via `eslint-config-next` (lint tooling) | [GHSA-vfj7-8cjw-p6xm](https://github.com/advisories/GHSA-vfj7-8cjw-p6xm) | Dev-only, never shipped in the bundle; no patched release available |
 - Dependabot for Maven, npm, Docker and GitHub Actions.
 - Docker base images pinned by digest in CI builds.
 
@@ -255,7 +260,7 @@ Sources: the [Spring Security 7.1.1 CSRF reference](https://docs.spring.io/sprin
 | Third-party code | No CDN scripts. Fonts and icons are self-hosted, so CSP can stay `'self'` |
 | Error details | `error.tsx` / `global-error.tsx` and `ErrorState` show friendly messages plus the `correlationId`, never stack traces (Next.js hides server error details in production) |
 | Session expiry | On `401` → `logout()` clears the store and redirects to `/login?from=…`. A timer based on `expiresAt` warns 2 min before expiry |
-| Dependency risk | `npm audit` in CI, Dependabot, lockfile committed |
+| Dependency risk | `npm audit --omit=dev --audit-level=high` in CI (dev-tool findings reviewed by hand, §4.10), Dependabot, lockfile committed |
 
 ---
 
