@@ -31,7 +31,7 @@ gantt
   - [ ] Adding `spring-context` to `domain` on a test branch **fails the build** (proves the enforcer works)
   - [ ] Adding a deliberate cross-layer import **fails ArchUnit**
   - [ ] A sample test runs under JaCoCo, PIT, ArchUnit and Mockito on Java 25 bytecode
-  - [ ] Dependency-Check and `npm audit` run in CI
+  - [ ] Dependency-Check and `npm audit --omit=dev --audit-level=high` run in CI
 
 ### P1 — Domain (TDD)
 - **Scope:** All value objects, `CollectedPokemon`, `User`, `EvolutionChain`, the sealed domain exceptions; business rules BR-01…BR-09 as tests.
