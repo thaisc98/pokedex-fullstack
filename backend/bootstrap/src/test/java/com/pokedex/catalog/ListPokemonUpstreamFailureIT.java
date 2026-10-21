@@ -26,8 +26,9 @@ import org.junit.jupiter.params.provider.CsvSource;
  * {@code UpstreamUnavailable}; testing-strategy.md §5 (429 / 5xx / connection refused → retried then 503,
  * malformed JSON → no stack trace); security.md §4.6 (no stack traces or internal details in errors).
  *
- * <p>Kept in its own class (own Spring context, own cache) and every test uses a unique (page, size) pair and
- * unique Pokémon ids, so nothing cached by a successful call can hide a failure.
+ * <p>Shares the application context and the single WireMock server with the other Catalog ITs. Caches and
+ * stubs are reset before every test (see {@link AbstractPokeApiIT}), and every test still uses a unique (page,
+ * size) pair and unique Pokémon ids, so nothing cached by a successful call can hide a failure.
  */
 @DisplayName("US01 - list Pokémon when PokeAPI fails")
 class ListPokemonUpstreamFailureIT extends AbstractPokeApiIT {

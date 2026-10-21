@@ -12,7 +12,6 @@ import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasItem;
-import static org.hamcrest.Matchers.matchesPattern;
 import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.Matchers.nullValue;
@@ -35,11 +34,14 @@ import org.junit.jupiter.params.provider.CsvSource;
  * {@code PokemonSummaryDto}, {@code ProblemDetail}; testing-strategy.md §5 "Catalog / PokeAPI"; security.md §3
  * (catalog is public) and §4.5 (never follow upstream URLs).
  *
- * <p>Every test uses its own (page, size) pair and its own Pokémon ids, so the Caffeine cache (ADR 0004)
- * shared by the Spring context can never make one test depend on another.
+ * <p>Caches and WireMock stubs are reset before every test ({@link AbstractPokeApiIT}). Every test also uses its
+ * own (page, size) pair and its own Pokémon ids, as a second line of defence against the cache (ADR 0004).
  */
 @DisplayName("US01 - list Pokémon page by page")
 class ListPokemonIT extends AbstractPokeApiIT {
+
+    static final String PLACEHOLDER_SPRITE =
+            "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items/poke-ball.png";
 
     // ------------------------------------------------------------ happy path
 
@@ -264,9 +266,8 @@ class ListPokemonIT extends AbstractPokeApiIT {
                 .statusCode(200)
                 .body("content.id", contains(10264))
                 .body("content[0].name", equalTo("koraidon-limited-build"))
-                .body("content[0].sprite", notNullValue())
-                // ImageUrl: always present, never "null"/blank; an absolute https URL or an app-relative path
-                .body("content[0].sprite", matchesPattern("^(https://\\S+|/\\S+)$"))
+                // Placeholder approved by the human (ImageUrl in openapi.yaml, security.md §4.5)
+                .body("content[0].sprite", equalTo(PLACEHOLDER_SPRITE))
                 .body("content[0].category", equalTo("Paradox Pokémon"))
                 .body("content[0].abilities.name", contains("orichalcum-pulse"))
                 .body("content[0].abilities.hidden", contains(false))

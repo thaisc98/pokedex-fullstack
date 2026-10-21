@@ -7,8 +7,8 @@ import static com.github.tomakehurst.wiremock.client.WireMock.okJson;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlPathMatching;
 import static com.github.tomakehurst.wiremock.core.WireMockConfiguration.wireMockConfig;
 
+import com.github.tomakehurst.wiremock.WireMockServer;
 import com.github.tomakehurst.wiremock.client.ResponseDefinitionBuilder;
-import com.github.tomakehurst.wiremock.junit5.WireMockExtension;
 import io.restassured.RestAssured;
 import io.restassured.config.JsonConfig;
 import io.restassured.config.RestAssuredConfig;
@@ -18,10 +18,14 @@ import java.io.UncheckedIOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Objects;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.extension.RegisterExtension;
+import org.springframework.beans.factory.ObjectProvider;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.cache.Cache;
+import org.springframework.cache.CacheManager;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 
@@ -42,6 +46,20 @@ import org.springframework.test.context.DynamicPropertySource;
  * that WireMock received the rebuilt requests, so following an upstream URL fails the test even when the
  * machine happens to have internet access.
  *
+ * <p><b>Isolation model.</b> All subclasses share <em>one</em> Spring application context: the
+ * {@code @DynamicPropertySource} below is inherited, so the context cache key is identical. That is correct
+ * because there is also exactly one WireMock server per JVM ({@link #POKEAPI}), started once in a static
+ * initializer on a dynamic port and never stopped by the test lifecycle (it dies with the JVM), so the base URL
+ * baked into the cached context never goes stale. Tests stay independent because, before every test:
+ *
+ * <ol>
+ *   <li>{@code POKEAPI.resetAll()} drops every stub and the request journal;
+ *   <li>every cache of every {@link CacheManager} bean is cleared (none exists until the backend adds caching,
+ *       so the lookup is optional).
+ * </ol>
+ *
+ * Tests still use unique (page, size) pairs and Pokémon ids as a second line of defence.
+ *
  * <p>Abstract, so Failsafe does not run it on its own.
  */
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -59,11 +77,12 @@ abstract class AbstractPokeApiIT {
             .resolve("../infrastructure/src/test/resources/pokeapi")
             .normalize();
 
-    @RegisterExtension
-    static final WireMockExtension POKEAPI = WireMockExtension.newInstance()
-            .options(wireMockConfig().dynamicPort())
-            .failOnUnmatchedRequests(false)
-            .build();
+    /** One PokeAPI stand-in for the whole JVM; its port never changes, so a shared context stays valid. */
+    static final WireMockServer POKEAPI = new WireMockServer(wireMockConfig().dynamicPort());
+
+    static {
+        POKEAPI.start();
+    }
 
     @DynamicPropertySource
     static void pointPokeApiAtWireMock(DynamicPropertyRegistry registry) {
@@ -72,6 +91,20 @@ abstract class AbstractPokeApiIT {
 
     @Value("${local.server.port}")
     int port;
+
+    @Autowired
+    ObjectProvider<CacheManager> cacheManagers;
+
+    @BeforeEach
+    void resetPokeApiAndCaches() {
+        POKEAPI.resetAll();
+        cacheManagers
+                .orderedStream()
+                .forEach(manager -> manager.getCacheNames().stream()
+                        .map(manager::getCache)
+                        .filter(Objects::nonNull)
+                        .forEach(Cache::clear));
+    }
 
     @BeforeEach
     void configureRestAssured() {
