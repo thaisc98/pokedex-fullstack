@@ -189,7 +189,7 @@ export interface paths {
             query?: never;
             header?: never;
             path: {
-                /** @description Pokédex id (`PokedexId`): a positive integer. */
+                /** @description Pokédex id (`PokedexId`): a positive integer. `0`, negatives and non-integers → `400` `/problems/validation-error` on field `pokedexId`. */
                 pokedexId: components["parameters"]["PokedexIdPathParam"];
             };
             cookie?: never;
@@ -607,8 +607,40 @@ export interface components {
         ProblemDetail: {
             /**
              * Format: uri-reference
-             * @description Problem type URI, e.g. `/problems/csrf-token-invalid`, `/problems/validation-error`.
+             * @description Problem type URI (relative to the API origin). Known types:
+             *
+             *     | `type` | Status | When |
+             *     |---|---|---|
+             *     | `/problems/validation-error` | 400 | Invalid input; `errors[]` lists the fields. |
+             *     | `/problems/unauthorized` | 401 | Authentication required or failed. Anonymous access to a non-public route also gets this (deny by default). |
+             *     | `/problems/invalid-credentials` | 401 | Login failed. One fixed body for an unknown email and a wrong password (security.md §4.1). |
+             *     | `/problems/forbidden` | 403 | Authenticated but not allowed (e.g. a `USER` calling an `ADMIN` route). |
+             *     | `/problems/csrf-token-invalid` | 403 | Missing or invalid `X-XSRF-TOKEN` on a non-GET request (security.md §4.2.1). |
+             *     | `/problems/email-taken` | 409 | Registration with an email that already has an account (BR-09). |
+             *     | `/problems/rate-limited` | 429 | Too many login or registration attempts; see `Retry-After` (security.md §4.1). |
+             *     | `/problems/not-found` | 404 | The resource does not exist (e.g. no such Pokémon; `0` and unknown ids or names). |
+             *     | `/problems/version-conflict` | 409 | Stale `version` on a collection update (BR-08): reload and retry. |
+             *     | `/problems/payload-too-large` | 413 | Request body over 16 KB (security.md §4.3). |
+             *     | `/problems/unsupported-media-type` | 415 | `Content-Type` of a write is not `application/json` (security.md §4.3). |
+             *     | `/problems/upstream-unavailable` | 503 | PokeAPI down, erroring, too large (> 1 MB) or partial; never a half-filled page (architecture.md §1.5). |
+             *     | `/problems/internal-error` | 500 | Unexpected error. Only a `correlationId`, never details. |
+             *
+             *     Clients must treat unknown types as generic errors for their `status`;
+             *     more types may be added (not a closed enum).
              * @default about:blank
+             * @example /problems/validation-error
+             * @example /problems/unauthorized
+             * @example /problems/invalid-credentials
+             * @example /problems/forbidden
+             * @example /problems/csrf-token-invalid
+             * @example /problems/not-found
+             * @example /problems/email-taken
+             * @example /problems/rate-limited
+             * @example /problems/version-conflict
+             * @example /problems/payload-too-large
+             * @example /problems/unsupported-media-type
+             * @example /problems/upstream-unavailable
+             * @example /problems/internal-error
              */
             type: string;
             /** @description Short, human-readable summary of the problem type. */
@@ -634,30 +666,60 @@ export interface components {
         };
     };
     responses: {
-        /** @description Invalid request (validation, malformed path/query, or disallowed field change — BR-06). */
+        /** @description Invalid request (validation, malformed path/query, or disallowed field change — BR-06). `type: /problems/validation-error`. */
         BadRequest: {
             headers: {
                 [name: string]: unknown;
             };
             content: {
+                /**
+                 * @example {
+                 *       "type": "/problems/validation-error",
+                 *       "title": "Validation failed",
+                 *       "status": 400,
+                 *       "detail": "One or more fields are invalid.",
+                 *       "errors": [
+                 *         {
+                 *           "field": "size",
+                 *           "message": "must be between 1 and 100"
+                 *         }
+                 *       ]
+                 *     }
+                 */
                 "application/problem+json": components["schemas"]["ProblemDetail"];
             };
         };
-        /** @description Authentication required or failed. The login response is deliberately generic (security.md §4.1). */
+        /** @description Authentication required or failed (`type: /problems/unauthorized`). Also returned for anonymous access to any non-public route (deny by default). No `WWW-Authenticate` challenge. A failed login is `type: /problems/invalid-credentials` with one fixed body for unknown email and wrong password (security.md §4.1). */
         Unauthorized: {
             headers: {
                 [name: string]: unknown;
             };
             content: {
+                /**
+                 * @example {
+                 *       "type": "/problems/unauthorized",
+                 *       "title": "Unauthorized",
+                 *       "status": 401,
+                 *       "detail": "Authentication is required to access this resource."
+                 *     }
+                 */
                 "application/problem+json": components["schemas"]["ProblemDetail"];
             };
         };
-        /** @description Authenticated but not authorized (e.g. a `USER` attempting a `DELETE`). */
+        /** @description Authenticated but not authorized (`type: /problems/forbidden`), e.g. a `USER` attempting a `DELETE`. */
         Forbidden: {
             headers: {
                 [name: string]: unknown;
             };
             content: {
+                /**
+                 * @example {
+                 *       "type": "/problems/forbidden",
+                 *       "title": "Forbidden",
+                 *       "status": 403,
+                 *       "detail": "You are not allowed to access this resource."
+                 *     }
+                 */
                 "application/problem+json": components["schemas"]["ProblemDetail"];
             };
         };
@@ -667,19 +729,53 @@ export interface components {
                 [name: string]: unknown;
             };
             content: {
+                /**
+                 * @example {
+                 *       "type": "/problems/csrf-token-invalid",
+                 *       "title": "Invalid CSRF token",
+                 *       "status": 403,
+                 *       "detail": "The CSRF token is missing or invalid. Fetch a new token and retry."
+                 *     }
+                 */
                 "application/problem+json": components["schemas"]["ProblemDetail"];
             };
         };
-        /** @description Resource not found. */
+        /** @description Unexpected error (`type: /problems/internal-error`). Details go to the log only; the body carries a `correlationId` (security.md §4.6). Any operation can return it. */
+        InternalServerError: {
+            headers: {
+                [name: string]: unknown;
+            };
+            content: {
+                /**
+                 * @example {
+                 *       "type": "/problems/internal-error",
+                 *       "title": "Internal server error",
+                 *       "status": 500,
+                 *       "detail": "An unexpected error occurred.",
+                 *       "correlationId": "3f2b8c1e-9d4a-4e7b-8a61-2c5d0f9e7a10"
+                 *     }
+                 */
+                "application/problem+json": components["schemas"]["ProblemDetail"];
+            };
+        };
+        /** @description Resource not found (`type: /problems/not-found`). The body never repeats the requested id or name in `detail`. */
         NotFound: {
             headers: {
                 [name: string]: unknown;
             };
             content: {
+                /**
+                 * @example {
+                 *       "type": "/problems/not-found",
+                 *       "title": "Not found",
+                 *       "status": 404,
+                 *       "detail": "The requested resource does not exist."
+                 *     }
+                 */
                 "application/problem+json": components["schemas"]["ProblemDetail"];
             };
         };
-        /** @description Conflict: duplicate email (register) or stale `version` (update, BR-08). */
+        /** @description Conflict: duplicate email (register, `type: /problems/email-taken`) or stale `version` (update, BR-08, `type: /problems/version-conflict`). */
         Conflict: {
             headers: {
                 [name: string]: unknown;
@@ -688,7 +784,7 @@ export interface components {
                 "application/problem+json": components["schemas"]["ProblemDetail"];
             };
         };
-        /** @description Request body exceeds the 16 KB limit (security.md §4.3). */
+        /** @description Request body exceeds the 16 KB limit (security.md §4.3). `type: /problems/payload-too-large`. */
         PayloadTooLarge: {
             headers: {
                 [name: string]: unknown;
@@ -697,7 +793,7 @@ export interface components {
                 "application/problem+json": components["schemas"]["ProblemDetail"];
             };
         };
-        /** @description `Content-Type` is not `application/json` (security.md §4.3). */
+        /** @description `Content-Type` is not `application/json` (security.md §4.3). `type: /problems/unsupported-media-type`. */
         UnsupportedMediaType: {
             headers: {
                 [name: string]: unknown;
@@ -706,7 +802,7 @@ export interface components {
                 "application/problem+json": components["schemas"]["ProblemDetail"];
             };
         };
-        /** @description Rate limit exceeded (security.md §4.1). Includes a `Retry-After` header. */
+        /** @description Rate limit exceeded (security.md §4.1, `type: /problems/rate-limited`). Includes a `Retry-After` header. */
         TooManyRequests: {
             headers: {
                 /** @description Seconds to wait before retrying. */
@@ -717,12 +813,21 @@ export interface components {
                 "application/problem+json": components["schemas"]["ProblemDetail"];
             };
         };
-        /** @description PokeAPI is unavailable or returned a partial page (architecture.md §1.5). We never return half-filled results. */
+        /** @description PokeAPI is unavailable, returned a response over 1 MB (security.md §4.5), or would have produced a partial page (architecture.md §1.5). `type: /problems/upstream-unavailable`. We never return half-filled results. */
         UpstreamUnavailable: {
             headers: {
                 [name: string]: unknown;
             };
             content: {
+                /**
+                 * @example {
+                 *       "type": "/problems/upstream-unavailable",
+                 *       "title": "Upstream service unavailable",
+                 *       "status": 503,
+                 *       "detail": "The Pokémon catalog is temporarily unavailable. Please try again later.",
+                 *       "correlationId": "3f2b8c1e-9d4a-4e7b-8a61-2c5d0f9e7a10"
+                 *     }
+                 */
                 "application/problem+json": components["schemas"]["ProblemDetail"];
             };
         };
@@ -739,7 +844,7 @@ export interface components {
          *     `pika;drop` is a `400`.
          */
         IdOrNameParam: string;
-        /** @description Pokédex id (`PokedexId`): a positive integer. */
+        /** @description Pokédex id (`PokedexId`): a positive integer. `0`, negatives and non-integers → `400` `/problems/validation-error` on field `pokedexId`. */
         PokedexIdPathParam: number;
         /** @description Filter by an exact `Tag` (`^[a-z0-9-]{1,30}$`). */
         TagFilterParam: components["schemas"]["Tag"];
@@ -1049,7 +1154,7 @@ export interface operations {
             query?: never;
             header?: never;
             path: {
-                /** @description Pokédex id (`PokedexId`): a positive integer. */
+                /** @description Pokédex id (`PokedexId`): a positive integer. `0`, negatives and non-integers → `400` `/problems/validation-error` on field `pokedexId`. */
                 pokedexId: components["parameters"]["PokedexIdPathParam"];
             };
             cookie?: never;
@@ -1065,6 +1170,7 @@ export interface operations {
                     "application/json": components["schemas"]["CollectedPokemonDto"];
                 };
             };
+            400: components["responses"]["BadRequest"];
             401: components["responses"]["Unauthorized"];
             404: components["responses"]["NotFound"];
         };
@@ -1081,7 +1187,7 @@ export interface operations {
                 "X-XSRF-TOKEN": components["parameters"]["CsrfHeader"];
             };
             path: {
-                /** @description Pokédex id (`PokedexId`): a positive integer. */
+                /** @description Pokédex id (`PokedexId`): a positive integer. `0`, negatives and non-integers → `400` `/problems/validation-error` on field `pokedexId`. */
                 pokedexId: components["parameters"]["PokedexIdPathParam"];
             };
             cookie?: never;
@@ -1122,7 +1228,7 @@ export interface operations {
                 "X-XSRF-TOKEN": components["parameters"]["CsrfHeader"];
             };
             path: {
-                /** @description Pokédex id (`PokedexId`): a positive integer. */
+                /** @description Pokédex id (`PokedexId`): a positive integer. `0`, negatives and non-integers → `400` `/problems/validation-error` on field `pokedexId`. */
                 pokedexId: components["parameters"]["PokedexIdPathParam"];
             };
             cookie?: never;
@@ -1136,6 +1242,7 @@ export interface operations {
                 };
                 content?: never;
             };
+            400: components["responses"]["BadRequest"];
             401: components["responses"]["Unauthorized"];
             /**
              * @description Forbidden, for either reason: the CSRF token is missing or invalid
