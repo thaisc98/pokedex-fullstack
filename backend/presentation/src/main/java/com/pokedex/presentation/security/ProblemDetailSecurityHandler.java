@@ -9,13 +9,16 @@ import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.access.AccessDeniedHandler;
 import org.springframework.security.web.csrf.CsrfException;
+import org.springframework.security.web.firewall.RequestRejectedException;
+import org.springframework.security.web.firewall.RequestRejectedHandler;
 
 /**
  * Writes RFC 9457 problems for security failures that happen in the filter chain, before any controller.
  * Bodies are fixed strings: nothing from the request is echoed back. No {@code WWW-Authenticate} challenge,
  * so browsers never show a Basic-auth prompt.
  */
-final class ProblemDetailSecurityHandler implements AuthenticationEntryPoint, AccessDeniedHandler {
+final class ProblemDetailSecurityHandler
+        implements AuthenticationEntryPoint, AccessDeniedHandler, RequestRejectedHandler {
 
     static final String UNAUTHORIZED = "{\"type\":\"/problems/unauthorized\",\"title\":\"Unauthorized\",\"status\":401,"
             + "\"detail\":\"Authentication is required to access this resource.\"}";
@@ -24,6 +27,10 @@ final class ProblemDetailSecurityHandler implements AuthenticationEntryPoint, Ac
                     + "\"detail\":\"The CSRF token is missing or invalid. Fetch a new token and retry.\"}";
     static final String FORBIDDEN = "{\"type\":\"/problems/forbidden\",\"title\":\"Forbidden\",\"status\":403,"
             + "\"detail\":\"You are not allowed to access this resource.\"}";
+    static final String REQUEST_REJECTED =
+            "{\"type\":\"/problems/validation-error\",\"title\":\"Validation failed\",\"status\":400,"
+                    + "\"detail\":\"One or more fields are invalid.\","
+                    + "\"errors\":[{\"field\":\"path\",\"message\":\"contains characters that are not allowed\"}]}";
 
     @Override
     public void commence(
@@ -41,6 +48,17 @@ final class ProblemDetailSecurityHandler implements AuthenticationEntryPoint, Ac
         } else {
             write(response, HttpServletResponse.SC_FORBIDDEN, FORBIDDEN);
         }
+    }
+
+    /**
+     * A URL refused by StrictHttpFirewall (for example {@code /pokemon/pika;drop}: Spring MVC would otherwise drop
+     * the {@code ;drop} and look up {@code pika}). The rejection reason is not echoed.
+     */
+    @Override
+    public void handle(
+            HttpServletRequest request, HttpServletResponse response, RequestRejectedException requestRejectedException)
+            throws IOException {
+        write(response, HttpServletResponse.SC_BAD_REQUEST, REQUEST_REJECTED);
     }
 
     private static void write(HttpServletResponse response, int status, String body) throws IOException {
