@@ -79,16 +79,43 @@ Set `JWT_SECRET` in `.env` to at least 256 bits of random data:
 openssl rand -base64 32
 ```
 
-### 2. Run
+### 2. Run the whole stack (Docker)
 
-> Filled in during Phase 6 (Packaging & Seed). Planned commands:
+Needs Docker Desktop running. From the repo root, with `.env` filled in (step 1):
 
 ```bash
-docker compose up --build
+docker compose up -d --build
+```
+
+| What | URL |
+|---|---|
+| Web app (Next.js) | http://localhost:3000 |
+| API docs / Swagger UI (`demo` profile) | http://localhost:8080/swagger-ui |
+| API base (direct, for curl) | http://localhost:8080/api/v1 |
+
+PostgreSQL starts first, then the backend (Flyway creates the tables on start), then the frontend. The first build takes a few minutes. Follow the logs, or stop everything:
+
+```bash
+docker compose logs -f backend
 ```
 ```bash
-docker compose --profile offline up --build
+docker compose down
 ```
+
+Add `-v` to `down` to also delete the database volume. Ports are bound to `127.0.0.1` only; change them with `FRONTEND_PORT`, `BACKEND_PORT` and `POSTGRES_PORT` in `.env`.
+
+> Use Chrome or Firefox at `http://localhost:3000`. The login cookie is `Secure`; browsers accept that on `localhost` over plain HTTP.
+
+**Make a user an ADMIN** (there's no demo seed yet; needed to test delete). Register in the app first, then:
+
+```bash
+docker compose exec postgres sh -c 'psql -U "$POSTGRES_USER" -d "$POSTGRES_DB" -c "UPDATE app_user SET role = '"'"'ADMIN'"'"' WHERE email = '"'"'you@example.com'"'"';"'
+```
+
+Log out and in again so the new role is in your token.
+
+### 3. Run the tests
+
 ```bash
 cd backend && ./mvnw verify
 ```
@@ -96,6 +123,8 @@ cd backend && ./mvnw verify
 cd frontend && npm ci && npm test
 ```
 
+The backend integration tests start PostgreSQL with Testcontainers, so Docker must be running.
+
 ### Demo credentials
 
-> The demo seed data is added in Phase 6. Planned accounts: one `ADMIN` and one `USER`. Their credentials will be listed here.
+> The demo seed data is added in Phase 6. Until then, register an account in the app and use the ADMIN command above.
