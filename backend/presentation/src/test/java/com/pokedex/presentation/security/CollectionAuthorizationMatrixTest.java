@@ -50,7 +50,7 @@ import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilde
 /**
  * Authorization matrix rows for the collection (security.md §3, BR-10): anonymous → 401 everywhere; USER may read,
  * sync and update; only ADMIN may delete (USER → 403 /problems/forbidden from the filter chain, before the use case
- * runs); writes need the CSRF token even with a valid access token.
+ * runs). CSRF on collection writes is in {@code CollectionCsrfTest}.
  */
 @WebMvcTest(CollectionController.class)
 @Import({SecurityConfig.class, StrictJsonConfig.class})
@@ -125,18 +125,7 @@ class CollectionAuthorizationMatrixTest {
         verifyNoInteractions(deleteOne);
     }
 
-    @Test
-    void should_require_csrf_on_collection_writes_even_when_authenticated() throws Exception {
-        mockMvc.perform(as("ADMIN", body(request(HttpMethod.POST, "/api/v1/collection"), "POST", "/api/v1/collection")))
-                .andExpect(status().isForbidden())
-                .andExpect(jsonPath("$.type").value("/problems/csrf-token-invalid"));
-        mockMvc.perform(as("ADMIN", request(HttpMethod.DELETE, "/api/v1/collection/25")))
-                .andExpect(status().isForbidden())
-                .andExpect(jsonPath("$.type").value("/problems/csrf-token-invalid"));
-        verifyNoInteractions(sync, deleteOne);
-    }
-
-    private static MockHttpServletRequestBuilder as(String caller, MockHttpServletRequestBuilder request) {
+    static MockHttpServletRequestBuilder as(String caller, MockHttpServletRequestBuilder request) {
         return switch (caller) {
             case "USER" -> request.with(jwt().authorities(new SimpleGrantedAuthority("ROLE_USER")));
             case "ADMIN" ->
@@ -157,7 +146,7 @@ class CollectionAuthorizationMatrixTest {
         return request;
     }
 
-    private static CollectedPokemon pikachu() {
+    static CollectedPokemon pikachu() {
         UpstreamSnapshot snapshot = new UpstreamSnapshot(
                 new PokedexId(25),
                 new PokemonName("pikachu"),

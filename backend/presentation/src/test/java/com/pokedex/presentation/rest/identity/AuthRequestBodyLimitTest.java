@@ -50,7 +50,7 @@ class AuthRequestBodyLimitTest {
                         .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(OVERSIZED))
-                .andExpect(status().isPayloadTooLarge())
+                .andExpect(status().is(413))
                 .andExpect(content().contentTypeCompatibleWith("application/problem+json"))
                 .andExpect(jsonPath("$.type").value("/problems/payload-too-large"))
                 .andExpect(jsonPath("$.status").value(413));
