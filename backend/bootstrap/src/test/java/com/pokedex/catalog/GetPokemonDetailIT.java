@@ -90,8 +90,21 @@ class GetPokemonDetailIT extends AbstractPokeApiIT {
         assertThat(json.getMap("$").keySet())
                 .as("PokemonDetailDto fields exactly (additionalProperties: false)")
                 .containsExactlyInAnyOrder(
-                        "id", "name", "artwork", "stats", "description", "evolution", "types", "height", "mass");
+                        "id",
+                        "name",
+                        "artwork",
+                        "stats",
+                        "description",
+                        "evolution",
+                        "types",
+                        "height",
+                        "mass",
+                        "abilities");
         assertThat(json.getMap("stats[0]").keySet()).containsExactlyInAnyOrder("name", "value");
+        // Abilities with the hidden flag, upstream order (contract: PokemonDetailDto.abilities, Ability)
+        assertThat(json.getList("abilities"))
+                .containsExactly(
+                        Map.of("name", "static", "hidden", false), Map.of("name", "lightning-rod", "hidden", true));
         assertDecimal(json, "height", "0.4"); // 4 dm
         assertDecimal(json, "mass", "6.0"); // 60 hg (BR-02)
 

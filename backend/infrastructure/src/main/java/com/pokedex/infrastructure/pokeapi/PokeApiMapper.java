@@ -106,7 +106,8 @@ public final class PokeApiMapper {
                 new EvolutionChain(node(Objects.requireNonNull(evolutionChain.chain(), "chain"), true)),
                 types(pokemon),
                 new Height(Objects.requireNonNull(pokemon.height(), "height")),
-                new Mass(Objects.requireNonNull(pokemon.weight(), "weight")));
+                new Mass(Objects.requireNonNull(pokemon.weight(), "weight")),
+                abilities(pokemon));
     }
 
     private static ImageUrl artwork(PokeApiPokemonDto pokemon) {

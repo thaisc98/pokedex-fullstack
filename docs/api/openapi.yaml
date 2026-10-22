@@ -811,7 +811,7 @@ components:
     PokemonDetailDto:
       type: object
       description: 'Catalog detail (`PokemonDetail`).'
-      required: [id, name, artwork, stats, description, evolution, types, height, mass]
+      required: [id, name, artwork, stats, description, evolution, types, height, mass, abilities]
       properties:
         id:
           $ref: '#/components/schemas/PokedexId'
@@ -836,6 +836,11 @@ components:
           $ref: '#/components/schemas/HeightM'
         mass:
           $ref: '#/components/schemas/MassKg'
+        abilities:
+          type: array
+          description: 'Abilities with the hidden flag, upstream order (same as `PokemonSummaryDto.abilities`; ui-ux §5.2).'
+          items:
+            $ref: '#/components/schemas/Ability'
       additionalProperties: false
 
     # ---- Collection value objects / DTOs ---------------------------------

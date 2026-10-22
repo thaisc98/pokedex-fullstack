@@ -62,7 +62,7 @@ public final class CachingPokeApiResources implements PokeApiResources {
     }
 
     /** Names and ids share one cache; a prefixed string key can never collide with an integer id. */
-    private static String nameKey(String name) {
+    static String nameKey(String name) {
         return "name:" + name;
     }
 }

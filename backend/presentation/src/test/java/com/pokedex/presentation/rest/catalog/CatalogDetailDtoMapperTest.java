@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import com.pokedex.application.catalog.PokemonDetailFixtures;
 import com.pokedex.domain.catalog.vo.EvolutionTrigger;
+import com.pokedex.presentation.rest.catalog.dto.AbilityDto;
 import com.pokedex.presentation.rest.catalog.dto.BaseStatDto;
 import com.pokedex.presentation.rest.catalog.dto.EvolutionNodeDto;
 import com.pokedex.presentation.rest.catalog.dto.EvolutionTriggerDto;
@@ -32,6 +33,8 @@ class CatalogDetailDtoMapperTest {
         assertThat(dto.types()).containsExactly("electric");
         assertThat(dto.height()).isEqualTo(0.4);
         assertThat(dto.mass()).isEqualTo(6.0);
+        assertThat(dto.abilities())
+                .containsExactly(new AbilityDto("static", false), new AbilityDto("lightning-rod", true));
     }
 
     @Test
@@ -78,7 +81,16 @@ class CatalogDetailDtoMapperTest {
 
         assertThat(json.propertyNames())
                 .containsExactlyInAnyOrder(
-                        "id", "name", "artwork", "stats", "description", "evolution", "types", "height", "mass");
+                        "id",
+                        "name",
+                        "artwork",
+                        "stats",
+                        "description",
+                        "evolution",
+                        "types",
+                        "height",
+                        "mass",
+                        "abilities");
         assertThat(json.get("evolution").get("root").has("trigger")).isTrue();
         assertThat(json.get("evolution").get("root").get("trigger").isNull()).isTrue();
         assertThat(json.get("evolution").get("root").propertyNames())
