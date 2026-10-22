@@ -83,6 +83,10 @@ public class PokeApiConfig {
                             .expireAfterWrite(ttl)
                             .build());
         }
+        // Search name index: one entry (the whole list), refreshed after the TTL.
+        manager.registerCustomCache(
+                CachingPokemonCatalog.NAME_INDEX_CACHE,
+                Caffeine.newBuilder().maximumSize(1).expireAfterWrite(ttl).build());
         // Login/registration buckets (security.md §4.1): bounded, and dropped once idle well past their window.
         manager.registerCustomCache(
                 AuthRateLimits.CACHE,
@@ -101,7 +105,10 @@ public class PokeApiConfig {
                 cache(cacheManager, CachingPokeApiResources.SPECIES_CACHE),
                 cache(cacheManager, CachingPokeApiResources.EVOLUTION_CHAIN_CACHE));
         PokeApiCatalogAdapter adapter = new PokeApiCatalogAdapter(resources, new PokeApiMapper());
-        return new CachingPokemonCatalog(adapter, cache(cacheManager, CachingPokemonCatalog.PAGES_CACHE));
+        return new CachingPokemonCatalog(
+                adapter,
+                cache(cacheManager, CachingPokemonCatalog.PAGES_CACHE),
+                cache(cacheManager, CachingPokemonCatalog.NAME_INDEX_CACHE));
     }
 
     private static Cache cache(CacheManager cacheManager, String name) {
