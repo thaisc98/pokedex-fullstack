@@ -207,7 +207,8 @@ Sources: the [Spring Security 7.1.1 CSRF reference](https://docs.spring.io/sprin
 | `X-Frame-Options` | `DENY` |
 | `Referrer-Policy` | `strict-origin-when-cross-origin` |
 | `Permissions-Policy` | `camera=(), microphone=(), geolocation=()` |
-| `Cache-Control` (authenticated responses) | `no-store` |
+| `Cache-Control` (public catalog: `200` from `GET /api/v1/pokemon`, `/api/v1/pokemon/{idOrName}`, `/api/v1/pokemon/search`) | `public, max-age=300, stale-while-revalidate=86400` (`pokedex.catalog.http-cache.*`), plus an `ETag` for `304` revalidation. The data is public and the same for every caller (ADR 0004) |
+| `Cache-Control` (everything else: auth, collection, actuator, docs, and every error, catalog `400`/`404`/`503` included) | `no-store` |
 
 ### 4.8 Configuration and secrets (A02)
 
@@ -333,7 +334,7 @@ Sources: the [Spring Security 7.1.1 CSRF reference](https://docs.spring.io/sprin
 | Cryptography | L1 | ✅ library primitives only (BCrypt, Nimbus); no custom crypto |
 | Secure communication | L1 | ✅ HTTPS + HSTS in deployment · ⚠️ plain HTTP accepted for `localhost` only |
 | Configuration | L1 + L2 | ✅ secrets from env, minimal actuator, least-privilege DB user |
-| Data protection | L1 | ✅ `no-store` on authenticated responses, no sensitive data in URLs |
+| Data protection | L1 | ✅ `no-store` on every response except public catalog `200`s (§4.7), no sensitive data in URLs |
 | Security logging & error handling | L1 + L2 | ✅ security events, no secrets in logs, generic errors |
 | File handling, OAuth/OIDC, WebRTC | — | N/A (the app has no file uploads, external identity provider or WebRTC) |
 

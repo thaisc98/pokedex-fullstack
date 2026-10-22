@@ -78,6 +78,11 @@ paths:
       responses:
         '200':
           description: A page of Pokémon summaries.
+          headers:
+            Cache-Control:
+              $ref: '#/components/headers/CatalogCacheControl'
+            ETag:
+              $ref: '#/components/headers/CatalogETag'
           content:
             application/json:
               schema:
@@ -110,6 +115,11 @@ paths:
       responses:
         '200':
           description: Matching names (possibly none).
+          headers:
+            Cache-Control:
+              $ref: '#/components/headers/CatalogCacheControl'
+            ETag:
+              $ref: '#/components/headers/CatalogETag'
           content:
             application/json:
               schema:
@@ -135,6 +145,11 @@ paths:
       responses:
         '200':
           description: The Pokémon detail.
+          headers:
+            Cache-Control:
+              $ref: '#/components/headers/CatalogCacheControl'
+            ETag:
+              $ref: '#/components/headers/CatalogETag'
           content:
             application/json:
               schema:
@@ -1306,6 +1321,23 @@ components:
           errors:
             - field: password
               message: must be between 12 and 64 characters
+
+  # ---------------------------------------------------------------- Headers
+  headers:
+    CatalogCacheControl:
+      description: |
+        Public, non-personalized catalog data (ADR 0004, security.md §4.7): browsers
+        and shared caches may reuse a `200` for 5 minutes and serve it stale for up
+        to a day while revalidating. Configurable (`pokedex.catalog.http-cache.*`).
+        Every other response, catalog errors included, is `no-store`.
+      schema:
+        type: string
+      example: 'max-age=300, public, stale-while-revalidate=86400'
+    CatalogETag:
+      description: 'Strong validator of the body; send it back in `If-None-Match` to get `304 Not Modified` while unchanged.'
+      schema:
+        type: string
+      example: '"0a1b2c3d4e5f60718293a4b5c6d7e8f90"'
 
   # ---------------------------------------------------------------- Responses
   responses:
