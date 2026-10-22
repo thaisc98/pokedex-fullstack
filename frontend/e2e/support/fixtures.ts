@@ -88,6 +88,9 @@ function watch(context: BrowserContext, allowed: AllowedHttpError[], problems: s
 
 /** 0 serious/critical axe violations (WCAG 2.0/2.1/2.2 A + AA) on the page as it is now. */
 export async function expectAccessible(page: Page) {
+  // After a client-side navigation Next.js sets <title> once the new route renders; scan the settled
+  // page, not the in-between one. (Auto-retrying wait; a page that never gets a title still fails.)
+  await expect(page).toHaveTitle(/\S/);
   const results = await new AxeBuilder({ page })
     .withTags(["wcag2a", "wcag2aa", "wcag21a", "wcag21aa", "wcag22aa"])
     .analyze();

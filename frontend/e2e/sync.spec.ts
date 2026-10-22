@@ -10,6 +10,7 @@ test.describe("US03 add to collection", () => {
     await page.getByRole("button", { name: "Add to collection" }).click();
 
     await expect(page).toHaveURL(/\/login\?from=%2Fpokemon%2Fpikachu$/);
+    await expect(page.getByRole("heading", { level: 1, name: "Log in" })).toBeVisible();
     await expectAccessible(page);
     // One account per viewport project: one login per email per run (security.md §4.1 rate limit).
     await page.getByLabel("Email").fill(us03Email(testInfo.project.name));

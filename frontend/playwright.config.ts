@@ -10,7 +10,8 @@ import { defineConfig, devices } from "@playwright/test";
  * - Three viewport projects (ui-ux.md §6.3 breakpoints): 375×812, 768×1024, 1280×800.
  * - A `setup` project logs the seeded demo accounts in once and saves their sessions, so the
  *   per-IP+email login limit (security.md §4.1: 5/min) is never hit by the suite.
- * - No retries: a flaky test must fail, not be hidden.
+ * - No retries: a flaky test must fail, not be hidden. Two workers: with four, one laptop running the whole
+ *   stack plus four browsers saw a 9.8 s API response and a timeout; two is what CI runs too.
  */
 const baseURL = process.env.E2E_BASE_URL ?? "http://localhost:3000";
 
@@ -19,7 +20,7 @@ export default defineConfig({
   fullyParallel: true,
   forbidOnly: Boolean(process.env.CI),
   retries: 0,
-  workers: process.env.CI ? 2 : 4,
+  workers: 2,
   timeout: 45_000,
   expect: { timeout: 10_000 },
   reporter: process.env.CI ? [["list"], ["html", { open: "never" }]] : [["list"]],
