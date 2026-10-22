@@ -1,0 +1,2824 @@
+{
+  "mappings": [
+    {
+      "name": "pokemon 1",
+      "priority": 5,
+      "request": {
+        "method": "GET",
+        "urlPathPattern": "/api/v2/pokemon/(?i)(1|bulbasaur)/?"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json; charset=utf-8"
+        },
+        "bodyFileName": "pokemon/1.json"
+      }
+    },
+    {
+      "name": "pokemon 10",
+      "priority": 5,
+      "request": {
+        "method": "GET",
+        "urlPathPattern": "/api/v2/pokemon/(?i)(10|caterpie)/?"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json; charset=utf-8"
+        },
+        "bodyFileName": "pokemon/10.json"
+      }
+    },
+    {
+      "name": "pokemon 100",
+      "priority": 5,
+      "request": {
+        "method": "GET",
+        "urlPathPattern": "/api/v2/pokemon/(?i)(100|voltorb)/?"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json; charset=utf-8"
+        },
+        "bodyFileName": "pokemon/100.json"
+      }
+    },
+    {
+      "name": "pokemon 101",
+      "priority": 5,
+      "request": {
+        "method": "GET",
+        "urlPathPattern": "/api/v2/pokemon/(?i)(101|electrode)/?"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json; charset=utf-8"
+        },
+        "bodyFileName": "pokemon/101.json"
+      }
+    },
+    {
+      "name": "pokemon 102",
+      "priority": 5,
+      "request": {
+        "method": "GET",
+        "urlPathPattern": "/api/v2/pokemon/(?i)(102|exeggcute)/?"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json; charset=utf-8"
+        },
+        "bodyFileName": "pokemon/102.json"
+      }
+    },
+    {
+      "name": "pokemon 103",
+      "priority": 5,
+      "request": {
+        "method": "GET",
+        "urlPathPattern": "/api/v2/pokemon/(?i)(103|exeggutor)/?"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json; charset=utf-8"
+        },
+        "bodyFileName": "pokemon/103.json"
+      }
+    },
+    {
+      "name": "pokemon 104",
+      "priority": 5,
+      "request": {
+        "method": "GET",
+        "urlPathPattern": "/api/v2/pokemon/(?i)(104|cubone)/?"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json; charset=utf-8"
+        },
+        "bodyFileName": "pokemon/104.json"
+      }
+    },
+    {
+      "name": "pokemon 105",
+      "priority": 5,
+      "request": {
+        "method": "GET",
+        "urlPathPattern": "/api/v2/pokemon/(?i)(105|marowak)/?"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json; charset=utf-8"
+        },
+        "bodyFileName": "pokemon/105.json"
+      }
+    },
+    {
+      "name": "pokemon 106",
+      "priority": 5,
+      "request": {
+        "method": "GET",
+        "urlPathPattern": "/api/v2/pokemon/(?i)(106|hitmonlee)/?"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json; charset=utf-8"
+        },
+        "bodyFileName": "pokemon/106.json"
+      }
+    },
+    {
+      "name": "pokemon 107",
+      "priority": 5,
+      "request": {
+        "method": "GET",
+        "urlPathPattern": "/api/v2/pokemon/(?i)(107|hitmonchan)/?"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json; charset=utf-8"
+        },
+        "bodyFileName": "pokemon/107.json"
+      }
+    },
+    {
+      "name": "pokemon 108",
+      "priority": 5,
+      "request": {
+        "method": "GET",
+        "urlPathPattern": "/api/v2/pokemon/(?i)(108|lickitung)/?"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json; charset=utf-8"
+        },
+        "bodyFileName": "pokemon/108.json"
+      }
+    },
+    {
+      "name": "pokemon 109",
+      "priority": 5,
+      "request": {
+        "method": "GET",
+        "urlPathPattern": "/api/v2/pokemon/(?i)(109|koffing)/?"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json; charset=utf-8"
+        },
+        "bodyFileName": "pokemon/109.json"
+      }
+    },
+    {
+      "name": "pokemon 11",
+      "priority": 5,
+      "request": {
+        "method": "GET",
+        "urlPathPattern": "/api/v2/pokemon/(?i)(11|metapod)/?"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json; charset=utf-8"
+        },
+        "bodyFileName": "pokemon/11.json"
+      }
+    },
+    {
+      "name": "pokemon 110",
+      "priority": 5,
+      "request": {
+        "method": "GET",
+        "urlPathPattern": "/api/v2/pokemon/(?i)(110|weezing)/?"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json; charset=utf-8"
+        },
+        "bodyFileName": "pokemon/110.json"
+      }
+    },
+    {
+      "name": "pokemon 111",
+      "priority": 5,
+      "request": {
+        "method": "GET",
+        "urlPathPattern": "/api/v2/pokemon/(?i)(111|rhyhorn)/?"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json; charset=utf-8"
+        },
+        "bodyFileName": "pokemon/111.json"
+      }
+    },
+    {
+      "name": "pokemon 112",
+      "priority": 5,
+      "request": {
+        "method": "GET",
+        "urlPathPattern": "/api/v2/pokemon/(?i)(112|rhydon)/?"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json; charset=utf-8"
+        },
+        "bodyFileName": "pokemon/112.json"
+      }
+    },
+    {
+      "name": "pokemon 113",
+      "priority": 5,
+      "request": {
+        "method": "GET",
+        "urlPathPattern": "/api/v2/pokemon/(?i)(113|chansey)/?"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json; charset=utf-8"
+        },
+        "bodyFileName": "pokemon/113.json"
+      }
+    },
+    {
+      "name": "pokemon 114",
+      "priority": 5,
+      "request": {
+        "method": "GET",
+        "urlPathPattern": "/api/v2/pokemon/(?i)(114|tangela)/?"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json; charset=utf-8"
+        },
+        "bodyFileName": "pokemon/114.json"
+      }
+    },
+    {
+      "name": "pokemon 115",
+      "priority": 5,
+      "request": {
+        "method": "GET",
+        "urlPathPattern": "/api/v2/pokemon/(?i)(115|kangaskhan)/?"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json; charset=utf-8"
+        },
+        "bodyFileName": "pokemon/115.json"
+      }
+    },
+    {
+      "name": "pokemon 116",
+      "priority": 5,
+      "request": {
+        "method": "GET",
+        "urlPathPattern": "/api/v2/pokemon/(?i)(116|horsea)/?"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json; charset=utf-8"
+        },
+        "bodyFileName": "pokemon/116.json"
+      }
+    },
+    {
+      "name": "pokemon 117",
+      "priority": 5,
+      "request": {
+        "method": "GET",
+        "urlPathPattern": "/api/v2/pokemon/(?i)(117|seadra)/?"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json; charset=utf-8"
+        },
+        "bodyFileName": "pokemon/117.json"
+      }
+    },
+    {
+      "name": "pokemon 118",
+      "priority": 5,
+      "request": {
+        "method": "GET",
+        "urlPathPattern": "/api/v2/pokemon/(?i)(118|goldeen)/?"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json; charset=utf-8"
+        },
+        "bodyFileName": "pokemon/118.json"
+      }
+    },
+    {
+      "name": "pokemon 119",
+      "priority": 5,
+      "request": {
+        "method": "GET",
+        "urlPathPattern": "/api/v2/pokemon/(?i)(119|seaking)/?"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json; charset=utf-8"
+        },
+        "bodyFileName": "pokemon/119.json"
+      }
+    },
+    {
+      "name": "pokemon 12",
+      "priority": 5,
+      "request": {
+        "method": "GET",
+        "urlPathPattern": "/api/v2/pokemon/(?i)(12|butterfree)/?"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json; charset=utf-8"
+        },
+        "bodyFileName": "pokemon/12.json"
+      }
+    },
+    {
+      "name": "pokemon 120",
+      "priority": 5,
+      "request": {
+        "method": "GET",
+        "urlPathPattern": "/api/v2/pokemon/(?i)(120|staryu)/?"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json; charset=utf-8"
+        },
+        "bodyFileName": "pokemon/120.json"
+      }
+    },
+    {
+      "name": "pokemon 121",
+      "priority": 5,
+      "request": {
+        "method": "GET",
+        "urlPathPattern": "/api/v2/pokemon/(?i)(121|starmie)/?"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json; charset=utf-8"
+        },
+        "bodyFileName": "pokemon/121.json"
+      }
+    },
+    {
+      "name": "pokemon 122",
+      "priority": 5,
+      "request": {
+        "method": "GET",
+        "urlPathPattern": "/api/v2/pokemon/(?i)(122|mr-mime)/?"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json; charset=utf-8"
+        },
+        "bodyFileName": "pokemon/122.json"
+      }
+    },
+    {
+      "name": "pokemon 123",
+      "priority": 5,
+      "request": {
+        "method": "GET",
+        "urlPathPattern": "/api/v2/pokemon/(?i)(123|scyther)/?"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json; charset=utf-8"
+        },
+        "bodyFileName": "pokemon/123.json"
+      }
+    },
+    {
+      "name": "pokemon 124",
+      "priority": 5,
+      "request": {
+        "method": "GET",
+        "urlPathPattern": "/api/v2/pokemon/(?i)(124|jynx)/?"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json; charset=utf-8"
+        },
+        "bodyFileName": "pokemon/124.json"
+      }
+    },
+    {
+      "name": "pokemon 125",
+      "priority": 5,
+      "request": {
+        "method": "GET",
+        "urlPathPattern": "/api/v2/pokemon/(?i)(125|electabuzz)/?"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json; charset=utf-8"
+        },
+        "bodyFileName": "pokemon/125.json"
+      }
+    },
+    {
+      "name": "pokemon 126",
+      "priority": 5,
+      "request": {
+        "method": "GET",
+        "urlPathPattern": "/api/v2/pokemon/(?i)(126|magmar)/?"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json; charset=utf-8"
+        },
+        "bodyFileName": "pokemon/126.json"
+      }
+    },
+    {
+      "name": "pokemon 127",
+      "priority": 5,
+      "request": {
+        "method": "GET",
+        "urlPathPattern": "/api/v2/pokemon/(?i)(127|pinsir)/?"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json; charset=utf-8"
+        },
+        "bodyFileName": "pokemon/127.json"
+      }
+    },
+    {
+      "name": "pokemon 128",
+      "priority": 5,
+      "request": {
+        "method": "GET",
+        "urlPathPattern": "/api/v2/pokemon/(?i)(128|tauros)/?"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json; charset=utf-8"
+        },
+        "bodyFileName": "pokemon/128.json"
+      }
+    },
+    {
+      "name": "pokemon 129",
+      "priority": 5,
+      "request": {
+        "method": "GET",
+        "urlPathPattern": "/api/v2/pokemon/(?i)(129|magikarp)/?"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json; charset=utf-8"
+        },
+        "bodyFileName": "pokemon/129.json"
+      }
+    },
+    {
+      "name": "pokemon 13",
+      "priority": 5,
+      "request": {
+        "method": "GET",
+        "urlPathPattern": "/api/v2/pokemon/(?i)(13|weedle)/?"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json; charset=utf-8"
+        },
+        "bodyFileName": "pokemon/13.json"
+      }
+    },
+    {
+      "name": "pokemon 130",
+      "priority": 5,
+      "request": {
+        "method": "GET",
+        "urlPathPattern": "/api/v2/pokemon/(?i)(130|gyarados)/?"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json; charset=utf-8"
+        },
+        "bodyFileName": "pokemon/130.json"
+      }
+    },
+    {
+      "name": "pokemon 131",
+      "priority": 5,
+      "request": {
+        "method": "GET",
+        "urlPathPattern": "/api/v2/pokemon/(?i)(131|lapras)/?"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json; charset=utf-8"
+        },
+        "bodyFileName": "pokemon/131.json"
+      }
+    },
+    {
+      "name": "pokemon 132",
+      "priority": 5,
+      "request": {
+        "method": "GET",
+        "urlPathPattern": "/api/v2/pokemon/(?i)(132|ditto)/?"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json; charset=utf-8"
+        },
+        "bodyFileName": "pokemon/132.json"
+      }
+    },
+    {
+      "name": "pokemon 133",
+      "priority": 5,
+      "request": {
+        "method": "GET",
+        "urlPathPattern": "/api/v2/pokemon/(?i)(133|eevee)/?"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json; charset=utf-8"
+        },
+        "bodyFileName": "pokemon/133.json"
+      }
+    },
+    {
+      "name": "pokemon 134",
+      "priority": 5,
+      "request": {
+        "method": "GET",
+        "urlPathPattern": "/api/v2/pokemon/(?i)(134|vaporeon)/?"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json; charset=utf-8"
+        },
+        "bodyFileName": "pokemon/134.json"
+      }
+    },
+    {
+      "name": "pokemon 135",
+      "priority": 5,
+      "request": {
+        "method": "GET",
+        "urlPathPattern": "/api/v2/pokemon/(?i)(135|jolteon)/?"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json; charset=utf-8"
+        },
+        "bodyFileName": "pokemon/135.json"
+      }
+    },
+    {
+      "name": "pokemon 136",
+      "priority": 5,
+      "request": {
+        "method": "GET",
+        "urlPathPattern": "/api/v2/pokemon/(?i)(136|flareon)/?"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json; charset=utf-8"
+        },
+        "bodyFileName": "pokemon/136.json"
+      }
+    },
+    {
+      "name": "pokemon 137",
+      "priority": 5,
+      "request": {
+        "method": "GET",
+        "urlPathPattern": "/api/v2/pokemon/(?i)(137|porygon)/?"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json; charset=utf-8"
+        },
+        "bodyFileName": "pokemon/137.json"
+      }
+    },
+    {
+      "name": "pokemon 138",
+      "priority": 5,
+      "request": {
+        "method": "GET",
+        "urlPathPattern": "/api/v2/pokemon/(?i)(138|omanyte)/?"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json; charset=utf-8"
+        },
+        "bodyFileName": "pokemon/138.json"
+      }
+    },
+    {
+      "name": "pokemon 139",
+      "priority": 5,
+      "request": {
+        "method": "GET",
+        "urlPathPattern": "/api/v2/pokemon/(?i)(139|omastar)/?"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json; charset=utf-8"
+        },
+        "bodyFileName": "pokemon/139.json"
+      }
+    },
+    {
+      "name": "pokemon 14",
+      "priority": 5,
+      "request": {
+        "method": "GET",
+        "urlPathPattern": "/api/v2/pokemon/(?i)(14|kakuna)/?"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json; charset=utf-8"
+        },
+        "bodyFileName": "pokemon/14.json"
+      }
+    },
+    {
+      "name": "pokemon 140",
+      "priority": 5,
+      "request": {
+        "method": "GET",
+        "urlPathPattern": "/api/v2/pokemon/(?i)(140|kabuto)/?"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json; charset=utf-8"
+        },
+        "bodyFileName": "pokemon/140.json"
+      }
+    },
+    {
+      "name": "pokemon 141",
+      "priority": 5,
+      "request": {
+        "method": "GET",
+        "urlPathPattern": "/api/v2/pokemon/(?i)(141|kabutops)/?"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json; charset=utf-8"
+        },
+        "bodyFileName": "pokemon/141.json"
+      }
+    },
+    {
+      "name": "pokemon 142",
+      "priority": 5,
+      "request": {
+        "method": "GET",
+        "urlPathPattern": "/api/v2/pokemon/(?i)(142|aerodactyl)/?"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json; charset=utf-8"
+        },
+        "bodyFileName": "pokemon/142.json"
+      }
+    },
+    {
+      "name": "pokemon 143",
+      "priority": 5,
+      "request": {
+        "method": "GET",
+        "urlPathPattern": "/api/v2/pokemon/(?i)(143|snorlax)/?"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json; charset=utf-8"
+        },
+        "bodyFileName": "pokemon/143.json"
+      }
+    },
+    {
+      "name": "pokemon 144",
+      "priority": 5,
+      "request": {
+        "method": "GET",
+        "urlPathPattern": "/api/v2/pokemon/(?i)(144|articuno)/?"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json; charset=utf-8"
+        },
+        "bodyFileName": "pokemon/144.json"
+      }
+    },
+    {
+      "name": "pokemon 145",
+      "priority": 5,
+      "request": {
+        "method": "GET",
+        "urlPathPattern": "/api/v2/pokemon/(?i)(145|zapdos)/?"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json; charset=utf-8"
+        },
+        "bodyFileName": "pokemon/145.json"
+      }
+    },
+    {
+      "name": "pokemon 146",
+      "priority": 5,
+      "request": {
+        "method": "GET",
+        "urlPathPattern": "/api/v2/pokemon/(?i)(146|moltres)/?"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json; charset=utf-8"
+        },
+        "bodyFileName": "pokemon/146.json"
+      }
+    },
+    {
+      "name": "pokemon 147",
+      "priority": 5,
+      "request": {
+        "method": "GET",
+        "urlPathPattern": "/api/v2/pokemon/(?i)(147|dratini)/?"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json; charset=utf-8"
+        },
+        "bodyFileName": "pokemon/147.json"
+      }
+    },
+    {
+      "name": "pokemon 148",
+      "priority": 5,
+      "request": {
+        "method": "GET",
+        "urlPathPattern": "/api/v2/pokemon/(?i)(148|dragonair)/?"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json; charset=utf-8"
+        },
+        "bodyFileName": "pokemon/148.json"
+      }
+    },
+    {
+      "name": "pokemon 149",
+      "priority": 5,
+      "request": {
+        "method": "GET",
+        "urlPathPattern": "/api/v2/pokemon/(?i)(149|dragonite)/?"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json; charset=utf-8"
+        },
+        "bodyFileName": "pokemon/149.json"
+      }
+    },
+    {
+      "name": "pokemon 15",
+      "priority": 5,
+      "request": {
+        "method": "GET",
+        "urlPathPattern": "/api/v2/pokemon/(?i)(15|beedrill)/?"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json; charset=utf-8"
+        },
+        "bodyFileName": "pokemon/15.json"
+      }
+    },
+    {
+      "name": "pokemon 150",
+      "priority": 5,
+      "request": {
+        "method": "GET",
+        "urlPathPattern": "/api/v2/pokemon/(?i)(150|mewtwo)/?"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json; charset=utf-8"
+        },
+        "bodyFileName": "pokemon/150.json"
+      }
+    },
+    {
+      "name": "pokemon 151",
+      "priority": 5,
+      "request": {
+        "method": "GET",
+        "urlPathPattern": "/api/v2/pokemon/(?i)(151|mew)/?"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json; charset=utf-8"
+        },
+        "bodyFileName": "pokemon/151.json"
+      }
+    },
+    {
+      "name": "pokemon 16",
+      "priority": 5,
+      "request": {
+        "method": "GET",
+        "urlPathPattern": "/api/v2/pokemon/(?i)(16|pidgey)/?"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json; charset=utf-8"
+        },
+        "bodyFileName": "pokemon/16.json"
+      }
+    },
+    {
+      "name": "pokemon 169",
+      "priority": 5,
+      "request": {
+        "method": "GET",
+        "urlPathPattern": "/api/v2/pokemon/(?i)(169|crobat)/?"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json; charset=utf-8"
+        },
+        "bodyFileName": "pokemon/169.json"
+      }
+    },
+    {
+      "name": "pokemon 17",
+      "priority": 5,
+      "request": {
+        "method": "GET",
+        "urlPathPattern": "/api/v2/pokemon/(?i)(17|pidgeotto)/?"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json; charset=utf-8"
+        },
+        "bodyFileName": "pokemon/17.json"
+      }
+    },
+    {
+      "name": "pokemon 172",
+      "priority": 5,
+      "request": {
+        "method": "GET",
+        "urlPathPattern": "/api/v2/pokemon/(?i)(172|pichu)/?"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json; charset=utf-8"
+        },
+        "bodyFileName": "pokemon/172.json"
+      }
+    },
+    {
+      "name": "pokemon 173",
+      "priority": 5,
+      "request": {
+        "method": "GET",
+        "urlPathPattern": "/api/v2/pokemon/(?i)(173|cleffa)/?"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json; charset=utf-8"
+        },
+        "bodyFileName": "pokemon/173.json"
+      }
+    },
+    {
+      "name": "pokemon 174",
+      "priority": 5,
+      "request": {
+        "method": "GET",
+        "urlPathPattern": "/api/v2/pokemon/(?i)(174|igglybuff)/?"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json; charset=utf-8"
+        },
+        "bodyFileName": "pokemon/174.json"
+      }
+    },
+    {
+      "name": "pokemon 18",
+      "priority": 5,
+      "request": {
+        "method": "GET",
+        "urlPathPattern": "/api/v2/pokemon/(?i)(18|pidgeot)/?"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json; charset=utf-8"
+        },
+        "bodyFileName": "pokemon/18.json"
+      }
+    },
+    {
+      "name": "pokemon 182",
+      "priority": 5,
+      "request": {
+        "method": "GET",
+        "urlPathPattern": "/api/v2/pokemon/(?i)(182|bellossom)/?"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json; charset=utf-8"
+        },
+        "bodyFileName": "pokemon/182.json"
+      }
+    },
+    {
+      "name": "pokemon 186",
+      "priority": 5,
+      "request": {
+        "method": "GET",
+        "urlPathPattern": "/api/v2/pokemon/(?i)(186|politoed)/?"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json; charset=utf-8"
+        },
+        "bodyFileName": "pokemon/186.json"
+      }
+    },
+    {
+      "name": "pokemon 19",
+      "priority": 5,
+      "request": {
+        "method": "GET",
+        "urlPathPattern": "/api/v2/pokemon/(?i)(19|rattata)/?"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json; charset=utf-8"
+        },
+        "bodyFileName": "pokemon/19.json"
+      }
+    },
+    {
+      "name": "pokemon 196",
+      "priority": 5,
+      "request": {
+        "method": "GET",
+        "urlPathPattern": "/api/v2/pokemon/(?i)(196|espeon)/?"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json; charset=utf-8"
+        },
+        "bodyFileName": "pokemon/196.json"
+      }
+    },
+    {
+      "name": "pokemon 197",
+      "priority": 5,
+      "request": {
+        "method": "GET",
+        "urlPathPattern": "/api/v2/pokemon/(?i)(197|umbreon)/?"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json; charset=utf-8"
+        },
+        "bodyFileName": "pokemon/197.json"
+      }
+    },
+    {
+      "name": "pokemon 199",
+      "priority": 5,
+      "request": {
+        "method": "GET",
+        "urlPathPattern": "/api/v2/pokemon/(?i)(199|slowking)/?"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json; charset=utf-8"
+        },
+        "bodyFileName": "pokemon/199.json"
+      }
+    },
+    {
+      "name": "pokemon 2",
+      "priority": 5,
+      "request": {
+        "method": "GET",
+        "urlPathPattern": "/api/v2/pokemon/(?i)(2|ivysaur)/?"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json; charset=utf-8"
+        },
+        "bodyFileName": "pokemon/2.json"
+      }
+    },
+    {
+      "name": "pokemon 20",
+      "priority": 5,
+      "request": {
+        "method": "GET",
+        "urlPathPattern": "/api/v2/pokemon/(?i)(20|raticate)/?"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json; charset=utf-8"
+        },
+        "bodyFileName": "pokemon/20.json"
+      }
+    },
+    {
+      "name": "pokemon 208",
+      "priority": 5,
+      "request": {
+        "method": "GET",
+        "urlPathPattern": "/api/v2/pokemon/(?i)(208|steelix)/?"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json; charset=utf-8"
+        },
+        "bodyFileName": "pokemon/208.json"
+      }
+    },
+    {
+      "name": "pokemon 21",
+      "priority": 5,
+      "request": {
+        "method": "GET",
+        "urlPathPattern": "/api/v2/pokemon/(?i)(21|spearow)/?"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json; charset=utf-8"
+        },
+        "bodyFileName": "pokemon/21.json"
+      }
+    },
+    {
+      "name": "pokemon 212",
+      "priority": 5,
+      "request": {
+        "method": "GET",
+        "urlPathPattern": "/api/v2/pokemon/(?i)(212|scizor)/?"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json; charset=utf-8"
+        },
+        "bodyFileName": "pokemon/212.json"
+      }
+    },
+    {
+      "name": "pokemon 22",
+      "priority": 5,
+      "request": {
+        "method": "GET",
+        "urlPathPattern": "/api/v2/pokemon/(?i)(22|fearow)/?"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json; charset=utf-8"
+        },
+        "bodyFileName": "pokemon/22.json"
+      }
+    },
+    {
+      "name": "pokemon 23",
+      "priority": 5,
+      "request": {
+        "method": "GET",
+        "urlPathPattern": "/api/v2/pokemon/(?i)(23|ekans)/?"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json; charset=utf-8"
+        },
+        "bodyFileName": "pokemon/23.json"
+      }
+    },
+    {
+      "name": "pokemon 230",
+      "priority": 5,
+      "request": {
+        "method": "GET",
+        "urlPathPattern": "/api/v2/pokemon/(?i)(230|kingdra)/?"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json; charset=utf-8"
+        },
+        "bodyFileName": "pokemon/230.json"
+      }
+    },
+    {
+      "name": "pokemon 233",
+      "priority": 5,
+      "request": {
+        "method": "GET",
+        "urlPathPattern": "/api/v2/pokemon/(?i)(233|porygon2)/?"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json; charset=utf-8"
+        },
+        "bodyFileName": "pokemon/233.json"
+      }
+    },
+    {
+      "name": "pokemon 236",
+      "priority": 5,
+      "request": {
+        "method": "GET",
+        "urlPathPattern": "/api/v2/pokemon/(?i)(236|tyrogue)/?"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json; charset=utf-8"
+        },
+        "bodyFileName": "pokemon/236.json"
+      }
+    },
+    {
+      "name": "pokemon 237",
+      "priority": 5,
+      "request": {
+        "method": "GET",
+        "urlPathPattern": "/api/v2/pokemon/(?i)(237|hitmontop)/?"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json; charset=utf-8"
+        },
+        "bodyFileName": "pokemon/237.json"
+      }
+    },
+    {
+      "name": "pokemon 238",
+      "priority": 5,
+      "request": {
+        "method": "GET",
+        "urlPathPattern": "/api/v2/pokemon/(?i)(238|smoochum)/?"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json; charset=utf-8"
+        },
+        "bodyFileName": "pokemon/238.json"
+      }
+    },
+    {
+      "name": "pokemon 239",
+      "priority": 5,
+      "request": {
+        "method": "GET",
+        "urlPathPattern": "/api/v2/pokemon/(?i)(239|elekid)/?"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json; charset=utf-8"
+        },
+        "bodyFileName": "pokemon/239.json"
+      }
+    },
+    {
+      "name": "pokemon 24",
+      "priority": 5,
+      "request": {
+        "method": "GET",
+        "urlPathPattern": "/api/v2/pokemon/(?i)(24|arbok)/?"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json; charset=utf-8"
+        },
+        "bodyFileName": "pokemon/24.json"
+      }
+    },
+    {
+      "name": "pokemon 240",
+      "priority": 5,
+      "request": {
+        "method": "GET",
+        "urlPathPattern": "/api/v2/pokemon/(?i)(240|magby)/?"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json; charset=utf-8"
+        },
+        "bodyFileName": "pokemon/240.json"
+      }
+    },
+    {
+      "name": "pokemon 242",
+      "priority": 5,
+      "request": {
+        "method": "GET",
+        "urlPathPattern": "/api/v2/pokemon/(?i)(242|blissey)/?"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json; charset=utf-8"
+        },
+        "bodyFileName": "pokemon/242.json"
+      }
+    },
+    {
+      "name": "pokemon 25",
+      "priority": 5,
+      "request": {
+        "method": "GET",
+        "urlPathPattern": "/api/v2/pokemon/(?i)(25|pikachu)/?"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json; charset=utf-8"
+        },
+        "bodyFileName": "pokemon/25.json"
+      }
+    },
+    {
+      "name": "pokemon 26",
+      "priority": 5,
+      "request": {
+        "method": "GET",
+        "urlPathPattern": "/api/v2/pokemon/(?i)(26|raichu)/?"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json; charset=utf-8"
+        },
+        "bodyFileName": "pokemon/26.json"
+      }
+    },
+    {
+      "name": "pokemon 27",
+      "priority": 5,
+      "request": {
+        "method": "GET",
+        "urlPathPattern": "/api/v2/pokemon/(?i)(27|sandshrew)/?"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json; charset=utf-8"
+        },
+        "bodyFileName": "pokemon/27.json"
+      }
+    },
+    {
+      "name": "pokemon 28",
+      "priority": 5,
+      "request": {
+        "method": "GET",
+        "urlPathPattern": "/api/v2/pokemon/(?i)(28|sandslash)/?"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json; charset=utf-8"
+        },
+        "bodyFileName": "pokemon/28.json"
+      }
+    },
+    {
+      "name": "pokemon 29",
+      "priority": 5,
+      "request": {
+        "method": "GET",
+        "urlPathPattern": "/api/v2/pokemon/(?i)(29|nidoran-f)/?"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json; charset=utf-8"
+        },
+        "bodyFileName": "pokemon/29.json"
+      }
+    },
+    {
+      "name": "pokemon 3",
+      "priority": 5,
+      "request": {
+        "method": "GET",
+        "urlPathPattern": "/api/v2/pokemon/(?i)(3|venusaur)/?"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json; charset=utf-8"
+        },
+        "bodyFileName": "pokemon/3.json"
+      }
+    },
+    {
+      "name": "pokemon 30",
+      "priority": 5,
+      "request": {
+        "method": "GET",
+        "urlPathPattern": "/api/v2/pokemon/(?i)(30|nidorina)/?"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json; charset=utf-8"
+        },
+        "bodyFileName": "pokemon/30.json"
+      }
+    },
+    {
+      "name": "pokemon 31",
+      "priority": 5,
+      "request": {
+        "method": "GET",
+        "urlPathPattern": "/api/v2/pokemon/(?i)(31|nidoqueen)/?"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json; charset=utf-8"
+        },
+        "bodyFileName": "pokemon/31.json"
+      }
+    },
+    {
+      "name": "pokemon 32",
+      "priority": 5,
+      "request": {
+        "method": "GET",
+        "urlPathPattern": "/api/v2/pokemon/(?i)(32|nidoran-m)/?"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json; charset=utf-8"
+        },
+        "bodyFileName": "pokemon/32.json"
+      }
+    },
+    {
+      "name": "pokemon 33",
+      "priority": 5,
+      "request": {
+        "method": "GET",
+        "urlPathPattern": "/api/v2/pokemon/(?i)(33|nidorino)/?"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json; charset=utf-8"
+        },
+        "bodyFileName": "pokemon/33.json"
+      }
+    },
+    {
+      "name": "pokemon 34",
+      "priority": 5,
+      "request": {
+        "method": "GET",
+        "urlPathPattern": "/api/v2/pokemon/(?i)(34|nidoking)/?"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json; charset=utf-8"
+        },
+        "bodyFileName": "pokemon/34.json"
+      }
+    },
+    {
+      "name": "pokemon 35",
+      "priority": 5,
+      "request": {
+        "method": "GET",
+        "urlPathPattern": "/api/v2/pokemon/(?i)(35|clefairy)/?"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json; charset=utf-8"
+        },
+        "bodyFileName": "pokemon/35.json"
+      }
+    },
+    {
+      "name": "pokemon 36",
+      "priority": 5,
+      "request": {
+        "method": "GET",
+        "urlPathPattern": "/api/v2/pokemon/(?i)(36|clefable)/?"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json; charset=utf-8"
+        },
+        "bodyFileName": "pokemon/36.json"
+      }
+    },
+    {
+      "name": "pokemon 37",
+      "priority": 5,
+      "request": {
+        "method": "GET",
+        "urlPathPattern": "/api/v2/pokemon/(?i)(37|vulpix)/?"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json; charset=utf-8"
+        },
+        "bodyFileName": "pokemon/37.json"
+      }
+    },
+    {
+      "name": "pokemon 38",
+      "priority": 5,
+      "request": {
+        "method": "GET",
+        "urlPathPattern": "/api/v2/pokemon/(?i)(38|ninetales)/?"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json; charset=utf-8"
+        },
+        "bodyFileName": "pokemon/38.json"
+      }
+    },
+    {
+      "name": "pokemon 39",
+      "priority": 5,
+      "request": {
+        "method": "GET",
+        "urlPathPattern": "/api/v2/pokemon/(?i)(39|jigglypuff)/?"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json; charset=utf-8"
+        },
+        "bodyFileName": "pokemon/39.json"
+      }
+    },
+    {
+      "name": "pokemon 4",
+      "priority": 5,
+      "request": {
+        "method": "GET",
+        "urlPathPattern": "/api/v2/pokemon/(?i)(4|charmander)/?"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json; charset=utf-8"
+        },
+        "bodyFileName": "pokemon/4.json"
+      }
+    },
+    {
+      "name": "pokemon 40",
+      "priority": 5,
+      "request": {
+        "method": "GET",
+        "urlPathPattern": "/api/v2/pokemon/(?i)(40|wigglytuff)/?"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json; charset=utf-8"
+        },
+        "bodyFileName": "pokemon/40.json"
+      }
+    },
+    {
+      "name": "pokemon 41",
+      "priority": 5,
+      "request": {
+        "method": "GET",
+        "urlPathPattern": "/api/v2/pokemon/(?i)(41|zubat)/?"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json; charset=utf-8"
+        },
+        "bodyFileName": "pokemon/41.json"
+      }
+    },
+    {
+      "name": "pokemon 42",
+      "priority": 5,
+      "request": {
+        "method": "GET",
+        "urlPathPattern": "/api/v2/pokemon/(?i)(42|golbat)/?"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json; charset=utf-8"
+        },
+        "bodyFileName": "pokemon/42.json"
+      }
+    },
+    {
+      "name": "pokemon 43",
+      "priority": 5,
+      "request": {
+        "method": "GET",
+        "urlPathPattern": "/api/v2/pokemon/(?i)(43|oddish)/?"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json; charset=utf-8"
+        },
+        "bodyFileName": "pokemon/43.json"
+      }
+    },
+    {
+      "name": "pokemon 439",
+      "priority": 5,
+      "request": {
+        "method": "GET",
+        "urlPathPattern": "/api/v2/pokemon/(?i)(439|mime-jr)/?"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json; charset=utf-8"
+        },
+        "bodyFileName": "pokemon/439.json"
+      }
+    },
+    {
+      "name": "pokemon 44",
+      "priority": 5,
+      "request": {
+        "method": "GET",
+        "urlPathPattern": "/api/v2/pokemon/(?i)(44|gloom)/?"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json; charset=utf-8"
+        },
+        "bodyFileName": "pokemon/44.json"
+      }
+    },
+    {
+      "name": "pokemon 440",
+      "priority": 5,
+      "request": {
+        "method": "GET",
+        "urlPathPattern": "/api/v2/pokemon/(?i)(440|happiny)/?"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json; charset=utf-8"
+        },
+        "bodyFileName": "pokemon/440.json"
+      }
+    },
+    {
+      "name": "pokemon 446",
+      "priority": 5,
+      "request": {
+        "method": "GET",
+        "urlPathPattern": "/api/v2/pokemon/(?i)(446|munchlax)/?"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json; charset=utf-8"
+        },
+        "bodyFileName": "pokemon/446.json"
+      }
+    },
+    {
+      "name": "pokemon 45",
+      "priority": 5,
+      "request": {
+        "method": "GET",
+        "urlPathPattern": "/api/v2/pokemon/(?i)(45|vileplume)/?"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json; charset=utf-8"
+        },
+        "bodyFileName": "pokemon/45.json"
+      }
+    },
+    {
+      "name": "pokemon 46",
+      "priority": 5,
+      "request": {
+        "method": "GET",
+        "urlPathPattern": "/api/v2/pokemon/(?i)(46|paras)/?"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json; charset=utf-8"
+        },
+        "bodyFileName": "pokemon/46.json"
+      }
+    },
+    {
+      "name": "pokemon 462",
+      "priority": 5,
+      "request": {
+        "method": "GET",
+        "urlPathPattern": "/api/v2/pokemon/(?i)(462|magnezone)/?"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json; charset=utf-8"
+        },
+        "bodyFileName": "pokemon/462.json"
+      }
+    },
+    {
+      "name": "pokemon 463",
+      "priority": 5,
+      "request": {
+        "method": "GET",
+        "urlPathPattern": "/api/v2/pokemon/(?i)(463|lickilicky)/?"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json; charset=utf-8"
+        },
+        "bodyFileName": "pokemon/463.json"
+      }
+    },
+    {
+      "name": "pokemon 464",
+      "priority": 5,
+      "request": {
+        "method": "GET",
+        "urlPathPattern": "/api/v2/pokemon/(?i)(464|rhyperior)/?"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json; charset=utf-8"
+        },
+        "bodyFileName": "pokemon/464.json"
+      }
+    },
+    {
+      "name": "pokemon 465",
+      "priority": 5,
+      "request": {
+        "method": "GET",
+        "urlPathPattern": "/api/v2/pokemon/(?i)(465|tangrowth)/?"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json; charset=utf-8"
+        },
+        "bodyFileName": "pokemon/465.json"
+      }
+    },
+    {
+      "name": "pokemon 466",
+      "priority": 5,
+      "request": {
+        "method": "GET",
+        "urlPathPattern": "/api/v2/pokemon/(?i)(466|electivire)/?"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json; charset=utf-8"
+        },
+        "bodyFileName": "pokemon/466.json"
+      }
+    },
+    {
+      "name": "pokemon 467",
+      "priority": 5,
+      "request": {
+        "method": "GET",
+        "urlPathPattern": "/api/v2/pokemon/(?i)(467|magmortar)/?"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json; charset=utf-8"
+        },
+        "bodyFileName": "pokemon/467.json"
+      }
+    },
+    {
+      "name": "pokemon 47",
+      "priority": 5,
+      "request": {
+        "method": "GET",
+        "urlPathPattern": "/api/v2/pokemon/(?i)(47|parasect)/?"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json; charset=utf-8"
+        },
+        "bodyFileName": "pokemon/47.json"
+      }
+    },
+    {
+      "name": "pokemon 470",
+      "priority": 5,
+      "request": {
+        "method": "GET",
+        "urlPathPattern": "/api/v2/pokemon/(?i)(470|leafeon)/?"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json; charset=utf-8"
+        },
+        "bodyFileName": "pokemon/470.json"
+      }
+    },
+    {
+      "name": "pokemon 471",
+      "priority": 5,
+      "request": {
+        "method": "GET",
+        "urlPathPattern": "/api/v2/pokemon/(?i)(471|glaceon)/?"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json; charset=utf-8"
+        },
+        "bodyFileName": "pokemon/471.json"
+      }
+    },
+    {
+      "name": "pokemon 474",
+      "priority": 5,
+      "request": {
+        "method": "GET",
+        "urlPathPattern": "/api/v2/pokemon/(?i)(474|porygon-z)/?"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json; charset=utf-8"
+        },
+        "bodyFileName": "pokemon/474.json"
+      }
+    },
+    {
+      "name": "pokemon 48",
+      "priority": 5,
+      "request": {
+        "method": "GET",
+        "urlPathPattern": "/api/v2/pokemon/(?i)(48|venonat)/?"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json; charset=utf-8"
+        },
+        "bodyFileName": "pokemon/48.json"
+      }
+    },
+    {
+      "name": "pokemon 49",
+      "priority": 5,
+      "request": {
+        "method": "GET",
+        "urlPathPattern": "/api/v2/pokemon/(?i)(49|venomoth)/?"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json; charset=utf-8"
+        },
+        "bodyFileName": "pokemon/49.json"
+      }
+    },
+    {
+      "name": "pokemon 5",
+      "priority": 5,
+      "request": {
+        "method": "GET",
+        "urlPathPattern": "/api/v2/pokemon/(?i)(5|charmeleon)/?"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json; charset=utf-8"
+        },
+        "bodyFileName": "pokemon/5.json"
+      }
+    },
+    {
+      "name": "pokemon 50",
+      "priority": 5,
+      "request": {
+        "method": "GET",
+        "urlPathPattern": "/api/v2/pokemon/(?i)(50|diglett)/?"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json; charset=utf-8"
+        },
+        "bodyFileName": "pokemon/50.json"
+      }
+    },
+    {
+      "name": "pokemon 51",
+      "priority": 5,
+      "request": {
+        "method": "GET",
+        "urlPathPattern": "/api/v2/pokemon/(?i)(51|dugtrio)/?"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json; charset=utf-8"
+        },
+        "bodyFileName": "pokemon/51.json"
+      }
+    },
+    {
+      "name": "pokemon 52",
+      "priority": 5,
+      "request": {
+        "method": "GET",
+        "urlPathPattern": "/api/v2/pokemon/(?i)(52|meowth)/?"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json; charset=utf-8"
+        },
+        "bodyFileName": "pokemon/52.json"
+      }
+    },
+    {
+      "name": "pokemon 53",
+      "priority": 5,
+      "request": {
+        "method": "GET",
+        "urlPathPattern": "/api/v2/pokemon/(?i)(53|persian)/?"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json; charset=utf-8"
+        },
+        "bodyFileName": "pokemon/53.json"
+      }
+    },
+    {
+      "name": "pokemon 54",
+      "priority": 5,
+      "request": {
+        "method": "GET",
+        "urlPathPattern": "/api/v2/pokemon/(?i)(54|psyduck)/?"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json; charset=utf-8"
+        },
+        "bodyFileName": "pokemon/54.json"
+      }
+    },
+    {
+      "name": "pokemon 55",
+      "priority": 5,
+      "request": {
+        "method": "GET",
+        "urlPathPattern": "/api/v2/pokemon/(?i)(55|golduck)/?"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json; charset=utf-8"
+        },
+        "bodyFileName": "pokemon/55.json"
+      }
+    },
+    {
+      "name": "pokemon 56",
+      "priority": 5,
+      "request": {
+        "method": "GET",
+        "urlPathPattern": "/api/v2/pokemon/(?i)(56|mankey)/?"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json; charset=utf-8"
+        },
+        "bodyFileName": "pokemon/56.json"
+      }
+    },
+    {
+      "name": "pokemon 57",
+      "priority": 5,
+      "request": {
+        "method": "GET",
+        "urlPathPattern": "/api/v2/pokemon/(?i)(57|primeape)/?"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json; charset=utf-8"
+        },
+        "bodyFileName": "pokemon/57.json"
+      }
+    },
+    {
+      "name": "pokemon 58",
+      "priority": 5,
+      "request": {
+        "method": "GET",
+        "urlPathPattern": "/api/v2/pokemon/(?i)(58|growlithe)/?"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json; charset=utf-8"
+        },
+        "bodyFileName": "pokemon/58.json"
+      }
+    },
+    {
+      "name": "pokemon 59",
+      "priority": 5,
+      "request": {
+        "method": "GET",
+        "urlPathPattern": "/api/v2/pokemon/(?i)(59|arcanine)/?"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json; charset=utf-8"
+        },
+        "bodyFileName": "pokemon/59.json"
+      }
+    },
+    {
+      "name": "pokemon 6",
+      "priority": 5,
+      "request": {
+        "method": "GET",
+        "urlPathPattern": "/api/v2/pokemon/(?i)(6|charizard)/?"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json; charset=utf-8"
+        },
+        "bodyFileName": "pokemon/6.json"
+      }
+    },
+    {
+      "name": "pokemon 60",
+      "priority": 5,
+      "request": {
+        "method": "GET",
+        "urlPathPattern": "/api/v2/pokemon/(?i)(60|poliwag)/?"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json; charset=utf-8"
+        },
+        "bodyFileName": "pokemon/60.json"
+      }
+    },
+    {
+      "name": "pokemon 61",
+      "priority": 5,
+      "request": {
+        "method": "GET",
+        "urlPathPattern": "/api/v2/pokemon/(?i)(61|poliwhirl)/?"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json; charset=utf-8"
+        },
+        "bodyFileName": "pokemon/61.json"
+      }
+    },
+    {
+      "name": "pokemon 62",
+      "priority": 5,
+      "request": {
+        "method": "GET",
+        "urlPathPattern": "/api/v2/pokemon/(?i)(62|poliwrath)/?"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json; charset=utf-8"
+        },
+        "bodyFileName": "pokemon/62.json"
+      }
+    },
+    {
+      "name": "pokemon 63",
+      "priority": 5,
+      "request": {
+        "method": "GET",
+        "urlPathPattern": "/api/v2/pokemon/(?i)(63|abra)/?"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json; charset=utf-8"
+        },
+        "bodyFileName": "pokemon/63.json"
+      }
+    },
+    {
+      "name": "pokemon 64",
+      "priority": 5,
+      "request": {
+        "method": "GET",
+        "urlPathPattern": "/api/v2/pokemon/(?i)(64|kadabra)/?"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json; charset=utf-8"
+        },
+        "bodyFileName": "pokemon/64.json"
+      }
+    },
+    {
+      "name": "pokemon 65",
+      "priority": 5,
+      "request": {
+        "method": "GET",
+        "urlPathPattern": "/api/v2/pokemon/(?i)(65|alakazam)/?"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json; charset=utf-8"
+        },
+        "bodyFileName": "pokemon/65.json"
+      }
+    },
+    {
+      "name": "pokemon 66",
+      "priority": 5,
+      "request": {
+        "method": "GET",
+        "urlPathPattern": "/api/v2/pokemon/(?i)(66|machop)/?"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json; charset=utf-8"
+        },
+        "bodyFileName": "pokemon/66.json"
+      }
+    },
+    {
+      "name": "pokemon 67",
+      "priority": 5,
+      "request": {
+        "method": "GET",
+        "urlPathPattern": "/api/v2/pokemon/(?i)(67|machoke)/?"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json; charset=utf-8"
+        },
+        "bodyFileName": "pokemon/67.json"
+      }
+    },
+    {
+      "name": "pokemon 68",
+      "priority": 5,
+      "request": {
+        "method": "GET",
+        "urlPathPattern": "/api/v2/pokemon/(?i)(68|machamp)/?"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json; charset=utf-8"
+        },
+        "bodyFileName": "pokemon/68.json"
+      }
+    },
+    {
+      "name": "pokemon 69",
+      "priority": 5,
+      "request": {
+        "method": "GET",
+        "urlPathPattern": "/api/v2/pokemon/(?i)(69|bellsprout)/?"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json; charset=utf-8"
+        },
+        "bodyFileName": "pokemon/69.json"
+      }
+    },
+    {
+      "name": "pokemon 7",
+      "priority": 5,
+      "request": {
+        "method": "GET",
+        "urlPathPattern": "/api/v2/pokemon/(?i)(7|squirtle)/?"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json; charset=utf-8"
+        },
+        "bodyFileName": "pokemon/7.json"
+      }
+    },
+    {
+      "name": "pokemon 70",
+      "priority": 5,
+      "request": {
+        "method": "GET",
+        "urlPathPattern": "/api/v2/pokemon/(?i)(70|weepinbell)/?"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json; charset=utf-8"
+        },
+        "bodyFileName": "pokemon/70.json"
+      }
+    },
+    {
+      "name": "pokemon 700",
+      "priority": 5,
+      "request": {
+        "method": "GET",
+        "urlPathPattern": "/api/v2/pokemon/(?i)(700|sylveon)/?"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json; charset=utf-8"
+        },
+        "bodyFileName": "pokemon/700.json"
+      }
+    },
+    {
+      "name": "pokemon 71",
+      "priority": 5,
+      "request": {
+        "method": "GET",
+        "urlPathPattern": "/api/v2/pokemon/(?i)(71|victreebel)/?"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json; charset=utf-8"
+        },
+        "bodyFileName": "pokemon/71.json"
+      }
+    },
+    {
+      "name": "pokemon 72",
+      "priority": 5,
+      "request": {
+        "method": "GET",
+        "urlPathPattern": "/api/v2/pokemon/(?i)(72|tentacool)/?"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json; charset=utf-8"
+        },
+        "bodyFileName": "pokemon/72.json"
+      }
+    },
+    {
+      "name": "pokemon 73",
+      "priority": 5,
+      "request": {
+        "method": "GET",
+        "urlPathPattern": "/api/v2/pokemon/(?i)(73|tentacruel)/?"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json; charset=utf-8"
+        },
+        "bodyFileName": "pokemon/73.json"
+      }
+    },
+    {
+      "name": "pokemon 74",
+      "priority": 5,
+      "request": {
+        "method": "GET",
+        "urlPathPattern": "/api/v2/pokemon/(?i)(74|geodude)/?"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json; charset=utf-8"
+        },
+        "bodyFileName": "pokemon/74.json"
+      }
+    },
+    {
+      "name": "pokemon 75",
+      "priority": 5,
+      "request": {
+        "method": "GET",
+        "urlPathPattern": "/api/v2/pokemon/(?i)(75|graveler)/?"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json; charset=utf-8"
+        },
+        "bodyFileName": "pokemon/75.json"
+      }
+    },
+    {
+      "name": "pokemon 76",
+      "priority": 5,
+      "request": {
+        "method": "GET",
+        "urlPathPattern": "/api/v2/pokemon/(?i)(76|golem)/?"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json; charset=utf-8"
+        },
+        "bodyFileName": "pokemon/76.json"
+      }
+    },
+    {
+      "name": "pokemon 77",
+      "priority": 5,
+      "request": {
+        "method": "GET",
+        "urlPathPattern": "/api/v2/pokemon/(?i)(77|ponyta)/?"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json; charset=utf-8"
+        },
+        "bodyFileName": "pokemon/77.json"
+      }
+    },
+    {
+      "name": "pokemon 78",
+      "priority": 5,
+      "request": {
+        "method": "GET",
+        "urlPathPattern": "/api/v2/pokemon/(?i)(78|rapidash)/?"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json; charset=utf-8"
+        },
+        "bodyFileName": "pokemon/78.json"
+      }
+    },
+    {
+      "name": "pokemon 79",
+      "priority": 5,
+      "request": {
+        "method": "GET",
+        "urlPathPattern": "/api/v2/pokemon/(?i)(79|slowpoke)/?"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json; charset=utf-8"
+        },
+        "bodyFileName": "pokemon/79.json"
+      }
+    },
+    {
+      "name": "pokemon 8",
+      "priority": 5,
+      "request": {
+        "method": "GET",
+        "urlPathPattern": "/api/v2/pokemon/(?i)(8|wartortle)/?"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json; charset=utf-8"
+        },
+        "bodyFileName": "pokemon/8.json"
+      }
+    },
+    {
+      "name": "pokemon 80",
+      "priority": 5,
+      "request": {
+        "method": "GET",
+        "urlPathPattern": "/api/v2/pokemon/(?i)(80|slowbro)/?"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json; charset=utf-8"
+        },
+        "bodyFileName": "pokemon/80.json"
+      }
+    },
+    {
+      "name": "pokemon 81",
+      "priority": 5,
+      "request": {
+        "method": "GET",
+        "urlPathPattern": "/api/v2/pokemon/(?i)(81|magnemite)/?"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json; charset=utf-8"
+        },
+        "bodyFileName": "pokemon/81.json"
+      }
+    },
+    {
+      "name": "pokemon 82",
+      "priority": 5,
+      "request": {
+        "method": "GET",
+        "urlPathPattern": "/api/v2/pokemon/(?i)(82|magneton)/?"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json; charset=utf-8"
+        },
+        "bodyFileName": "pokemon/82.json"
+      }
+    },
+    {
+      "name": "pokemon 83",
+      "priority": 5,
+      "request": {
+        "method": "GET",
+        "urlPathPattern": "/api/v2/pokemon/(?i)(83|farfetchd)/?"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json; charset=utf-8"
+        },
+        "bodyFileName": "pokemon/83.json"
+      }
+    },
+    {
+      "name": "pokemon 84",
+      "priority": 5,
+      "request": {
+        "method": "GET",
+        "urlPathPattern": "/api/v2/pokemon/(?i)(84|doduo)/?"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json; charset=utf-8"
+        },
+        "bodyFileName": "pokemon/84.json"
+      }
+    },
+    {
+      "name": "pokemon 85",
+      "priority": 5,
+      "request": {
+        "method": "GET",
+        "urlPathPattern": "/api/v2/pokemon/(?i)(85|dodrio)/?"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json; charset=utf-8"
+        },
+        "bodyFileName": "pokemon/85.json"
+      }
+    },
+    {
+      "name": "pokemon 86",
+      "priority": 5,
+      "request": {
+        "method": "GET",
+        "urlPathPattern": "/api/v2/pokemon/(?i)(86|seel)/?"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json; charset=utf-8"
+        },
+        "bodyFileName": "pokemon/86.json"
+      }
+    },
+    {
+      "name": "pokemon 863",
+      "priority": 5,
+      "request": {
+        "method": "GET",
+        "urlPathPattern": "/api/v2/pokemon/(?i)(863|perrserker)/?"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json; charset=utf-8"
+        },
+        "bodyFileName": "pokemon/863.json"
+      }
+    },
+    {
+      "name": "pokemon 865",
+      "priority": 5,
+      "request": {
+        "method": "GET",
+        "urlPathPattern": "/api/v2/pokemon/(?i)(865|sirfetchd)/?"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json; charset=utf-8"
+        },
+        "bodyFileName": "pokemon/865.json"
+      }
+    },
+    {
+      "name": "pokemon 866",
+      "priority": 5,
+      "request": {
+        "method": "GET",
+        "urlPathPattern": "/api/v2/pokemon/(?i)(866|mr-rime)/?"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json; charset=utf-8"
+        },
+        "bodyFileName": "pokemon/866.json"
+      }
+    },
+    {
+      "name": "pokemon 87",
+      "priority": 5,
+      "request": {
+        "method": "GET",
+        "urlPathPattern": "/api/v2/pokemon/(?i)(87|dewgong)/?"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json; charset=utf-8"
+        },
+        "bodyFileName": "pokemon/87.json"
+      }
+    },
+    {
+      "name": "pokemon 88",
+      "priority": 5,
+      "request": {
+        "method": "GET",
+        "urlPathPattern": "/api/v2/pokemon/(?i)(88|grimer)/?"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json; charset=utf-8"
+        },
+        "bodyFileName": "pokemon/88.json"
+      }
+    },
+    {
+      "name": "pokemon 89",
+      "priority": 5,
+      "request": {
+        "method": "GET",
+        "urlPathPattern": "/api/v2/pokemon/(?i)(89|muk)/?"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json; charset=utf-8"
+        },
+        "bodyFileName": "pokemon/89.json"
+      }
+    },
+    {
+      "name": "pokemon 9",
+      "priority": 5,
+      "request": {
+        "method": "GET",
+        "urlPathPattern": "/api/v2/pokemon/(?i)(9|blastoise)/?"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json; charset=utf-8"
+        },
+        "bodyFileName": "pokemon/9.json"
+      }
+    },
+    {
+      "name": "pokemon 90",
+      "priority": 5,
+      "request": {
+        "method": "GET",
+        "urlPathPattern": "/api/v2/pokemon/(?i)(90|shellder)/?"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json; charset=utf-8"
+        },
+        "bodyFileName": "pokemon/90.json"
+      }
+    },
+    {
+      "name": "pokemon 900",
+      "priority": 5,
+      "request": {
+        "method": "GET",
+        "urlPathPattern": "/api/v2/pokemon/(?i)(900|kleavor)/?"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json; charset=utf-8"
+        },
+        "bodyFileName": "pokemon/900.json"
+      }
+    },
+    {
+      "name": "pokemon 91",
+      "priority": 5,
+      "request": {
+        "method": "GET",
+        "urlPathPattern": "/api/v2/pokemon/(?i)(91|cloyster)/?"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json; charset=utf-8"
+        },
+        "bodyFileName": "pokemon/91.json"
+      }
+    },
+    {
+      "name": "pokemon 92",
+      "priority": 5,
+      "request": {
+        "method": "GET",
+        "urlPathPattern": "/api/v2/pokemon/(?i)(92|gastly)/?"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json; charset=utf-8"
+        },
+        "bodyFileName": "pokemon/92.json"
+      }
+    },
+    {
+      "name": "pokemon 93",
+      "priority": 5,
+      "request": {
+        "method": "GET",
+        "urlPathPattern": "/api/v2/pokemon/(?i)(93|haunter)/?"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json; charset=utf-8"
+        },
+        "bodyFileName": "pokemon/93.json"
+      }
+    },
+    {
+      "name": "pokemon 94",
+      "priority": 5,
+      "request": {
+        "method": "GET",
+        "urlPathPattern": "/api/v2/pokemon/(?i)(94|gengar)/?"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json; charset=utf-8"
+        },
+        "bodyFileName": "pokemon/94.json"
+      }
+    },
+    {
+      "name": "pokemon 95",
+      "priority": 5,
+      "request": {
+        "method": "GET",
+        "urlPathPattern": "/api/v2/pokemon/(?i)(95|onix)/?"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json; charset=utf-8"
+        },
+        "bodyFileName": "pokemon/95.json"
+      }
+    },
+    {
+      "name": "pokemon 96",
+      "priority": 5,
+      "request": {
+        "method": "GET",
+        "urlPathPattern": "/api/v2/pokemon/(?i)(96|drowzee)/?"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json; charset=utf-8"
+        },
+        "bodyFileName": "pokemon/96.json"
+      }
+    },
+    {
+      "name": "pokemon 97",
+      "priority": 5,
+      "request": {
+        "method": "GET",
+        "urlPathPattern": "/api/v2/pokemon/(?i)(97|hypno)/?"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json; charset=utf-8"
+        },
+        "bodyFileName": "pokemon/97.json"
+      }
+    },
+    {
+      "name": "pokemon 979",
+      "priority": 5,
+      "request": {
+        "method": "GET",
+        "urlPathPattern": "/api/v2/pokemon/(?i)(979|annihilape)/?"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json; charset=utf-8"
+        },
+        "bodyFileName": "pokemon/979.json"
+      }
+    },
+    {
+      "name": "pokemon 98",
+      "priority": 5,
+      "request": {
+        "method": "GET",
+        "urlPathPattern": "/api/v2/pokemon/(?i)(98|krabby)/?"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json; charset=utf-8"
+        },
+        "bodyFileName": "pokemon/98.json"
+      }
+    },
+    {
+      "name": "pokemon 99",
+      "priority": 5,
+      "request": {
+        "method": "GET",
+        "urlPathPattern": "/api/v2/pokemon/(?i)(99|kingler)/?"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json; charset=utf-8"
+        },
+        "bodyFileName": "pokemon/99.json"
+      }
+    }
+  ]
+}

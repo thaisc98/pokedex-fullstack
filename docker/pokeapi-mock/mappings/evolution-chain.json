@@ -1,0 +1,1174 @@
+{
+  "mappings": [
+    {
+      "name": "evolution-chain 1",
+      "priority": 5,
+      "request": {
+        "method": "GET",
+        "urlPathPattern": "/api/v2/evolution-chain/1/?"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json; charset=utf-8"
+        },
+        "bodyFileName": "evolution-chain/1.json"
+      }
+    },
+    {
+      "name": "evolution-chain 10",
+      "priority": 5,
+      "request": {
+        "method": "GET",
+        "urlPathPattern": "/api/v2/evolution-chain/10/?"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json; charset=utf-8"
+        },
+        "bodyFileName": "evolution-chain/10.json"
+      }
+    },
+    {
+      "name": "evolution-chain 11",
+      "priority": 5,
+      "request": {
+        "method": "GET",
+        "urlPathPattern": "/api/v2/evolution-chain/11/?"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json; charset=utf-8"
+        },
+        "bodyFileName": "evolution-chain/11.json"
+      }
+    },
+    {
+      "name": "evolution-chain 12",
+      "priority": 5,
+      "request": {
+        "method": "GET",
+        "urlPathPattern": "/api/v2/evolution-chain/12/?"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json; charset=utf-8"
+        },
+        "bodyFileName": "evolution-chain/12.json"
+      }
+    },
+    {
+      "name": "evolution-chain 13",
+      "priority": 5,
+      "request": {
+        "method": "GET",
+        "urlPathPattern": "/api/v2/evolution-chain/13/?"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json; charset=utf-8"
+        },
+        "bodyFileName": "evolution-chain/13.json"
+      }
+    },
+    {
+      "name": "evolution-chain 14",
+      "priority": 5,
+      "request": {
+        "method": "GET",
+        "urlPathPattern": "/api/v2/evolution-chain/14/?"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json; charset=utf-8"
+        },
+        "bodyFileName": "evolution-chain/14.json"
+      }
+    },
+    {
+      "name": "evolution-chain 15",
+      "priority": 5,
+      "request": {
+        "method": "GET",
+        "urlPathPattern": "/api/v2/evolution-chain/15/?"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json; charset=utf-8"
+        },
+        "bodyFileName": "evolution-chain/15.json"
+      }
+    },
+    {
+      "name": "evolution-chain 16",
+      "priority": 5,
+      "request": {
+        "method": "GET",
+        "urlPathPattern": "/api/v2/evolution-chain/16/?"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json; charset=utf-8"
+        },
+        "bodyFileName": "evolution-chain/16.json"
+      }
+    },
+    {
+      "name": "evolution-chain 17",
+      "priority": 5,
+      "request": {
+        "method": "GET",
+        "urlPathPattern": "/api/v2/evolution-chain/17/?"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json; charset=utf-8"
+        },
+        "bodyFileName": "evolution-chain/17.json"
+      }
+    },
+    {
+      "name": "evolution-chain 18",
+      "priority": 5,
+      "request": {
+        "method": "GET",
+        "urlPathPattern": "/api/v2/evolution-chain/18/?"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json; charset=utf-8"
+        },
+        "bodyFileName": "evolution-chain/18.json"
+      }
+    },
+    {
+      "name": "evolution-chain 19",
+      "priority": 5,
+      "request": {
+        "method": "GET",
+        "urlPathPattern": "/api/v2/evolution-chain/19/?"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json; charset=utf-8"
+        },
+        "bodyFileName": "evolution-chain/19.json"
+      }
+    },
+    {
+      "name": "evolution-chain 2",
+      "priority": 5,
+      "request": {
+        "method": "GET",
+        "urlPathPattern": "/api/v2/evolution-chain/2/?"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json; charset=utf-8"
+        },
+        "bodyFileName": "evolution-chain/2.json"
+      }
+    },
+    {
+      "name": "evolution-chain 20",
+      "priority": 5,
+      "request": {
+        "method": "GET",
+        "urlPathPattern": "/api/v2/evolution-chain/20/?"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json; charset=utf-8"
+        },
+        "bodyFileName": "evolution-chain/20.json"
+      }
+    },
+    {
+      "name": "evolution-chain 21",
+      "priority": 5,
+      "request": {
+        "method": "GET",
+        "urlPathPattern": "/api/v2/evolution-chain/21/?"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json; charset=utf-8"
+        },
+        "bodyFileName": "evolution-chain/21.json"
+      }
+    },
+    {
+      "name": "evolution-chain 22",
+      "priority": 5,
+      "request": {
+        "method": "GET",
+        "urlPathPattern": "/api/v2/evolution-chain/22/?"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json; charset=utf-8"
+        },
+        "bodyFileName": "evolution-chain/22.json"
+      }
+    },
+    {
+      "name": "evolution-chain 23",
+      "priority": 5,
+      "request": {
+        "method": "GET",
+        "urlPathPattern": "/api/v2/evolution-chain/23/?"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json; charset=utf-8"
+        },
+        "bodyFileName": "evolution-chain/23.json"
+      }
+    },
+    {
+      "name": "evolution-chain 24",
+      "priority": 5,
+      "request": {
+        "method": "GET",
+        "urlPathPattern": "/api/v2/evolution-chain/24/?"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json; charset=utf-8"
+        },
+        "bodyFileName": "evolution-chain/24.json"
+      }
+    },
+    {
+      "name": "evolution-chain 25",
+      "priority": 5,
+      "request": {
+        "method": "GET",
+        "urlPathPattern": "/api/v2/evolution-chain/25/?"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json; charset=utf-8"
+        },
+        "bodyFileName": "evolution-chain/25.json"
+      }
+    },
+    {
+      "name": "evolution-chain 26",
+      "priority": 5,
+      "request": {
+        "method": "GET",
+        "urlPathPattern": "/api/v2/evolution-chain/26/?"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json; charset=utf-8"
+        },
+        "bodyFileName": "evolution-chain/26.json"
+      }
+    },
+    {
+      "name": "evolution-chain 27",
+      "priority": 5,
+      "request": {
+        "method": "GET",
+        "urlPathPattern": "/api/v2/evolution-chain/27/?"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json; charset=utf-8"
+        },
+        "bodyFileName": "evolution-chain/27.json"
+      }
+    },
+    {
+      "name": "evolution-chain 28",
+      "priority": 5,
+      "request": {
+        "method": "GET",
+        "urlPathPattern": "/api/v2/evolution-chain/28/?"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json; charset=utf-8"
+        },
+        "bodyFileName": "evolution-chain/28.json"
+      }
+    },
+    {
+      "name": "evolution-chain 29",
+      "priority": 5,
+      "request": {
+        "method": "GET",
+        "urlPathPattern": "/api/v2/evolution-chain/29/?"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json; charset=utf-8"
+        },
+        "bodyFileName": "evolution-chain/29.json"
+      }
+    },
+    {
+      "name": "evolution-chain 3",
+      "priority": 5,
+      "request": {
+        "method": "GET",
+        "urlPathPattern": "/api/v2/evolution-chain/3/?"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json; charset=utf-8"
+        },
+        "bodyFileName": "evolution-chain/3.json"
+      }
+    },
+    {
+      "name": "evolution-chain 30",
+      "priority": 5,
+      "request": {
+        "method": "GET",
+        "urlPathPattern": "/api/v2/evolution-chain/30/?"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json; charset=utf-8"
+        },
+        "bodyFileName": "evolution-chain/30.json"
+      }
+    },
+    {
+      "name": "evolution-chain 31",
+      "priority": 5,
+      "request": {
+        "method": "GET",
+        "urlPathPattern": "/api/v2/evolution-chain/31/?"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json; charset=utf-8"
+        },
+        "bodyFileName": "evolution-chain/31.json"
+      }
+    },
+    {
+      "name": "evolution-chain 32",
+      "priority": 5,
+      "request": {
+        "method": "GET",
+        "urlPathPattern": "/api/v2/evolution-chain/32/?"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json; charset=utf-8"
+        },
+        "bodyFileName": "evolution-chain/32.json"
+      }
+    },
+    {
+      "name": "evolution-chain 33",
+      "priority": 5,
+      "request": {
+        "method": "GET",
+        "urlPathPattern": "/api/v2/evolution-chain/33/?"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json; charset=utf-8"
+        },
+        "bodyFileName": "evolution-chain/33.json"
+      }
+    },
+    {
+      "name": "evolution-chain 34",
+      "priority": 5,
+      "request": {
+        "method": "GET",
+        "urlPathPattern": "/api/v2/evolution-chain/34/?"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json; charset=utf-8"
+        },
+        "bodyFileName": "evolution-chain/34.json"
+      }
+    },
+    {
+      "name": "evolution-chain 35",
+      "priority": 5,
+      "request": {
+        "method": "GET",
+        "urlPathPattern": "/api/v2/evolution-chain/35/?"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json; charset=utf-8"
+        },
+        "bodyFileName": "evolution-chain/35.json"
+      }
+    },
+    {
+      "name": "evolution-chain 36",
+      "priority": 5,
+      "request": {
+        "method": "GET",
+        "urlPathPattern": "/api/v2/evolution-chain/36/?"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json; charset=utf-8"
+        },
+        "bodyFileName": "evolution-chain/36.json"
+      }
+    },
+    {
+      "name": "evolution-chain 37",
+      "priority": 5,
+      "request": {
+        "method": "GET",
+        "urlPathPattern": "/api/v2/evolution-chain/37/?"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json; charset=utf-8"
+        },
+        "bodyFileName": "evolution-chain/37.json"
+      }
+    },
+    {
+      "name": "evolution-chain 38",
+      "priority": 5,
+      "request": {
+        "method": "GET",
+        "urlPathPattern": "/api/v2/evolution-chain/38/?"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json; charset=utf-8"
+        },
+        "bodyFileName": "evolution-chain/38.json"
+      }
+    },
+    {
+      "name": "evolution-chain 39",
+      "priority": 5,
+      "request": {
+        "method": "GET",
+        "urlPathPattern": "/api/v2/evolution-chain/39/?"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json; charset=utf-8"
+        },
+        "bodyFileName": "evolution-chain/39.json"
+      }
+    },
+    {
+      "name": "evolution-chain 4",
+      "priority": 5,
+      "request": {
+        "method": "GET",
+        "urlPathPattern": "/api/v2/evolution-chain/4/?"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json; charset=utf-8"
+        },
+        "bodyFileName": "evolution-chain/4.json"
+      }
+    },
+    {
+      "name": "evolution-chain 40",
+      "priority": 5,
+      "request": {
+        "method": "GET",
+        "urlPathPattern": "/api/v2/evolution-chain/40/?"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json; charset=utf-8"
+        },
+        "bodyFileName": "evolution-chain/40.json"
+      }
+    },
+    {
+      "name": "evolution-chain 41",
+      "priority": 5,
+      "request": {
+        "method": "GET",
+        "urlPathPattern": "/api/v2/evolution-chain/41/?"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json; charset=utf-8"
+        },
+        "bodyFileName": "evolution-chain/41.json"
+      }
+    },
+    {
+      "name": "evolution-chain 42",
+      "priority": 5,
+      "request": {
+        "method": "GET",
+        "urlPathPattern": "/api/v2/evolution-chain/42/?"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json; charset=utf-8"
+        },
+        "bodyFileName": "evolution-chain/42.json"
+      }
+    },
+    {
+      "name": "evolution-chain 43",
+      "priority": 5,
+      "request": {
+        "method": "GET",
+        "urlPathPattern": "/api/v2/evolution-chain/43/?"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json; charset=utf-8"
+        },
+        "bodyFileName": "evolution-chain/43.json"
+      }
+    },
+    {
+      "name": "evolution-chain 44",
+      "priority": 5,
+      "request": {
+        "method": "GET",
+        "urlPathPattern": "/api/v2/evolution-chain/44/?"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json; charset=utf-8"
+        },
+        "bodyFileName": "evolution-chain/44.json"
+      }
+    },
+    {
+      "name": "evolution-chain 45",
+      "priority": 5,
+      "request": {
+        "method": "GET",
+        "urlPathPattern": "/api/v2/evolution-chain/45/?"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json; charset=utf-8"
+        },
+        "bodyFileName": "evolution-chain/45.json"
+      }
+    },
+    {
+      "name": "evolution-chain 46",
+      "priority": 5,
+      "request": {
+        "method": "GET",
+        "urlPathPattern": "/api/v2/evolution-chain/46/?"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json; charset=utf-8"
+        },
+        "bodyFileName": "evolution-chain/46.json"
+      }
+    },
+    {
+      "name": "evolution-chain 47",
+      "priority": 5,
+      "request": {
+        "method": "GET",
+        "urlPathPattern": "/api/v2/evolution-chain/47/?"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json; charset=utf-8"
+        },
+        "bodyFileName": "evolution-chain/47.json"
+      }
+    },
+    {
+      "name": "evolution-chain 48",
+      "priority": 5,
+      "request": {
+        "method": "GET",
+        "urlPathPattern": "/api/v2/evolution-chain/48/?"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json; charset=utf-8"
+        },
+        "bodyFileName": "evolution-chain/48.json"
+      }
+    },
+    {
+      "name": "evolution-chain 49",
+      "priority": 5,
+      "request": {
+        "method": "GET",
+        "urlPathPattern": "/api/v2/evolution-chain/49/?"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json; charset=utf-8"
+        },
+        "bodyFileName": "evolution-chain/49.json"
+      }
+    },
+    {
+      "name": "evolution-chain 5",
+      "priority": 5,
+      "request": {
+        "method": "GET",
+        "urlPathPattern": "/api/v2/evolution-chain/5/?"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json; charset=utf-8"
+        },
+        "bodyFileName": "evolution-chain/5.json"
+      }
+    },
+    {
+      "name": "evolution-chain 50",
+      "priority": 5,
+      "request": {
+        "method": "GET",
+        "urlPathPattern": "/api/v2/evolution-chain/50/?"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json; charset=utf-8"
+        },
+        "bodyFileName": "evolution-chain/50.json"
+      }
+    },
+    {
+      "name": "evolution-chain 51",
+      "priority": 5,
+      "request": {
+        "method": "GET",
+        "urlPathPattern": "/api/v2/evolution-chain/51/?"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json; charset=utf-8"
+        },
+        "bodyFileName": "evolution-chain/51.json"
+      }
+    },
+    {
+      "name": "evolution-chain 52",
+      "priority": 5,
+      "request": {
+        "method": "GET",
+        "urlPathPattern": "/api/v2/evolution-chain/52/?"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json; charset=utf-8"
+        },
+        "bodyFileName": "evolution-chain/52.json"
+      }
+    },
+    {
+      "name": "evolution-chain 53",
+      "priority": 5,
+      "request": {
+        "method": "GET",
+        "urlPathPattern": "/api/v2/evolution-chain/53/?"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json; charset=utf-8"
+        },
+        "bodyFileName": "evolution-chain/53.json"
+      }
+    },
+    {
+      "name": "evolution-chain 54",
+      "priority": 5,
+      "request": {
+        "method": "GET",
+        "urlPathPattern": "/api/v2/evolution-chain/54/?"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json; charset=utf-8"
+        },
+        "bodyFileName": "evolution-chain/54.json"
+      }
+    },
+    {
+      "name": "evolution-chain 55",
+      "priority": 5,
+      "request": {
+        "method": "GET",
+        "urlPathPattern": "/api/v2/evolution-chain/55/?"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json; charset=utf-8"
+        },
+        "bodyFileName": "evolution-chain/55.json"
+      }
+    },
+    {
+      "name": "evolution-chain 56",
+      "priority": 5,
+      "request": {
+        "method": "GET",
+        "urlPathPattern": "/api/v2/evolution-chain/56/?"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json; charset=utf-8"
+        },
+        "bodyFileName": "evolution-chain/56.json"
+      }
+    },
+    {
+      "name": "evolution-chain 57",
+      "priority": 5,
+      "request": {
+        "method": "GET",
+        "urlPathPattern": "/api/v2/evolution-chain/57/?"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json; charset=utf-8"
+        },
+        "bodyFileName": "evolution-chain/57.json"
+      }
+    },
+    {
+      "name": "evolution-chain 58",
+      "priority": 5,
+      "request": {
+        "method": "GET",
+        "urlPathPattern": "/api/v2/evolution-chain/58/?"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json; charset=utf-8"
+        },
+        "bodyFileName": "evolution-chain/58.json"
+      }
+    },
+    {
+      "name": "evolution-chain 59",
+      "priority": 5,
+      "request": {
+        "method": "GET",
+        "urlPathPattern": "/api/v2/evolution-chain/59/?"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json; charset=utf-8"
+        },
+        "bodyFileName": "evolution-chain/59.json"
+      }
+    },
+    {
+      "name": "evolution-chain 6",
+      "priority": 5,
+      "request": {
+        "method": "GET",
+        "urlPathPattern": "/api/v2/evolution-chain/6/?"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json; charset=utf-8"
+        },
+        "bodyFileName": "evolution-chain/6.json"
+      }
+    },
+    {
+      "name": "evolution-chain 60",
+      "priority": 5,
+      "request": {
+        "method": "GET",
+        "urlPathPattern": "/api/v2/evolution-chain/60/?"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json; charset=utf-8"
+        },
+        "bodyFileName": "evolution-chain/60.json"
+      }
+    },
+    {
+      "name": "evolution-chain 61",
+      "priority": 5,
+      "request": {
+        "method": "GET",
+        "urlPathPattern": "/api/v2/evolution-chain/61/?"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json; charset=utf-8"
+        },
+        "bodyFileName": "evolution-chain/61.json"
+      }
+    },
+    {
+      "name": "evolution-chain 62",
+      "priority": 5,
+      "request": {
+        "method": "GET",
+        "urlPathPattern": "/api/v2/evolution-chain/62/?"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json; charset=utf-8"
+        },
+        "bodyFileName": "evolution-chain/62.json"
+      }
+    },
+    {
+      "name": "evolution-chain 63",
+      "priority": 5,
+      "request": {
+        "method": "GET",
+        "urlPathPattern": "/api/v2/evolution-chain/63/?"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json; charset=utf-8"
+        },
+        "bodyFileName": "evolution-chain/63.json"
+      }
+    },
+    {
+      "name": "evolution-chain 64",
+      "priority": 5,
+      "request": {
+        "method": "GET",
+        "urlPathPattern": "/api/v2/evolution-chain/64/?"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json; charset=utf-8"
+        },
+        "bodyFileName": "evolution-chain/64.json"
+      }
+    },
+    {
+      "name": "evolution-chain 65",
+      "priority": 5,
+      "request": {
+        "method": "GET",
+        "urlPathPattern": "/api/v2/evolution-chain/65/?"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json; charset=utf-8"
+        },
+        "bodyFileName": "evolution-chain/65.json"
+      }
+    },
+    {
+      "name": "evolution-chain 66",
+      "priority": 5,
+      "request": {
+        "method": "GET",
+        "urlPathPattern": "/api/v2/evolution-chain/66/?"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json; charset=utf-8"
+        },
+        "bodyFileName": "evolution-chain/66.json"
+      }
+    },
+    {
+      "name": "evolution-chain 67",
+      "priority": 5,
+      "request": {
+        "method": "GET",
+        "urlPathPattern": "/api/v2/evolution-chain/67/?"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json; charset=utf-8"
+        },
+        "bodyFileName": "evolution-chain/67.json"
+      }
+    },
+    {
+      "name": "evolution-chain 68",
+      "priority": 5,
+      "request": {
+        "method": "GET",
+        "urlPathPattern": "/api/v2/evolution-chain/68/?"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json; charset=utf-8"
+        },
+        "bodyFileName": "evolution-chain/68.json"
+      }
+    },
+    {
+      "name": "evolution-chain 69",
+      "priority": 5,
+      "request": {
+        "method": "GET",
+        "urlPathPattern": "/api/v2/evolution-chain/69/?"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json; charset=utf-8"
+        },
+        "bodyFileName": "evolution-chain/69.json"
+      }
+    },
+    {
+      "name": "evolution-chain 7",
+      "priority": 5,
+      "request": {
+        "method": "GET",
+        "urlPathPattern": "/api/v2/evolution-chain/7/?"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json; charset=utf-8"
+        },
+        "bodyFileName": "evolution-chain/7.json"
+      }
+    },
+    {
+      "name": "evolution-chain 70",
+      "priority": 5,
+      "request": {
+        "method": "GET",
+        "urlPathPattern": "/api/v2/evolution-chain/70/?"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json; charset=utf-8"
+        },
+        "bodyFileName": "evolution-chain/70.json"
+      }
+    },
+    {
+      "name": "evolution-chain 71",
+      "priority": 5,
+      "request": {
+        "method": "GET",
+        "urlPathPattern": "/api/v2/evolution-chain/71/?"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json; charset=utf-8"
+        },
+        "bodyFileName": "evolution-chain/71.json"
+      }
+    },
+    {
+      "name": "evolution-chain 72",
+      "priority": 5,
+      "request": {
+        "method": "GET",
+        "urlPathPattern": "/api/v2/evolution-chain/72/?"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json; charset=utf-8"
+        },
+        "bodyFileName": "evolution-chain/72.json"
+      }
+    },
+    {
+      "name": "evolution-chain 73",
+      "priority": 5,
+      "request": {
+        "method": "GET",
+        "urlPathPattern": "/api/v2/evolution-chain/73/?"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json; charset=utf-8"
+        },
+        "bodyFileName": "evolution-chain/73.json"
+      }
+    },
+    {
+      "name": "evolution-chain 74",
+      "priority": 5,
+      "request": {
+        "method": "GET",
+        "urlPathPattern": "/api/v2/evolution-chain/74/?"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json; charset=utf-8"
+        },
+        "bodyFileName": "evolution-chain/74.json"
+      }
+    },
+    {
+      "name": "evolution-chain 75",
+      "priority": 5,
+      "request": {
+        "method": "GET",
+        "urlPathPattern": "/api/v2/evolution-chain/75/?"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json; charset=utf-8"
+        },
+        "bodyFileName": "evolution-chain/75.json"
+      }
+    },
+    {
+      "name": "evolution-chain 76",
+      "priority": 5,
+      "request": {
+        "method": "GET",
+        "urlPathPattern": "/api/v2/evolution-chain/76/?"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json; charset=utf-8"
+        },
+        "bodyFileName": "evolution-chain/76.json"
+      }
+    },
+    {
+      "name": "evolution-chain 77",
+      "priority": 5,
+      "request": {
+        "method": "GET",
+        "urlPathPattern": "/api/v2/evolution-chain/77/?"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json; charset=utf-8"
+        },
+        "bodyFileName": "evolution-chain/77.json"
+      }
+    },
+    {
+      "name": "evolution-chain 78",
+      "priority": 5,
+      "request": {
+        "method": "GET",
+        "urlPathPattern": "/api/v2/evolution-chain/78/?"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json; charset=utf-8"
+        },
+        "bodyFileName": "evolution-chain/78.json"
+      }
+    },
+    {
+      "name": "evolution-chain 8",
+      "priority": 5,
+      "request": {
+        "method": "GET",
+        "urlPathPattern": "/api/v2/evolution-chain/8/?"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json; charset=utf-8"
+        },
+        "bodyFileName": "evolution-chain/8.json"
+      }
+    },
+    {
+      "name": "evolution-chain 9",
+      "priority": 5,
+      "request": {
+        "method": "GET",
+        "urlPathPattern": "/api/v2/evolution-chain/9/?"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json; charset=utf-8"
+        },
+        "bodyFileName": "evolution-chain/9.json"
+      }
+    }
+  ]
+}

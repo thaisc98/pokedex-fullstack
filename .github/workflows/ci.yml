@@ -1,7 +1,7 @@
 # CI pipeline. Grows phase by phase (see docs/roadmap.md):
 #   now      → secret scan
 #   Phase 0  → backend (./mvnw verify) + frontend (lint, typecheck, test, build) + dependency scanning
-#   P4–P5    → e2e (Playwright vs docker compose --profile offline) + API contract check
+#   P4–P5    → e2e (Playwright vs docker compose -f docker-compose.yml -f docker-compose.offline.yml) + API contract check
 #   P6       → Docker build, image scan, OWASP ZAP baseline
 #
 # Security rules (docs/security.md §4.10):
