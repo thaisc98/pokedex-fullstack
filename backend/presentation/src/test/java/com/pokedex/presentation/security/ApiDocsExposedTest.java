@@ -2,6 +2,7 @@ package com.pokedex.presentation.security;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -39,6 +40,25 @@ class ApiDocsExposedTest {
             strings = {"/v3/api-docs", "/v3/api-docs/swagger-config", "/swagger-ui/index.html", "/swagger-ui.html"})
     void should_let_anonymous_reads_through_to_the_docs(String path) throws Exception {
         mockMvc.perform(get(path)).andExpect(status().isNotFound());
+    }
+
+    /** Swagger UI loads its own scripts, styles and the spec, so the docs get a CSP that allows same-origin assets. */
+    @ParameterizedTest
+    @ValueSource(strings = {"/v3/api-docs", "/swagger-ui/index.html"})
+    void should_give_the_docs_a_csp_that_lets_swagger_ui_load(String path) throws Exception {
+        mockMvc.perform(get(path))
+                .andExpect(header().string("Content-Security-Policy", SecurityConfig.API_DOCS_CSP))
+                .andExpect(header().string(
+                                "Content-Security-Policy", org.hamcrest.Matchers.containsString("script-src 'self'")))
+                .andExpect(header().string(
+                                "Content-Security-Policy",
+                                org.hamcrest.Matchers.containsString("frame-ancestors 'none'")));
+    }
+
+    @org.junit.jupiter.api.Test
+    void should_keep_the_strict_api_csp_outside_the_docs() throws Exception {
+        mockMvc.perform(get("/api/v1/collection"))
+                .andExpect(header().string("Content-Security-Policy", "default-src 'none'; frame-ancestors 'none'"));
     }
 
     @ParameterizedTest

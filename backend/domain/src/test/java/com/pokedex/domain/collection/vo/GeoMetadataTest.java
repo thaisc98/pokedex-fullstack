@@ -56,6 +56,14 @@ class GeoMetadataTest {
     }
 
     @Test
+    void should_accept_1_character() {
+        GeoMetadata geo = new GeoMetadata("r", "h", null);
+
+        assertThat(geo.region()).isEqualTo("r");
+        assertThat(geo.habitat()).isEqualTo("h");
+    }
+
+    @Test
     void should_accept_60_characters() {
         GeoMetadata geo = new GeoMetadata("r".repeat(60), "h".repeat(60), null);
 

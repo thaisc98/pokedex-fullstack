@@ -142,6 +142,8 @@ class RegisterUserServiceTest {
         RegisterUserCommand command = new RegisterUserCommand("ash@example.com", PASSWORD, "Ash");
 
         assertThat(command.toString()).doesNotContain(PASSWORD);
+        assertThat(command.toString())
+                .isEqualTo("RegisterUserCommand[email=ash@example.com, password=***, displayName=Ash]");
     }
 
     @Test

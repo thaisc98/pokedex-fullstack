@@ -25,6 +25,12 @@ class AccessTokenTest {
     }
 
     @Test
+    void should_print_a_redacted_form_with_the_expiry() {
+        assertThat(new AccessToken(JWT, EXPIRES_AT).toString())
+                .isEqualTo("AccessToken[value=***, expiresAt=2026-10-21T11:00:00Z]");
+    }
+
+    @Test
     void should_never_print_the_token_value() {
         assertThat(new AccessToken(JWT, EXPIRES_AT).toString())
                 .doesNotContain(JWT)

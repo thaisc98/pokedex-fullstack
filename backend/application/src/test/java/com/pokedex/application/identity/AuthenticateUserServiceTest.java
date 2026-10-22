@@ -175,7 +175,8 @@ class AuthenticateUserServiceTest {
     @Test
     void should_never_print_the_password_in_the_command() {
         assertThat(new AuthenticateUserCommand("ash@example.com", PASSWORD).toString())
-                .doesNotContain(PASSWORD);
+                .doesNotContain(PASSWORD)
+                .isEqualTo("AuthenticateUserCommand[email=ash@example.com, password=***]");
     }
 
     @Test

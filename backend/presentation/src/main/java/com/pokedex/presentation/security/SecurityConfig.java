@@ -19,8 +19,13 @@ import org.springframework.security.web.authentication.AuthenticationEntryPointF
 import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
 import org.springframework.security.web.csrf.CsrfTokenRepository;
 import org.springframework.security.web.firewall.RequestRejectedHandler;
+import org.springframework.security.web.header.HeaderWriter;
+import org.springframework.security.web.header.writers.ContentSecurityPolicyHeaderWriter;
+import org.springframework.security.web.header.writers.DelegatingRequestMatcherHeaderWriter;
+import org.springframework.security.web.header.writers.ReferrerPolicyHeaderWriter.ReferrerPolicy;
 import org.springframework.security.web.savedrequest.NullRequestCache;
 import org.springframework.security.web.servlet.util.matcher.PathPatternRequestMatcher;
+import org.springframework.security.web.util.matcher.NegatedRequestMatcher;
 import org.springframework.security.web.util.matcher.OrRequestMatcher;
 import org.springframework.security.web.util.matcher.RequestMatcher;
 
@@ -56,6 +61,19 @@ public class SecurityConfig {
     static final String LOGOUT = "/api/v1/auth/logout";
     static final String ME = "/api/v1/auth/me";
     static final String CSRF = "/api/v1/auth/csrf";
+
+    /** security.md §4.7: API responses are data only; nothing may load, frame or run them. */
+    static final String API_CSP = "default-src 'none'; frame-ancestors 'none'";
+
+    /**
+     * Swagger UI and the spec ({@code demo} profile only): same-origin scripts (the UI has no inline scripts), inline
+     * styles (the UI sets style attributes at runtime), data: images (icons) and same-origin fetches of the spec.
+     */
+    static final String API_DOCS_CSP = "default-src 'none'; script-src 'self'; style-src 'self' 'unsafe-inline'; "
+            + "img-src 'self' data:; connect-src 'self'; font-src 'self'; frame-ancestors 'none'; "
+            + "base-uri 'none'; form-action 'none'";
+
+    static final String PERMISSIONS_POLICY = "camera=(), microphone=(), geolocation=()";
     static final String COLLECTION = "/api/v1/collection";
     static final String COLLECTION_ITEM = "/api/v1/collection/*";
 
@@ -110,6 +128,13 @@ public class SecurityConfig {
                 .requestCache(cache -> cache.requestCache(new NullRequestCache()))
                 .csrf(csrf -> csrf.spa().csrfTokenRepository(csrfTokenRepository))
                 .addFilter(cookieTokenFilter(jwtDecoder, problems))
+                // nosniff, X-Frame-Options DENY and no-cache/no-store stay Spring's defaults; HSTS is only written for
+                // secure requests (behind TLS).
+                .headers(headers -> headers.addHeaderWriter(contentSecurityPolicy(apiDocsPublic))
+                        .referrerPolicy(referrer -> referrer.policy(ReferrerPolicy.STRICT_ORIGIN_WHEN_CROSS_ORIGIN))
+                        .permissionsPolicyHeader(permissions -> permissions.policy(PERMISSIONS_POLICY))
+                        .httpStrictTransportSecurity(
+                                hsts -> hsts.includeSubDomains(true).maxAgeInSeconds(31_536_000)))
                 .httpBasic(AbstractHttpConfigurer::disable)
                 .formLogin(AbstractHttpConfigurer::disable)
                 .logout(AbstractHttpConfigurer::disable)
@@ -129,6 +154,25 @@ public class SecurityConfig {
                 new BearerTokenAuthenticationFilter(new ProviderManager(provider), fromCookie);
         filter.setAuthenticationFailureHandler(new AuthenticationEntryPointFailureHandler(problems));
         return filter;
+    }
+
+    /** The strict API CSP everywhere; the Swagger-friendly one only on the docs routes, and only when they are public. */
+    private static HeaderWriter contentSecurityPolicy(boolean apiDocsPublic) {
+        ContentSecurityPolicyHeaderWriter api = new ContentSecurityPolicyHeaderWriter(API_CSP);
+        if (!apiDocsPublic) {
+            return api;
+        }
+        PathPatternRequestMatcher.Builder paths = PathPatternRequestMatcher.withDefaults();
+        RequestMatcher docs = new OrRequestMatcher(java.util.Arrays.stream(API_DOCS_PATHS)
+                .map(path -> (RequestMatcher) paths.matcher(path))
+                .toList());
+        HeaderWriter docsWriter =
+                new DelegatingRequestMatcherHeaderWriter(docs, new ContentSecurityPolicyHeaderWriter(API_DOCS_CSP));
+        HeaderWriter apiWriter = new DelegatingRequestMatcherHeaderWriter(new NegatedRequestMatcher(docs), api);
+        return (request, response) -> {
+            docsWriter.writeHeaders(request, response);
+            apiWriter.writeHeaders(request, response);
+        };
     }
 
     /** Routes where the access-token cookie is not even read (a stale cookie must not block them). */
