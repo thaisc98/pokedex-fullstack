@@ -93,7 +93,7 @@ class PokeApiMapperTest {
     @Test
     void should_use_the_placeholder_when_sprites_are_missing() {
         PokeApiPokemonDto pokemon = PokeApiFixtures.parse("""
-                {"id": 1, "name": "bulbasaur", "weight": 69, "abilities": [],
+                {"id": 1, "name": "bulbasaur", "weight": 69, "abilities": [], "types": [{"slot": 1, "type": {"name": "grass", "url": "x"}}],
                  "species": {"name": "bulbasaur", "url": "https://pokeapi.co/api/v2/pokemon-species/1/"}}
                 """, PokeApiPokemonDto.class);
 
@@ -214,6 +214,7 @@ class PokeApiMapperTest {
                 {"id": 1, "name": "%s", "weight": %s,
                  "sprites": {"front_default": %s},
                  "abilities": [{"is_hidden": false, "slot": 1, "ability": {"name": "overgrow", "url": "x"}}],
+                 "types": [{"slot": 1, "type": {"name": "grass", "url": "x"}}],
                  "species": {"name": "bulbasaur", "url": "https://pokeapi.co/api/v2/pokemon-species/1/"}}
                 """.formatted(name, weight, frontDefault);
     }
