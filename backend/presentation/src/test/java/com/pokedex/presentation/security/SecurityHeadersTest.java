@@ -38,6 +38,7 @@ import org.springframework.test.web.servlet.ResultActions;
 
 /**
  * security.md §4.7: every API response, success or error, carries the API security headers. HSTS only over HTTPS.
+ * Cache-Control (public catalog vs no-store everywhere else) is covered by {@code CatalogHttpCacheTest}.
  */
 @WebMvcTest(
         controllers = {CatalogController.class, AuthController.class},
@@ -111,7 +112,6 @@ class SecurityHeadersTest {
                 .andExpect(header().string("Referrer-Policy", "strict-origin-when-cross-origin"))
                 .andExpect(header().string("Permissions-Policy", "camera=(), microphone=(), geolocation=()"))
                 .andExpect(header().string("X-Content-Type-Options", "nosniff"))
-                .andExpect(header().string("X-Frame-Options", "DENY"))
-                .andExpect(header().string("Cache-Control", org.hamcrest.Matchers.containsString("no-store")));
+                .andExpect(header().string("X-Frame-Options", "DENY"));
     }
 }
