@@ -221,6 +221,13 @@ jobs:
       - name: Playwright (375 / 768 / 1280, axe, console guard)
         run: npm run test:e2e
 
+      # Same stack, through the edge. Accessibility >= 0.9 is the gate (ui-ux.md §12, roadmap P5); performance,
+      # best practices and SEO only warn. Mobile + desktop presets, 3 runs each, median run. Reports stay on the
+      # runner (upload target: filesystem); nothing goes to a public server.
+      - name: Lighthouse CI (accessibility gate)
+        if: ${{ !cancelled() }}
+        run: npm run test:lighthouse
+
       # No report/trace artifact: traces hold the run's session cookies, and this repository is public.
       - name: Stack logs on failure
         if: failure()
