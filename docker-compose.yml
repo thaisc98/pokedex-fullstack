@@ -4,7 +4,7 @@
 #
 #   open http://localhost:3000 (UI) · http://localhost:8080/swagger-ui (API, demo profile)
 #
-# Services: postgres → backend (Spring Boot, Flyway migrates on start) → frontend (Next.js standalone).
+# Services: postgres → backend (Spring Boot, Flyway migrates on start) → frontend (Next.js standalone) → edge (nginx).
 # Still to come (docs/roadmap.md P6): the "offline" profile (WireMock + recorded PokeAPI fixtures) and demo seed data.
 #
 # Security (docs/security.md §4.8, §4.10):
@@ -86,8 +86,30 @@ services:
         condition: service_healthy
     environment:
       BACKEND_INTERNAL_URL: http://backend:8080
+    # No published port: browsers reach the frontend only through the edge proxy below.
+    expose:
+      - "3000"
+    security_opt:
+      - no-new-privileges:true
+
+  edge:
+    # nginx in front of Next.js: overwrites X-Forwarded-For with the real client IP (docker/nginx/default.conf).
+    # Unprivileged image (non-root, listens on 8080). Pinned by tag AND digest.
+    image: nginxinc/nginx-unprivileged:1.29-alpine@sha256:0c79d56aee561a1d81c63f00eee5fb5fe29279560cdc55e91425133104c7fbe6
+    restart: unless-stopped
+    depends_on:
+      frontend:
+        condition: service_healthy
+    volumes:
+      - ./docker/nginx/default.conf:/etc/nginx/conf.d/default.conf:ro
     ports:
-      - "127.0.0.1:${FRONTEND_PORT:-3000}:3000"
+      - "127.0.0.1:${FRONTEND_PORT:-3000}:8080"
+    healthcheck:
+      test: ["CMD-SHELL", "wget -q -O /dev/null http://127.0.0.1:8080/ || exit 1"]
+      interval: 10s
+      timeout: 3s
+      retries: 6
+      start_period: 10s
     security_opt:
       - no-new-privileges:true
 

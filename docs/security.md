@@ -111,12 +111,12 @@ Two boundaries matter most: **browser → API** (every input is untrusted) and *
 | Route | Guard |
 |---|---|
 | `/pokemon`, `/pokemon/:idOrName`, `/login`, `/register` | none |
-| `/collection`, `/collection/[pokedexId]` | `proxy.ts` **optimistic** check: no `access_token` cookie → redirect to `/login?from=…` |
+| `/collection`, `/collection/[pokedexId]` | `proxy.ts` **optimistic** check: no `pokedex_signed_in` hint cookie → redirect to `/login?from=…` |
 | Delete button | shown only for `ADMIN` |
 
 Hiding a button is a convenience. The API enforces every rule on its own.
 
-> **Why `proxy.ts` is never the security boundary:** the Next.js docs describe Proxy as being for *optimistic* checks, not full authorization. CVE-2025-29927 (a Next.js middleware bypass via a crafted header) showed what happens when apps rely on it. Our proxy only checks that the cookie **exists**. It doesn't hold the JWT secret and doesn't verify the token. Even if the proxy is bypassed, the Spring API still returns 401/403.
+> **Why `proxy.ts` is never the security boundary:** the Next.js docs describe Proxy as being for *optimistic* checks, not full authorization. CVE-2025-29927 (a Next.js middleware bypass via a crafted header) showed what happens when apps rely on it. Our proxy only checks that a cookie **exists**. Because `access_token` is scoped to `Path=/api`, page requests never carry it, so the frontend sets a separate `pokedex_signed_in=1` hint cookie after login (removed on logout or any 401). It holds no secret and grants nothing; it only drives this redirect and lets visitors skip a pointless `GET /auth/me`. It doesn't hold the JWT secret and doesn't verify the token. Even if the proxy is bypassed, the Spring API still returns 401/403.
 
 ---
 
@@ -215,7 +215,7 @@ Sources: the [Spring Security 7.1.1 CSRF reference](https://docs.spring.io/sprin
 - Swagger UI and the demo data seeder are active **only** in the `dev` / `demo` profiles.
 - Containers run as a non-root user, use pinned base images, and include no build tools in the runtime image.
 - **Database least privilege (L2):** Flyway runs as the schema owner; the app connects as a user with `SELECT/INSERT/UPDATE/DELETE` only (no DDL). The app always connects as `DB_USER` / `DB_PASSWORD`. When **both** `FLYWAY_USER` and `FLYWAY_PASSWORD` are set, Flyway migrates as that owner on the same `DB_URL`; otherwise it uses the app's credentials (local runs, Testcontainers). The tables are owned by `FLYWAY_USER`; `DB_USER` gets its privileges through default privileges.
-- **Client IP behind the proxy:** `X-Forwarded-For` is honoured only when the direct peer matches `TRUSTED_PROXIES` (a regex of proxy IPs; default: private and loopback ranges). The rate limits (§4.1) key on that IP, so the Next.js server must forward `X-Forwarded-For`. A client calling Spring directly cannot spoof its IP.
+- **Client IP behind the proxy:** `X-Forwarded-For` is honoured only when the direct peer matches `TRUSTED_PROXIES` (a regex of proxy IPs; default: private and loopback ranges). The rate limits (§4.1) key on that IP, so the Next.js server must forward `X-Forwarded-For`. A client calling Spring directly cannot spoof its IP. Next.js passes a client-supplied `X-Forwarded-For` through unchanged, so browsers reach the app only through the **`edge` nginx proxy** (`docker/nginx/default.conf`), which **overwrites** the header with the real client address (`$remote_addr`); the frontend container publishes no port. The backend port published on `127.0.0.1` is for local manual testing only: requests to it come from the Docker gateway (a private, trusted address), so it must never be exposed beyond localhost.
 
 ### 4.9 Security logging and monitoring (A09)
 
