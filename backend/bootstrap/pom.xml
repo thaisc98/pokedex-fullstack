@@ -36,6 +36,11 @@
             <artifactId>pokedex-presentation</artifactId>
             <version>${project.version}</version>
         </dependency>
+        <!-- GET /actuator/health only (security.md §3.2, §4.8). Boot-managed. -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-actuator</artifactId>
+        </dependency>
         <!-- Flyway migrations on PostgreSQL (Boot-managed). -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -54,6 +59,14 @@
         <dependency>
             <groupId>com.tngtech.archunit</groupId>
             <artifactId>archunit-junit5</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <!-- In-memory fakes for the demo-seed unit tests (architecture §2.4). -->
+        <dependency>
+            <groupId>com.pokedex</groupId>
+            <artifactId>pokedex-application</artifactId>
+            <version>${project.version}</version>
+            <type>test-jar</type>
             <scope>test</scope>
         </dependency>
         <!-- PostgreSQL Testcontainer for the ITs via @ServiceConnection (Boot-managed, Testcontainers 2.x). -->

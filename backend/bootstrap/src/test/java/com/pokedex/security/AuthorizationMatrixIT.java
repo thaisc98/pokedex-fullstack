@@ -7,6 +7,9 @@ import static org.hamcrest.Matchers.nullValue;
 import static org.hamcrest.Matchers.startsWith;
 
 import com.pokedex.support.AbstractIntegrationIT;
+import io.restassured.response.Response;
+import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 import org.junit.jupiter.api.DisplayName;
@@ -15,6 +18,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.boot.actuate.endpoint.web.PathMappedEndpoints;
 import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping;
 
 /**
@@ -31,6 +35,9 @@ import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandl
  *       the default profile it is "anything else": 401. The demo counterpart is {@code OpenApiContractIT}.
  *   <li>The public catalog rows ({@code GET /api/v1/pokemon[/{idOrName}]} → 200) need a stubbed PokeAPI and are
  *       covered by the anonymous-access tests in {@code ListPokemonIT} and {@code GetPokemonDetailIT}.
+ *   <li>Actuator: only {@code GET /actuator/health} is public and returns exactly {@code {"status":"UP"}}; every
+ *       other actuator path is denied (401 anonymous, 403 USER). The completeness check also collects every exposed
+ *       actuator endpoint ({@code PathMappedEndpoints}).
  *   <li>Collection rows run without PokeAPI: an authorised call either reaches validation (400) or misses a record
  *       that no test syncs (404), which proves it passed authorization without changing data. The ADMIN is inserted
  *       by the test ({@code loggedInAdmin()}: JdbcTemplate + a BCrypt hash computed in the test).
@@ -59,7 +66,9 @@ class AuthorizationMatrixIT extends AbstractIntegrationIT {
             "POST /api/v1/collection",
             "GET /api/v1/collection/{pokedexId}",
             "PUT /api/v1/collection/{pokedexId}",
-            "DELETE /api/v1/collection/{pokedexId}");
+            "DELETE /api/v1/collection/{pokedexId}",
+            // actuator: every exposed endpoint (PathMappedEndpoints); only health, rows below
+            "ACTUATOR /actuator/health");
 
     /** A pokedexId no test ever syncs, so authorised calls end in 404 instead of touching data. */
     static final String MISSING = "/api/v1/collection/999999999";
@@ -69,6 +78,10 @@ class AuthorizationMatrixIT extends AbstractIntegrationIT {
 
     @Autowired
     @Qualifier("requestMappingHandlerMapping") RequestMappingHandlerMapping handlerMapping;
+
+    /** Every actuator endpoint exposed over HTTP (management.endpoints.web.exposure). */
+    @Autowired
+    PathMappedEndpoints actuatorEndpoints;
 
     // ------------------------------------------------------------ ANONYMOUS
 
@@ -223,6 +236,32 @@ class AuthorizationMatrixIT extends AbstractIntegrationIT {
         admin.write("DELETE", MISSING, null).then().statusCode(404).body("type", equalTo("/problems/not-found"));
     }
 
+    // ------------------------------------------------------------ actuator (security.md §3.2, §4.8)
+
+    @Test
+    void should_serve_status_only_health_to_anonymous_user_and_admin() {
+        for (Browser caller : List.of(new Browser(), loggedInUser(), loggedInAdmin())) {
+            Response health = caller.get("/actuator/health");
+
+            health.then().statusCode(200);
+            assertThat(health.jsonPath().getMap("$"))
+                    .as("status only: no components, no details")
+                    .isEqualTo(Map.of("status", "UP"));
+        }
+    }
+
+    @ParameterizedTest(name = "anonymous GET {0} -> 401")
+    @CsvSource({"/actuator/env", "/actuator/health/db", "/actuator", "/actuator/info", "/actuator/heapdump"})
+    void should_deny_anonymous_other_actuator_paths(String path) {
+        new Browser().get(path).then().statusCode(401).body("type", equalTo("/problems/unauthorized"));
+    }
+
+    @ParameterizedTest(name = "USER GET {0} -> 403")
+    @CsvSource({"/actuator/env", "/actuator/health/db", "/actuator", "/actuator/info", "/actuator/heapdump"})
+    void should_deny_user_other_actuator_paths(String path) {
+        loggedInUser().get(path).then().statusCode(403).body("type", equalTo("/problems/forbidden"));
+    }
+
     // ------------------------------------------------------------ completeness
 
     @Test
@@ -242,6 +281,9 @@ class AuthorizationMatrixIT extends AbstractIntegrationIT {
                 }
             }
         });
+
+        // Actuator endpoints are not in the MVC handler mapping; collect what is exposed over HTTP.
+        actuatorEndpoints.getAllPaths().forEach(path -> served.add("ACTUATOR " + path));
 
         assertThat(served)
                 .as("every served endpoint needs a row in the authorization matrix (AGENTS.md security rules)")

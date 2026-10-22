@@ -23,6 +23,23 @@ spring:
     hibernate:
       ddl-auto: validate
 
+# Actuator (security.md §4.8): only `health` over HTTP, status only ({"status":"UP"}), nothing else exposed.
+management:
+  endpoints:
+    access:
+      default: none
+    web:
+      exposure:
+        include: health
+  endpoint:
+    health:
+      access: read-only
+      show-details: never
+      show-components: never
+      # No liveness/readiness groups: they would be advertised in the body ("groups"), and the contract is status only.
+      probes:
+        enabled: false
+
 # OpenAPI docs and Swagger UI are off by default; only the demo profile turns them on (security.md §3.2).
 springdoc:
   api-docs:

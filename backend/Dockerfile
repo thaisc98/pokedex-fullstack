@@ -18,5 +18,5 @@ USER pokedex
 EXPOSE 8080
 # A public endpoint that never calls PokeAPI, so the check doesn't depend on the internet.
 HEALTHCHECK --interval=10s --timeout=3s --start-period=40s --retries=6 \
-  CMD wget -q -O /dev/null http://127.0.0.1:8080/api/v1/auth/csrf || exit 1
+  CMD wget -q -O /dev/null http://127.0.0.1:8080/actuator/health || exit 1
 ENTRYPOINT ["java", "-XX:MaxRAMPercentage=75", "-jar", "/app/app.jar"]
