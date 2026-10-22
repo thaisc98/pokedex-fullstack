@@ -20,7 +20,7 @@ Last recorded: 2026-10-22 from `https://pokeapi.co/api/v2`.
 | `GET /api/v2/pokemon/{id or name}` | Recorded body, for ids 1–151 and every species in their evolution chains (188 Pokémon: 1–151 plus 169, 172–174, 182, 186, 196, 197, 199, 208, 212, 230, 233, 236–240, 242, 439, 440, 446, 462–467, 470, 471, 474, 700, 863, 865, 866, 900, 979). Names match case-insensitively and a trailing slash is allowed, like PokeAPI. |
 | `GET /api/v2/pokemon-species/{id or name}` | Same 188 species. |
 | `GET /api/v2/evolution-chain/{id}` | The 78 chains those species belong to (e.g. 67 = Eevee and its 8 evolutions). |
-| `GET /api/v2/pokemon?offset=O&limit=L` | `count: 151` and `results` = entries `O … O+L-1` of the recorded Gen 1 list (`name` + `url`). Built by response templating (`__files/pokemon-list/page.json.hbs`: a JSONPath `[O:O+L]` slice), so every page size the UI allows (1–100) and every page works. An offset past 151 gives `results: []`; offsets of 10+ digits hit a static empty page. |
+| `GET /api/v2/pokemon?offset=O&limit=L` | `count: 151` and `results` = entries `O … O+L-1` of the recorded Gen 1 list (`name` + `url`). Built by response templating (`__files/pokemon-list/page.json.hbs`: a JSONPath `[O:O+L]` slice), so every page size the UI allows (1–100), every page, and the name search's single `offset=0&limit=100000` call (the whole Gen 1 list) work. An offset past 151 gives `results: []`; offsets of 10+ digits hit a static empty page. |
 | Anything else (#152+, unknown names, other resources) | `404` with PokeAPI's real body `{"status":404,"message":"Not Found"}`. |
 
 The response `url`s still point at `https://pokeapi.co/...`, exactly as recorded. The backend only extracts ids from
