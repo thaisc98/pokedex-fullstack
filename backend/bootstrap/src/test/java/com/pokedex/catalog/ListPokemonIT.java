@@ -80,6 +80,10 @@ class ListPokemonIT extends AbstractPokeApiIT {
                 // skills = abilities with the hidden flag, upstream order
                 .body("content[0].abilities.name", contains("overgrow", "chlorophyll"))
                 .body("content[0].abilities.hidden", contains(false, true))
+                // types in slot order (PokemonSummaryDto.types, same as the detail)
+                .body("content[0].types", contains("grass", "poison"))
+                .body("content[1].types", contains("grass", "poison"))
+                .body("content[2].types", contains("grass", "poison"))
                 .extract()
                 .response();
 
@@ -111,7 +115,7 @@ class ListPokemonIT extends AbstractPokeApiIT {
         assertThat(json.getMap("$").keySet())
                 .containsExactlyInAnyOrder("content", "page", "size", "totalElements", "totalPages");
         assertThat(json.getMap("content[0]").keySet())
-                .containsExactlyInAnyOrder("id", "name", "sprite", "category", "mass", "abilities");
+                .containsExactlyInAnyOrder("id", "name", "sprite", "category", "mass", "abilities", "types");
         assertThat(json.getMap("content[0].abilities[0]").keySet()).containsExactlyInAnyOrder("name", "hidden");
     }
 

@@ -2,6 +2,7 @@ package com.pokedex.application.catalog;
 
 import com.pokedex.application.catalog.port.out.PokemonCatalogPort;
 import com.pokedex.domain.catalog.PokemonDetail;
+import com.pokedex.domain.catalog.PokemonNameRef;
 import com.pokedex.domain.catalog.PokemonSummary;
 import com.pokedex.domain.catalog.vo.PokemonRef;
 import com.pokedex.domain.shared.NotFoundException;
@@ -24,6 +25,8 @@ public final class StubPokemonCatalog implements PokemonCatalogPort {
     private final List<PokemonDetail> details = new ArrayList<>();
     private final List<PageRequest> requests = new ArrayList<>();
     private final List<PokemonRef> detailRequests = new ArrayList<>();
+    private final List<PokemonNameRef> nameIndex = new ArrayList<>();
+    private int nameIndexRequests;
     private @Nullable UpstreamUnavailableException failure;
 
     public StubPokemonCatalog(List<PokemonSummary> catalog) {
@@ -37,10 +40,30 @@ public final class StubPokemonCatalog implements PokemonCatalogPort {
         return stub;
     }
 
+    /** A catalog whose name index (for search) is {@code index}, in the given order. */
+    public static StubPokemonCatalog withNameIndex(List<PokemonNameRef> index) {
+        StubPokemonCatalog stub = new StubPokemonCatalog(List.of());
+        stub.nameIndex.addAll(index);
+        return stub;
+    }
+
     /** Every later call throws {@code failure}. */
     public StubPokemonCatalog failingWith(UpstreamUnavailableException failure) {
         this.failure = Objects.requireNonNull(failure);
         return this;
+    }
+
+    public int nameIndexRequests() {
+        return nameIndexRequests;
+    }
+
+    @Override
+    public List<PokemonNameRef> fetchNameIndex() {
+        nameIndexRequests++;
+        if (failure != null) {
+            throw failure;
+        }
+        return List.copyOf(nameIndex);
     }
 
     public List<PageRequest> requests() {
