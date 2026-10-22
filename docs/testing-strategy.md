@@ -94,7 +94,7 @@ The same fixtures feed the `offline` WireMock container used for the demo.
 - Flavor text containing `\f` / `\n`, duplicated across game versions, or **with no English entry** → empty description.
 - Genus with no English entry → `Category.UNKNOWN`.
 - Evolution chains: none, linear 3-stage, branched, baby, and forms whose species id differs.
-- Upstream **404** → our 404. **429 / 5xx / timeout / connection refused** → retried (never on 4xx), then 503. **Malformed JSON** → 502/503, and no stack trace leaks into the response. **New unknown upstream fields** → ignored.
+- Upstream **404** → our 404. **5xx / timeout / connection refused** → retried with backoff, then 503. **429 and other 4xx** → **not** retried (retrying a rate limit makes it worse), then 503. **Malformed JSON** → 503, and no stack trace leaks into the response. **New unknown upstream fields** → ignored.
 - Cache: a second identical call makes **zero** HTTP calls (WireMock `verify(0)`). Not-found results are not cached, or only briefly. The cache size is capped.
 
 ### Sync (US03)
