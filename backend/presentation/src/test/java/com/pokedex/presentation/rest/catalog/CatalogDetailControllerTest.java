@@ -138,7 +138,7 @@ class CatalogDetailControllerTest {
     @Test
     void should_reject_a_raw_uri_with_a_semicolon_even_if_it_reaches_the_controller() {
         // Defence in depth: the firewall normally stops this first (see the test above).
-        CatalogController controller = new CatalogController(listPokemon, getPokemonDetail);
+        CatalogController controller = new CatalogController(listPokemon, getPokemonDetail, searchPokemonNames);
         MockHttpServletRequest request = new MockHttpServletRequest("GET", "/api/v1/pokemon/pika;drop");
 
         assertThatThrownBy(() -> controller.detail("pika", request))

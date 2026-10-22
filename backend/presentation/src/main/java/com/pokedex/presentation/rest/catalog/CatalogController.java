@@ -2,10 +2,14 @@ package com.pokedex.presentation.rest.catalog;
 
 import com.pokedex.application.catalog.port.in.GetPokemonDetailUseCase;
 import com.pokedex.application.catalog.port.in.ListPokemonUseCase;
+import com.pokedex.application.catalog.port.in.SearchPokemonNamesUseCase;
+import com.pokedex.domain.catalog.vo.NameQuery;
 import com.pokedex.domain.catalog.vo.PokemonRef;
+import com.pokedex.domain.catalog.vo.SearchLimit;
 import com.pokedex.domain.shared.InvalidValueException;
 import com.pokedex.domain.shared.PageRequest;
 import com.pokedex.presentation.rest.catalog.dto.PokemonDetailDto;
+import com.pokedex.presentation.rest.catalog.dto.PokemonSearchResultDto;
 import com.pokedex.presentation.rest.catalog.dto.PokemonSummaryDto;
 import com.pokedex.presentation.rest.shared.PageResponse;
 import io.swagger.v3.oas.annotations.Operation;
@@ -15,6 +19,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
+import org.jspecify.annotations.Nullable;
 import org.springframework.http.ProblemDetail;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -39,8 +44,46 @@ public class CatalogController {
 
     private final ListPokemonUseCase listPokemon;
     private final GetPokemonDetailUseCase getPokemonDetail;
+    private final SearchPokemonNamesUseCase searchPokemonNames;
 
-    public CatalogController(ListPokemonUseCase listPokemon, GetPokemonDetailUseCase getPokemonDetail) {
+    /**
+     * Name search (autocomplete). A literal {@code /search} mapping, so Spring matches it before {@code
+     * /{idOrName}}: {@code search} is never looked up as a Pokémon. {@code q} is checked by {@link NameQuery}, {@code
+     * limit} by {@link SearchLimit}; a violation (or a missing {@code q}) is a 400 on that field.
+     */
+    @GetMapping("/search")
+    @Operation(
+            operationId = "searchPokemonNames",
+            summary = "Search Pokémon names (autocomplete)",
+            description = "Prefix matches first, then other matches, each by Pokédex id; at most `limit`.")
+    @ApiResponse(responseCode = "200", description = "Matching names (possibly none).")
+    @ApiResponse(
+            responseCode = "400",
+            description = "Invalid `q` or `limit` (`/problems/validation-error`).",
+            content = @Content(mediaType = PROBLEM_JSON, schema = @Schema(implementation = ProblemDetail.class)))
+    @ApiResponse(
+            responseCode = "503",
+            description = "The name index cannot be loaded (`/problems/upstream-unavailable`).",
+            content = @Content(mediaType = PROBLEM_JSON, schema = @Schema(implementation = ProblemDetail.class)))
+    public PokemonSearchResultDto search(
+            @Parameter(description = "Name fragment; trimmed, lowercased, spaces become hyphens.", required = true)
+                    @RequestParam(name = "q", required = false)
+                    @Nullable String q,
+            @Parameter(description = "Maximum results (1–20, default 10).")
+                    @RequestParam(name = "limit", defaultValue = "" + SearchLimit.DEFAULT_VALUE)
+                    int limit) {
+        if (q == null) {
+            throw new InvalidValueException("q", "is required");
+        }
+        NameQuery query = NameQuery.parse(q);
+        return CatalogDtoMapper.toSearchResult(searchPokemonNames.search(query, new SearchLimit(limit)));
+    }
+
+    public CatalogController(
+            ListPokemonUseCase listPokemon,
+            GetPokemonDetailUseCase getPokemonDetail,
+            SearchPokemonNamesUseCase searchPokemonNames) {
+        this.searchPokemonNames = searchPokemonNames;
         this.listPokemon = listPokemon;
         this.getPokemonDetail = getPokemonDetail;
     }
