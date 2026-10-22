@@ -4,7 +4,7 @@ A RESTful API built with **Java 25 + Spring Boot 4.1.1**. It reads Pokémon data
 
 The project follows **Clean Architecture** and **TDD**.
 
-> **Status:** 🟢 All four user stories and authentication work end to end (13 API endpoints incl. name search, catalog and collection UI, Docker, offline demo). 🟡 Playwright E2E, Lighthouse and the ZAP scan are still to come. See [docs/roadmap.md](docs/roadmap.md).
+> **Status:** 🟢 All four user stories and authentication work end to end (13 API endpoints incl. name search, catalog and collection UI, Docker, offline demo). ✅ Playwright E2E (61 tests, axe, console guard) and Lighthouse CI run on every PR. 🟡 The OWASP ZAP scan is on hold. See [docs/roadmap.md](docs/roadmap.md).
 
 **Quick start:** `cp .env.example .env`, set `JWT_SECRET` (`openssl rand -base64 48`), then `docker compose up -d --build` and open http://localhost:3000. Log in with the `DEMO_*` accounts from your `.env` (see [Demo credentials](#demo-credentials)). No internet? See [Offline demo](#offline-demo-no-internet).
 
@@ -27,11 +27,11 @@ The project follows **Clean Architecture** and **TDD**.
 | Framework | Spring Boot 4.1.1 (Spring Framework 7, Jakarta EE 11, Jackson 3) |
 | Build | Maven 3.9 (wrapper), multi-module build |
 | Persistence | PostgreSQL 17, Spring Data JPA, Flyway |
-| Caching | Caffeine (Spring Cache) |
+| Caching | Caffeine (Spring Cache) on the server; HTTP `Cache-Control` + ETag (304) on public catalog responses |
 | Security | Spring Security 7, OAuth2 Resource Server (JWT in an httpOnly cookie + CSRF), BCrypt, Bucket4j rate limiting; OWASP Top 10:2025 / ASVS 5.0 L1 + selected L2 |
 | Testing (backend) | JUnit 5, AssertJ, Mockito, WireMock, Testcontainers, RestAssured, ArchUnit, JaCoCo (per-module gates), PIT (mutation) |
 | Frontend | Node.js 26, Next.js 16 (App Router), React 19, TypeScript (strict), **HeroUI v3** (React Aria), Tailwind CSS v4, Redux Toolkit + RTK Query, React Hook Form + Zod, next-themes |
-| Testing (frontend) | Vitest, React Testing Library, MSW; Playwright + axe-core (in progress), Lighthouse (planned) |
+| Testing (frontend) | Vitest, React Testing Library, MSW; Playwright + axe-core + console guard (E2E in CI); Lighthouse CI (accessibility ≥ 90) |
 | Security scanning | gitleaks, OWASP Dependency-Check (weekly), `npm audit` (production deps), CycloneDX SBOM, Dependabot; OWASP ZAP baseline (on hold) |
 | Delivery | Docker (multi-stage, non-root, pinned by digest), Docker Compose (postgres → backend → frontend → nginx edge), WireMock offline mode, GitHub Actions |
 
