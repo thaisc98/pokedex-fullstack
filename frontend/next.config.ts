@@ -15,6 +15,11 @@ const nextConfig: NextConfig = {
   // security.md §5: no `X-Powered-By: Next.js` fingerprint.
   poweredByHeader: false,
   reactStrictMode: true,
+  // Blocking metadata for every client: the detail page's <title> and meta description go in
+  // <head> instead of being streamed into <body> (Lighthouse "meta-description", crawlers
+  // without JavaScript, link previews). Cost: the head waits for the detail fetch, which the
+  // page needs anyway and the API serves from its cache.
+  htmlLimitedBots: /.*/,
   // Pin the project root to this folder so Next.js does not infer the repo root
   // (or a stray lockfile higher up) as the workspace root.
   outputFileTracingRoot: path.join(__dirname),
