@@ -89,11 +89,11 @@ docker compose up -d --build
 
 | What | URL |
 |---|---|
-| Web app (Next.js) | http://localhost:3000 |
+| Web app (through the nginx edge proxy) | http://localhost:3000 |
 | API docs / Swagger UI (`demo` profile) | http://localhost:8080/swagger-ui |
 | API base (direct, for curl) | http://localhost:8080/api/v1 |
 
-PostgreSQL starts first, then the backend (Flyway creates the tables on start), then the frontend. The first build takes a few minutes. Follow the logs, or stop everything:
+PostgreSQL starts first, then the backend (Flyway creates the tables on start), then the frontend, then the `edge` nginx proxy that serves it on port 3000. The first build takes a few minutes. Follow the logs, or stop everything:
 
 ```bash
 docker compose logs -f backend
