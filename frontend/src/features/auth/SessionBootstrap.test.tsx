@@ -39,20 +39,39 @@ describe("SessionBootstrap", () => {
 
   it("should_not_call_auth_me_for_visitors", async () => {
     pathname.current = "/pokemon";
-    // No handler: an unexpected request would fail the test (onUnhandledRequest: error).
+    let meCalls = 0;
+    server.use(
+      http.get(`${API}/auth/me`, () => {
+        meCalls += 1;
+        return HttpResponse.json(user);
+      }),
+    );
+
     const store = renderWithStore();
 
     await waitFor(() => expect(store.getState().auth.checked).toBe(true));
+    // Give a stray request time to arrive before asserting it never did.
+    await new Promise((resolve) => setTimeout(resolve, 50));
+    expect(meCalls).toBe(0);
     expect(store.getState().auth.user).toBeNull();
   });
 
   it("should_skip_the_probe_and_drop_a_stale_hint_on_the_login_page", async () => {
     pathname.current = "/login";
     document.cookie = "pokedex_signed_in=1; path=/";
+    let meCalls = 0;
+    server.use(
+      http.get(`${API}/auth/me`, () => {
+        meCalls += 1;
+        return HttpResponse.json(user);
+      }),
+    );
 
     const store = renderWithStore();
 
     await waitFor(() => expect(store.getState().auth.checked).toBe(true));
+    await new Promise((resolve) => setTimeout(resolve, 50));
+    expect(meCalls).toBe(0);
     expect(document.cookie).not.toContain("pokedex_signed_in=1");
   });
 });
