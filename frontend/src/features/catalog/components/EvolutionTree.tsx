@@ -10,7 +10,7 @@ type Props = { root: EvolutionNode; currentId: number };
 
 /**
  * Evolution tree (BR-04, docs/ui-ux.md §5.2): every stage links to its detail page;
- * branches (Eevee's 8) are kept and wrap into compact rows. Nested lists give screen
+ * branches (Eevee's 8) are kept: 2 per row, 4 per row once the column is >= 32rem. Nested lists give screen
  * readers the tree structure.
  *
  * Layout follows the panel's width (container queries; the panel is `@container`): a linear
@@ -20,7 +20,7 @@ type Props = { root: EvolutionNode; currentId: number };
 export function EvolutionTree({ root, currentId }: Props) {
   if (root.evolvesTo.length === 0) {
     return (
-      <div className="flex flex-col items-center gap-3 pt-3">
+      <div className="flex flex-col items-center gap-3 pt-3 @lg:items-start">
         <ul aria-label="Evolution chain">
           <li>
             <Stage node={root} currentId={currentId} />
@@ -32,7 +32,7 @@ export function EvolutionTree({ root, currentId }: Props) {
   }
   return (
     // pt-3: room for the "This Pokémon" badge, which overlaps the top edge of its card.
-    <ul aria-label="Evolution chain" className="flex justify-center pt-3">
+    <ul aria-label="Evolution chain" className="flex justify-center pt-3 @lg:justify-start">
       <li>
         <Branch node={root} currentId={currentId} />
       </li>
@@ -50,7 +50,7 @@ function Branch({ node, currentId }: { node: EvolutionNode; currentId: number })
         <ul
           className={
             isFork
-              ? "flex flex-wrap justify-center gap-x-3 gap-y-4"
+              ? "grid grid-cols-2 gap-x-3 gap-y-4 @lg:grid-cols-4"
               : "flex flex-col items-center gap-2 @lg:flex-row"
           }
         >

@@ -53,15 +53,29 @@ export default async function PokemonDetailPage(props: PageProps<"/pokemon/[idOr
   const name = formatName(pokemon.name);
 
   return (
-    <article className="flex flex-col gap-8" aria-labelledby="pokemon-name">
+    <article className="flex flex-col gap-6" aria-labelledby="pokemon-name">
       <BackToCatalog current={name} />
 
-      <div className="grid gap-6 lg:grid-cols-2 lg:gap-10">
-        <div className="flex items-center justify-center rounded-3xl bg-surface p-6">
-          <Sprite src={pokemon.artwork} alt={`${name} official artwork`} size={320} priority />
+      {/*
+        Two columns from 1024 px: LEFT artwork + Base stats, RIGHT info, About and Evolution
+        (Evolution fills the space beside the stats, so it is visible without a long scroll).
+        Single column below that: artwork, info, About, Evolution, Base stats (the story of the
+        Pokémon first, the numbers last). items-start: no panel stretches to its neighbour.
+      */}
+      {/* Rows auto + 1fr: row 1 is only as tall as the artwork, so Base stats sits right
+          under it; the taller right column flows into the flexible second row. */}
+      <div className="grid items-start gap-6 lg:grid-cols-2 lg:grid-rows-[auto_1fr] lg:gap-x-10 lg:gap-y-6">
+        <div className="flex h-72 items-center justify-center rounded-3xl bg-surface p-6 sm:h-80 lg:col-start-1 lg:row-start-1 lg:h-96">
+          <Sprite
+            src={pokemon.artwork}
+            alt={`${name} official artwork`}
+            size={320}
+            priority
+            className="h-full w-auto max-w-full"
+          />
         </div>
 
-        <div className="flex flex-col gap-4">
+        <div className="flex flex-col gap-4 lg:col-start-2 lg:row-span-2 lg:row-start-1">
           <div>
             <p className="text-lg font-semibold text-muted">{formatDexNumber(pokemon.id)}</p>
             <h1 id="pokemon-name" tabIndex={-1} className="text-4xl font-bold tracking-tight outline-none">
@@ -83,7 +97,7 @@ export default async function PokemonDetailPage(props: PageProps<"/pokemon/[idOr
               <dd className="text-lg font-semibold">{formatMeters(pokemon.height)}</dd>
             </div>
             <div>
-              <dt className="text-sm text-muted">Mass</dt>
+              <dt className="text-sm text-muted">Weight</dt>
               <dd className="text-lg font-semibold">{formatKg(pokemon.mass)}</dd>
             </div>
           </dl>
@@ -95,11 +109,11 @@ export default async function PokemonDetailPage(props: PageProps<"/pokemon/[idOr
             <AbilityList abilities={pokemon.abilities} className="font-medium" />
           </section>
 
-          <div className="pt-2">
+          <div>
             <AddToCollectionButton pokedexId={pokemon.id} name={name} />
           </div>
 
-          <section aria-labelledby="about-heading" className="flex flex-col gap-2 pt-2">
+          <section aria-labelledby="about-heading" className="flex flex-col gap-2">
             <h2 id="about-heading" className="text-xl font-semibold">
               About
             </h2>
@@ -107,27 +121,24 @@ export default async function PokemonDetailPage(props: PageProps<"/pokemon/[idOr
               {pokemon.description || "No description is available for this Pokémon yet."}
             </p>
           </section>
-        </div>
-      </div>
 
-      {/* items-start: each panel is as tall as its own content (no empty area under the chain). */}
-      <div className="grid items-start gap-8 lg:grid-cols-2 lg:gap-10">
-        <section aria-labelledby="stats-heading" className="flex flex-col gap-3 rounded-3xl bg-surface p-5">
+          {/* @container: the chain lays itself out by this column's width, not the viewport's. */}
+          <section aria-labelledby="evolution-heading" className="@container flex flex-col gap-2">
+            <h2 id="evolution-heading" className="text-xl font-semibold">
+              Evolution
+            </h2>
+            <EvolutionTree root={pokemon.evolution.root} currentId={pokemon.id} />
+          </section>
+        </div>
+
+        <section
+          aria-labelledby="stats-heading"
+          className="flex flex-col gap-3 rounded-3xl bg-surface p-5 lg:col-start-1 lg:row-start-2"
+        >
           <h2 id="stats-heading" className="text-xl font-semibold">
             Base stats
           </h2>
           <StatMeters stats={pokemon.stats} />
-        </section>
-
-        {/* @container: the chain lays itself out by the panel's width, not the viewport's. */}
-        <section
-          aria-labelledby="evolution-heading"
-          className="@container flex flex-col gap-3 rounded-3xl bg-surface p-5"
-        >
-          <h2 id="evolution-heading" className="text-xl font-semibold">
-            Evolution
-          </h2>
-          <EvolutionTree root={pokemon.evolution.root} currentId={pokemon.id} />
         </section>
       </div>
     </article>
