@@ -1,10 +1,12 @@
 # Pokédex — Full-Stack Clean Architecture Exercise
 
-A RESTful API built with **Java 25 + Spring Boot 4.1.1**. It reads Pokémon data from [PokeAPI](https://pokeapi.co/docs/v2), lets users copy entries into a local PostgreSQL database and add their own fields to them, and protects writes with JWT authentication. A **React + TypeScript + Redux Toolkit** frontend uses the API.
+A RESTful API built with **Java 25 + Spring Boot 4.1.1**. It reads Pokémon data from [PokeAPI v2](https://pokeapi.co/docs/v2), lets users copy entries into a local PostgreSQL database and add their own fields to them, and protects writes with JWT authentication. A **Next.js 16 + React 19 + HeroUI v3 + Redux Toolkit** frontend uses the API.
 
 The project follows **Clean Architecture** and **TDD**.
 
-> **Status:** 🟡 Planning. Architecture, test strategy and roadmap are done; no application code yet. See [docs/roadmap.md](docs/roadmap.md) for the current phase.
+> **Status:** 🟢 All four user stories and authentication work end to end (12 API endpoints, catalog and collection UI, Docker, offline demo). 🟡 Playwright E2E, Lighthouse and the ZAP scan are still to come. See [docs/roadmap.md](docs/roadmap.md).
+
+**Quick start:** `cp .env.example .env`, set `JWT_SECRET` (`openssl rand -base64 48`), then `docker compose up -d --build` and open http://localhost:3000. Log in with the `DEMO_*` accounts from your `.env` (see [Demo credentials](#demo-credentials)). No internet? See [Offline demo](#offline-demo-no-internet).
 
 ---
 
@@ -14,7 +16,7 @@ The project follows **Clean Architecture** and **TDD**.
 |---|---|---|
 | US01 | Browse Pokémon page by page: sprite, category, mass, skills | `GET /api/v1/pokemon` |
 | US02 | Detail view: image, base stats, description, evolution chain | `GET /api/v1/pokemon/{idOrName}` |
-| US03 | Copy a Pokémon into the local DB to add our own fields | `POST /api/v1/collection` |
+| US03 | Copy a Pokémon into the local DB to add our own fields | `POST /api/v1/collection` (+ `GET` list/one, admin `DELETE`) |
 | US04 | Update a locally stored Pokémon, with validation | `PUT /api/v1/collection/{pokedexId}` |
 
 ## Tech stack
@@ -27,11 +29,11 @@ The project follows **Clean Architecture** and **TDD**.
 | Persistence | PostgreSQL 17, Spring Data JPA, Flyway |
 | Caching | Caffeine (Spring Cache) |
 | Security | Spring Security 7, OAuth2 Resource Server (JWT in an httpOnly cookie + CSRF), BCrypt, Bucket4j rate limiting; OWASP Top 10:2025 / ASVS 5.0 L1 + selected L2 |
-| Testing (backend) | JUnit 5, AssertJ, jqwik, Mockito, WireMock, Testcontainers, RestAssured, ArchUnit, JaCoCo, PIT |
+| Testing (backend) | JUnit 5, AssertJ, Mockito, WireMock, Testcontainers, RestAssured, ArchUnit, JaCoCo (per-module gates), PIT (mutation) |
 | Frontend | Node.js 26, Next.js 16 (App Router), React 19, TypeScript (strict), **HeroUI v3** (React Aria), Tailwind CSS v4, Redux Toolkit + RTK Query, React Hook Form + Zod, next-themes |
-| Testing (frontend) | Vitest, React Testing Library, MSW, Playwright, axe-core, Lighthouse CI |
-| Security scanning | OWASP Dependency-Check, `npm audit`, OWASP ZAP baseline scan, CycloneDX SBOM, Dependabot |
-| Delivery | Docker (multi-stage), Docker Compose, GitHub Actions |
+| Testing (frontend) | Vitest, React Testing Library, MSW; Playwright + axe-core (in progress), Lighthouse (planned) |
+| Security scanning | gitleaks, OWASP Dependency-Check (weekly), `npm audit` (production deps), CycloneDX SBOM, Dependabot; OWASP ZAP baseline (on hold) |
+| Delivery | Docker (multi-stage, non-root, pinned by digest), Docker Compose (postgres → backend → frontend → nginx edge), WireMock offline mode, GitHub Actions |
 
 ## Repository layout
 
@@ -54,7 +56,11 @@ pokedex/
 | [docs/testing-strategy.md](docs/testing-strategy.md) | TDD approach, test pyramid, coverage gates, edge cases |
 | [docs/roadmap.md](docs/roadmap.md) | Phases with entry/exit criteria, risk register |
 | [docs/requirements-checklist.md](docs/requirements-checklist.md) | Every exercise requirement mapped to where it is met |
-| [docs/adr/](docs/adr/) | Architecture Decision Records |
+| [docs/adr/](docs/adr/) | Architecture Decision Records (0001–0014) |
+| [docs/api/openapi.yaml](docs/api/openapi.yaml) | The API contract (Swagger UI at http://localhost:8080/swagger-ui with the `demo` profile) |
+| [docs/quality/](docs/quality/) | Quality reports per story: acceptance criteria, coverage, mutation score, findings |
+| [docs/demo-script.md](docs/demo-script.md) | Step-by-step script for the live demo |
+| [postman/](postman/) | Postman collection for all 12 endpoints (cookies and CSRF handled automatically) |
 | [docs/agents/README.md](docs/agents/README.md) | AI agent team: backend, frontend and test engineers; file ownership, workflow, handoff notes |
 | [docs/genai/workflow.md](docs/genai/workflow.md) | How GenAI is used and the review checklist for AI-generated code |
 | [docs/genai/prompt-log.md](docs/genai/prompt-log.md) | Log of prompts and the decision taken on each output |

@@ -1,6 +1,6 @@
 # ADR 0004 — Caffeine cache in a decorator around the PokeAPI adapter
 
-**Status:** Accepted · 2026-10-19
+**Status:** Accepted · 2026-10-19 · Collection sync behaviour refined by [ADR 0013](0013-collection-sync-live-and-cache-refresh.md)
 
 ## Context
 One list page needs about 41 PokeAPI calls (see architecture §1.5). PokeAPI data almost never changes, and its fair-use policy asks clients to cache. The exercise lists caching as a nice-to-have.

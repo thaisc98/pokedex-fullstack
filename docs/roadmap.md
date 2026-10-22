@@ -2,7 +2,17 @@
 
 > Related: [architecture.md](architecture.md) · [testing-strategy.md](testing-strategy.md) · [requirements-checklist.md](requirements-checklist.md)
 
-**Current phase:** P0 — Inception & Scaffolding (documentation done; build setup not started)
+**Current phase:** P7 — Polish, Docs & GenAI (as of 2026-10-22). All 12 endpoints and both frontend phases are on `main`; Playwright E2E and the remaining P5/P6 gates are in progress.
+
+| Phase | Status | Delivered in |
+|---|---|---|
+| P0 Scaffolding & CI | ✅ Done | #1–#11, #15, #18–#20 |
+| P1–P4 Domain → API & Security | ✅ Done, **story by story** (see note below) | US01 #17, #24 · US02 #25, #32 · Auth #26, #31 · Collection #27, #33 |
+| P5 Frontend | 🟡 Pages done; E2E/axe/console guard + Lighthouse pending | Phase A #29 · Phase B #34 |
+| P6 Packaging & Seed | 🟡 Compose, Dockerfiles, nginx edge, least-privilege DB role, demo seed, offline mode done; ZAP baseline on hold | #28, #30, #35, #36, #37 |
+| P7 Polish, Docs & GenAI | 🟡 In progress | this update |
+
+> **How P1–P4 were actually delivered:** instead of building every domain type first (P1), then every use case (P2) and so on, each user story was built top to bottom: failing acceptance tests by the test engineer → human review → domain and use cases → adapters → controller, in one PR per story. The phase exit criteria below still apply and were checked per story (coverage and PIT gates in CI, quality reports in `docs/quality/`). Working endpoints appeared after each story instead of only at P4.
 
 ```mermaid
 gantt
@@ -27,11 +37,11 @@ gantt
 - **Scope:** Public Git repo; Maven build (parent POM + 5 modules) with the wrapper; enforcer, Surefire/Failsafe, JaCoCo, PIT, Spotless; OWASP Dependency-Check + CycloneDX; Dependabot; `.env.example`; ArchUnit skeleton; Next.js 16 + TS strict + ESLint + HeroUI v3 + Redux Toolkit store skeleton (`makeStore`, `StoreProvider`); confirm whether `@heroui/react` ships `"use client"` directives; GitHub Actions (`setup-java` 25, Maven cache, Node); Compose with PostgreSQL; ADRs; `AGENTS.md` (root + `backend/` + `frontend/`); agent definitions in `.claude/agents/`; **first version of the API contract `docs/api/openapi.yaml`** (from architecture §2.8) so the frontend and test agents can start in parallel.
 - **Entry:** Blueprint approved. JDK 25 (Temurin) and Docker available.
 - **Exit:**
-  - [ ] `./mvnw verify` and `npm run build` pass in CI
-  - [ ] Adding `spring-context` to `domain` on a test branch **fails the build** (proves the enforcer works)
-  - [ ] Adding a deliberate cross-layer import **fails ArchUnit**
-  - [ ] A sample test runs under JaCoCo, PIT, ArchUnit and Mockito on Java 25 bytecode
-  - [ ] Dependency-Check and `npm audit --omit=dev --audit-level=high` run in CI
+  - [x] `./mvnw verify` and `npm run build` pass in CI
+  - [x] Adding `spring-context` to `domain` on a test branch **fails the build** (proves the enforcer works)
+  - [x] Adding a deliberate cross-layer import **fails ArchUnit**
+  - [x] A sample test runs under JaCoCo, PIT, ArchUnit and Mockito on Java 25 bytecode
+  - [x] Dependency-Check and `npm audit --omit=dev --audit-level=high` run in CI
 
 ### P1 — Domain (TDD)
 - **Scope:** All value objects, `CollectedPokemon`, `User`, `EvolutionChain`, the sealed domain exceptions; business rules BR-01…BR-09 as tests.
