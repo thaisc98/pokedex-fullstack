@@ -26,16 +26,32 @@ export function readCookie(name: string): string | undefined {
   return undefined;
 }
 
+/**
+ * When the session ends (ISO-8601, from the login response). `GET /auth/me` doesn't return
+ * it, so it is kept next to the hint to re-arm the expiry warning after a reload. Not a secret.
+ */
+export const SESSION_EXPIRES_COOKIE = "pokedex_session_expires";
+
 export function setSignedInHint(expiresAt: string | null) {
   if (typeof document === "undefined") return;
   const seconds = expiresAt ? Math.floor((Date.parse(expiresAt) - Date.now()) / 1000) : 3600;
   const maxAge = Number.isFinite(seconds) && seconds > 0 ? seconds : 3600;
   document.cookie = `${SIGNED_IN_HINT_COOKIE}=1; Path=/; Max-Age=${maxAge}; SameSite=Strict`;
+  if (expiresAt && Number.isFinite(Date.parse(expiresAt))) {
+    document.cookie = `${SESSION_EXPIRES_COOKIE}=${encodeURIComponent(expiresAt)}; Path=/; Max-Age=${maxAge}; SameSite=Strict`;
+  }
 }
 
 export function clearSignedInHint() {
   if (typeof document === "undefined") return;
   document.cookie = `${SIGNED_IN_HINT_COOKIE}=; Path=/; Max-Age=0; SameSite=Strict`;
+  document.cookie = `${SESSION_EXPIRES_COOKIE}=; Path=/; Max-Age=0; SameSite=Strict`;
+}
+
+/** The stored session end, if any and valid. */
+export function readSessionExpiry(): string | null {
+  const value = readCookie(SESSION_EXPIRES_COOKIE);
+  return value && Number.isFinite(Date.parse(value)) ? value : null;
 }
 
 export function hasSignedInHint(): boolean {
