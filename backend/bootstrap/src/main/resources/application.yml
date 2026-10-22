@@ -48,6 +48,11 @@ springdoc:
     enabled: false
 
 pokedex:
+  catalog:
+    # security.md §4.7, ADR 0004: browser and shared-cache policy for public catalog 200s only.
+    http-cache:
+      max-age: 300s
+      stale-while-revalidate: 86400s
   security:
     # Only application-demo.yml sets this to true. Otherwise the springdoc routes stay denied (401).
     api-docs-public: false
