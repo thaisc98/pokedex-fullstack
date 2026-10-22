@@ -166,6 +166,108 @@ Every substantial AI interaction, with the decision taken on its output. This lo
 
 ---
 
+## #007 — US01 with a lead session driving the agents (tests first, then code)
+
+- **Date:** 2026-10-20 → 21
+- **Tool:** Claude Code (Claude Opus 5.5): a lead session launching backend-engineer and test-engineer subagents in separate git worktrees
+- **Phase:** P1–P4, story by story
+
+**Prompt (summary):** Instead of the human copy-pasting prompts between sessions, the lead session launched the agents itself: the test engineer wrote failing acceptance ITs for `GET /api/v1/pokemon` from the contract only (real recorded PokeAPI fixtures, WireMock, RestAssured); in parallel the backend engineer wrote failing domain tests and **stopped** for human review; after approval it implemented inside-out until everything was green, in one PR.
+
+**Output:** PR #17 (US01: 27 acceptance cases, ~300 unit tests, PIT 100%), then #24 (springdoc contract check, 1 MB upstream limit, problem types).
+
+**Verdict:** ✏️ Modified
+
+| What the AI did or proposed | What was changed / decided | Why |
+|---|---|---|
+| Shared test harness: `@DynamicPropertySource` + a per-class `WireMockExtension` | One JVM-wide WireMock server, reset + cache clear before each test | Review found the two IT classes shared one Spring context (same cache key) while WireMock restarted on a new port: tests could pass for the wrong reason (connection refused → 503) |
+| `.cookie("JSESSIONID", nullValue())` to assert "no session" | Assert on the cookie map and every `Set-Cookie` header | RestAssured fails that matcher when the cookie is **absent**, the exact case being tested; the backend agent refused to edit a test it didn't own and reported it |
+| Placeholder sprite: undefined | A real allow-listed PokeAPI sprite (poke-ball) | Passes the strict `ImageUrl` rules without a bypass |
+
+**What I checked critically:** the agents' claims were verified against `git diff` (developers never touched the tester's `*IT` files) and CI logs, not taken from the handoff notes.
+
+---
+
+## #008 — Overnight push: US02, Auth and Collection under a standing approval
+
+- **Date:** 2026-10-20 23:00 → 2026-10-21 11:00
+- **Tool:** Claude Code (Claude Opus 5.5): lead session + up to 3 backend engineers and 1 test engineer in parallel worktrees
+- **Phase:** P1–P4
+
+**Prompt (summary):** Deadline: all 12 endpoints by 14:00. The human gave a **standing approval** with explicit stop-rules (stop only for a breaking contract change, a new unmanaged dependency, weakening a security rule or gate, or a new ADR). The lead reviewed every red test before its implementation started.
+
+**Output:** PRs #25 (US02 detail, evolution tree), #26 (auth: register/login/logout/me/csrf), #27 (collection: sync/list/get/update/delete). 202 ITs green at the end.
+
+**Verdict:** ✏️ Modified
+
+| What the AI did or proposed | What was changed / decided | Why |
+|---|---|---|
+| `oauth2ResourceServer(o -> o.jwt())` (the usual AI default) | Hand-wired `BearerTokenAuthenticationFilter` reading the cookie only | The DSL silently adds `csrf.ignoringRequestMatchers(<bearer requests>)`; with a cookie token **CSRF was off for every logged-in write**. The test engineer's `LogoutIT` caught it (204 instead of 403) |
+| Password policy: 12–64 characters | Also ≤ 72 UTF-8 bytes | BCrypt ignores bytes after 72; 64 emoji are up to 256 bytes |
+| Gitleaks failed on fake test values | A `.gitleaksignore` with **exact fingerprints**, never by path | The first version quoted the values in its comments and was flagged itself |
+| A 67-case collection suite and a 33-case detail suite | New standing rule: **lean acceptance tests** (happy path + contract statuses + documented edge cases; boundaries in unit tests) | The human found the suites slowed delivery |
+
+**What I checked critically:** usage limits interrupted the agents twice; work resumed from git state, never from memory. A squash-merged dependency branch made a PR "conflict": verified `main`'s tree equalled the merged branch tip before resolving with the branch's side.
+
+---
+
+## #009 — Frontend Phase A and B with human preview before each PR
+
+- **Date:** 2026-10-21
+- **Tool:** Claude Code (Claude Opus 5.5): frontend-engineer subagent; lead built Docker previews and drove the in-app browser
+- **Phase:** P5
+
+**Prompt (summary):** Phase A: app shell, theme, catalog and detail pages (Server Components). Phase B: auth pages, RTK Query layer with CSRF handling, collection table, sync, edit form with conflict dialog. Both pushed **without a PR** until the human had used a running preview.
+
+**Output:** PRs #29 (Phase A) and #34 (Phase B), 112 Vitest tests.
+
+**Verdict:** ✏️ Modified
+
+| What the AI did or proposed | What was changed / decided | Why |
+|---|---|---|
+| Footer "Data from PokeAPI · v1.0" | "Pokémon data from PokéAPI v2 (pokeapi.co)" | The human read "v1.0" as the PokeAPI version |
+| Assumed the Next.js `/api` rewrite forwards `X-Forwarded-For` | Echo-server test: it forwards nothing, and passes a client-supplied value unchanged | Led to the nginx edge proxy (#35, ADR 0011) |
+| Optimistic redirect checks `access_token` (security.md §3.3) | `pokedex_signed_in` hint cookie (ADR 0012) | `access_token` is `Path=/api`, invisible to page routes |
+| `upgrade-insecure-requests` + HSTS always on | Only over HTTPS | Broke `/_next` assets on `http://localhost` in Docker |
+| HeroUI `Meter.Fill` / next/image inline styles | SVG width / classes | The nonce-based CSP blocks inline `style` attributes in server-rendered HTML |
+
+---
+
+## #010 — Running it: Docker Compose, Postman, least-privilege DB, nginx, demo seed, offline mode
+
+- **Date:** 2026-10-21 → 22
+- **Tool:** Claude Code (Claude Opus 5.5): lead session (Compose, Postman, previews) + backend/test engineers
+- **Phase:** P6
+
+**Prompt (summary):** "I need to test the UI and backend manually": full-stack Compose, a Postman collection, then the hardening and demo features that surfaced while testing.
+
+**Output:** #28 (Dockerfiles + Compose + README), Postman collection (27 requests, cookies/CSRF automated, run with Newman: 0 failures), #30 (least-privilege `pokedex_app` role), #35 (nginx edge), #36 (demo seed + `/actuator/health`), #37 (offline WireMock PokeAPI, Gen 1).
+
+**Verdict:** ✏️ Modified
+
+| What the AI did or proposed | What was changed / decided | Why |
+|---|---|---|
+| Health check body `{"groups":["liveness","readiness"],"status":"UP"}` | Probes off: exactly `{"status":"UP"}` | Public endpoint must be status only (security.md §3.2); the matrix IT caught it |
+| Demo seed always on in the `demo` profile | Runs only when a `DEMO_*` variable is set | The contract IT uses `demo` and would have called live PokeAPI and written into the shared IT database |
+| "Offline" as a Compose profile | A Compose override file | A profile can't change the backend's env or startup order (ADR 0014) |
+| The human's stack failed after #30 | `docker compose down -v` once | The init script that creates the app role only runs on an empty volume |
+
+---
+
+## #011 — The dependency scan that took 1 h 35 min and found real CVEs
+
+- **Date:** 2026-10-20 → 21
+- **Tool:** Claude Code (Claude Opus 5.5): lead session + test engineer
+- **Phase:** P0 / CI
+
+**Summary:** OWASP Dependency-Check needs the full NVD database (≈ 412k records). The first CI runs timed out (45 min, then the cache was only saved on success), later downloads stalled, and caches saved by a PR are invisible to other PRs. When it finally completed it found **9 CVEs (CVSS 7.5–9.8) in Tomcat 11.0.24**, fixed with a version override (#10).
+
+**Decisions:** the scan runs weekly and on demand only (#18); the cache is saved with `if: always()`; Dependabot PRs need their own copy of the `NVD_API_KEY` secret; a stale `gh run rerun` re-tests the old commit, so after merging a fix the PR branch must be updated instead.
+
+**What I checked critically:** an "Invalid API key" error the human saw was from an old log (timestamp before the key change); the newer runs had accepted the key.
+
+---
+
 ## Template
 
 ```markdown
