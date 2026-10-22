@@ -54,6 +54,12 @@
    * surface-secondary 5.7, surface-tertiary 5.5, default 5.5.
    */
   --muted: oklch(0.48 0.0138 285.94);
+  /*
+   * Danger ≈ #c71a22 (HeroUI default #ff383c was 3.5:1 as text on white): as text 6.2:1 on
+   * surface, 5.6 on background, 5.2 on default; white-ish text on a danger button 6.0:1.
+   */
+  --danger: oklch(0.52 0.21 26);
+  --danger-foreground: var(--snow);
 }
 
 /* ── Dark ────────────────────────────────────────────────────────────────── */
@@ -65,6 +71,10 @@
   --link: var(--accent);
   /* Muted text ≈ #a3a3ad: ≥ 6.0:1 on background, surface, surface-secondary and default. */
   --muted: oklch(0.72 0.0138 285.94);
+  /* Danger: as text ≥ 5.1:1 on background, surface, surface-secondary, default; dark text on
+     a danger button 6.1:1 (HeroUI's default was 4.0:1 as text on surface). */
+  --danger: oklch(0.7 0.18 25);
+  --danger-foreground: var(--eclipse);
 }
 
 /* Bridge to Tailwind: bg-type-fire, text-type-fire-foreground, … */

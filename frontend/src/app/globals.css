@@ -10,3 +10,16 @@
  * layer is below `base`, so the overrides would be ignored.
  */
 @import "../styles/themes/pokedex.css" layer(base);
+
+@layer components {
+  /*
+   * Alert dialogs (delete confirmation, 409 conflict) keep their zoom-in but no longer fade
+   * in from transparent, and the backdrop appears at once: mid-fade, the dialog text (and the
+   * page text under a half-faded backdrop) fell below 4.5:1, which axe flagged whenever it
+   * scanned an opening dialog. Exit animations are unchanged.
+   */
+  .alert-dialog__container[data-entering="true"],
+  .alert-dialog__backdrop[data-entering="true"] {
+    --tw-enter-opacity: 1;
+  }
+}
