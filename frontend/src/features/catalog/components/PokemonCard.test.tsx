@@ -13,21 +13,16 @@ const bulbasaur: CatalogItem = {
     { name: "overgrow", hidden: false },
     { name: "chlorophyll", hidden: true },
   ],
+  types: ["grass", "poison"],
 };
 
 describe("PokemonCard", () => {
   it("should_show_the_type_chips_under_the_name", () => {
-    render(<PokemonCard pokemon={{ ...bulbasaur, types: ["grass", "poison"] }} />);
+    render(<PokemonCard pokemon={bulbasaur} />);
 
     const types = within(screen.getByRole("list", { name: "Types" }));
     expect(types.getByText("Grass")).toBeInTheDocument();
     expect(types.getByText("Poison")).toBeInTheDocument();
-  });
-
-  it("should_render_without_types_until_the_api_sends_them", () => {
-    render(<PokemonCard pokemon={bulbasaur} />);
-
-    expect(screen.queryByRole("list", { name: "Types" })).not.toBeInTheDocument();
     expect(screen.getByRole("link")).toHaveTextContent(/Bulbasaur.*Seed Pokémon.*Weight6\.9 kg.*Abilities/);
   });
 

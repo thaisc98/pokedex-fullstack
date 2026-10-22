@@ -15,7 +15,6 @@ import { TypeBadge } from "./TypeBadge";
  */
 export function PokemonCard({ pokemon, priority = false }: { pokemon: CatalogItem; priority?: boolean }) {
   const name = formatName(pokemon.name);
-  const types = pokemon.types ?? [];
   return (
     <AppLink
       href={`/pokemon/${pokemon.name}`}
@@ -37,9 +36,9 @@ export function PokemonCard({ pokemon, priority = false }: { pokemon: CatalogIte
         <Card.Header className="gap-1">
           <span className="text-xs font-medium text-muted">{formatDexNumber(pokemon.id)}</span>
           <Card.Title className="text-base">{name}</Card.Title>
-          {types.length > 0 && (
+          {pokemon.types.length > 0 && (
             <ul className="flex flex-wrap gap-1" aria-label="Types">
-              {types.map((type) => (
+              {pokemon.types.map((type) => (
                 <li key={type}>
                   <TypeBadge type={type} size="sm" />
                 </li>

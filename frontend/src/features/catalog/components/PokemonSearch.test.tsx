@@ -54,6 +54,19 @@ describe("PokemonSearch", () => {
     expect(calls).toEqual(["pich"]);
   });
 
+  it("should_open_the_suggestion_list_by_typing_alone", async () => {
+    server.use(searchHandler([]));
+    const { user } = renderWithStore(<PokemonSearch />);
+    const input = screen.getByRole("combobox", { name: "Find a Pokémon" });
+
+    // No ArrowDown: the list must open and show the suggestions as you type.
+    await user.type(input, "p");
+
+    expect(await screen.findByRole("listbox")).toBeVisible();
+    expect(input).toHaveAttribute("aria-expanded", "true");
+    expect(await screen.findByRole("option", { name: "#025 Pikachu" })).toBeVisible();
+  });
+
   it("should_open_the_pokemon_picked_with_the_keyboard", async () => {
     server.use(searchHandler([]));
     const { user } = renderWithStore(<PokemonSearch />);

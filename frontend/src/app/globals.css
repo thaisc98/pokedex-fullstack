@@ -22,4 +22,14 @@
   .alert-dialog__backdrop[data-entering="true"] {
     --tw-enter-opacity: 1;
   }
+
+  /*
+   * "Find a Pokémon" suggestions appear at once. The popover opens on the first keystroke,
+   * and its suggestions arrive (debounced) while the fade-in runs; in the preview the list
+   * could stay at opacity 0 in its entering state (aria-expanded=true) until a key press
+   * re-rendered it. With no enter animation React Aria never waits for one.
+   */
+  .combo-box__popover[data-entering="true"] {
+    animation: none;
+  }
 }
