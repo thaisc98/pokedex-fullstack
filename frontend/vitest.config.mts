@@ -20,6 +20,7 @@ export default defineConfig({
         // Tests and test helpers are not the code under test.
         "src/**/*.test.{ts,tsx}",
         "src/mocks/**",
+        "src/test-utils/**",
         // Generated from docs/api/openapi.yaml, and other type-only modules (no runtime code).
         "src/**/*.d.ts",
         "src/shared/api/types.ts",
