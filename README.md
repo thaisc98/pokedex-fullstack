@@ -106,7 +106,7 @@ Add `-v` to `down` to also delete the database volume. Ports are bound to `127.0
 
 > Use Chrome or Firefox at `http://localhost:3000`. The login cookie is `Secure`; browsers accept that on `localhost` over plain HTTP.
 
-**Make a user an ADMIN** (there's no demo seed yet; needed to test delete). Register in the app first, then:
+**Make a user an ADMIN** (only needed without the demo seed below; delete requires ADMIN). Register in the app first, then:
 
 ```bash
 docker compose exec postgres sh -c 'psql -U "$POSTGRES_USER" -d "$POSTGRES_DB" -c "UPDATE app_user SET role = '"'"'ADMIN'"'"' WHERE email = '"'"'you@example.com'"'"';"'
@@ -129,4 +129,9 @@ The backend integration tests start PostgreSQL with Testcontainers, so Docker mu
 
 ### Demo credentials
 
-> The demo seed data is added in Phase 6. Until then, register an account in the app and use the ADMIN command above.
+With the `demo` profile (the default in `.env.example`), the backend seeds demo data on startup:
+
+- **Two accounts** from your `.env`: an ADMIN (`DEMO_ADMIN_EMAIL` / `DEMO_ADMIN_PASSWORD`) and a USER (`DEMO_USER_EMAIL` / `DEMO_USER_PASSWORD`). Log in with the values you set there. The passwords follow the normal policy (12–64 characters, not a common password); an account whose variable is missing or too weak is skipped with a warning in the backend log.
+- **A sample collection:** Bulbasaur, Charmander, Squirtle, Pikachu, Eevee and Snorlax, synced from PokeAPI, with a Japanese name, the Kanto region, a habitat and tags such as `starter`. If PokeAPI is unreachable, the collection is skipped and the app still starts.
+
+The seed is idempotent: existing accounts (and their passwords) and Pokémon already in the collection are left as they are. Without any `DEMO_*` variable nothing is seeded. Change a demo password by editing it in the app's database or by using a new `DEMO_*_EMAIL`.
