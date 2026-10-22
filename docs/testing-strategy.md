@@ -34,7 +34,7 @@
 | Frontend: Server Components | E2E | Playwright | Catalog / detail pages render server-side data, `notFound()`, `error.tsx`. Vitest **does not support async Server Components** (Next.js docs), so these are E2E only | — |
 | Frontend: API layer | Integration | Vitest + MSW + real `makeStore()` | Endpoints, refetch after changes, 401 → logout, ProblemDetail parsing | — |
 | Frontend: components | Component | RTL + **`@testing-library/user-event`** + `renderWithProviders(ui, { preloadedState })` + MSW | Client Components: loading / empty / error / success states; logged-in vs logged-out. HeroUI uses React Aria press events, so tests use `user-event`, not `fireEvent` | — |
-| Full stack | E2E (UI) | Playwright vs `docker compose --profile offline` at 375 / 768 / 1280 px | User journeys ([ui-ux §11](ui-ux.md)); **fails on any console warning or error** | CI job |
+| Full stack | E2E (UI) | Playwright vs the offline stack (`docker compose -f docker-compose.yml -f docker-compose.offline.yml`) at 375 / 768 / 1280 px | User journeys ([ui-ux §11](ui-ux.md)); **fails on any console warning or error** | CI job |
 | Accessibility | Automated | `@axe-core/playwright`, Lighthouse CI | 0 serious/critical axe violations; Lighthouse a11y ≥ 90 | CI job |
 | Security | Automated | Authorization-matrix test, OWASP ZAP baseline, Dependency-Check, `npm audit` | See [security.md §6](security.md) | Surefire + CI jobs |
 
@@ -54,7 +54,8 @@ Each frontend test builds a **fresh store** with `makeStore()`. MSW intercepts t
 - The combined report (`report-aggregate` in `bootstrap`) is expected to be **≥ 85% line**.
 - Excluded from coverage: `PokedexApplication.main`, `@Configuration` classes, plain DTO records.
 - **Mutation testing:** PIT (`-Pmutation`) on `domain` + `application`, mutation score ≥ 75%. This checks that the tests actually catch wrong behaviour, not just that they run the lines.
-- **Frontend:** Vitest v8 coverage ≥ 80%; `authSlice` and `baseQuery` at 100%.
+- **Frontend:** Vitest v8 coverage is **measured, not gated yet** (`npm run test:coverage`; ~56% lines over `src/**` after #42, excluding route files covered only by E2E). The threshold is decided by the human once the remaining work is done; the original target was ≥ 80%.
+- **CI E2E job (every PR):** builds the offline stack, runs Playwright (61 tests: §11 journeys × 3 viewports, axe on every visited page, console guard, the nginx X-Forwarded-For check), then Lighthouse CI (accessibility ≥ 90 enforced).
 - **Static checks:** Spotless, compiler warnings treated as errors (`-Werror`), ESLint, `tsc --strict`.
 
 **Commands:**

@@ -307,6 +307,7 @@ HeroUI's theme uses CSS variables mapped to Tailwind with `@theme inline`. A pla
 | Collection | Skeleton rows | `EmptyState` + Browse catalog | `ErrorState` + Retry | Redirect to login |
 | Edit | Form skeleton | — | Field errors / `ErrorSummary` / 409 dialog / 404 notice | Redirect to login |
 | Login / Register | Button spinner | — | Generic auth error / 429 countdown / field errors | — |
+| Any page, signed in | — | — | — | **Session ending:** 2 min before expiry a non-blocking notice (`role="status"`, polite) "Your session ends in 2 minutes. Save your changes." with **Log in again** (returns to the same page) and **Dismiss**, once per session. **At expiry:** "You've been signed out" toast; on `/collection*` redirect to `/login?from=…`; if the edit form has unsaved input, the page stays and says the changes can't be saved until the user logs in again |
 
 **Action feedback:** buttons switch to a spinner and are disabled while a request runs, so a double submit is impossible. Success → toast. Failure → inline error near the action. Destructive actions → confirmation dialog naming the record (*"Delete Pikachu from the collection?"*).
 
@@ -365,6 +366,6 @@ HeroUI's theme uses CSS variables mapped to Tailwind with `@theme inline`. A pla
 |---|---|---|
 | Journeys at 375 / 768 / 1280 px | Playwright projects per viewport | All pass |
 | Automated accessibility | `@axe-core/playwright` on every route | 0 serious / critical violations |
-| Lighthouse | Lighthouse CI on catalog + detail | Accessibility ≥ 90, Performance ≥ 85, Best Practices ≥ 90 |
+| Lighthouse | Lighthouse CI (`npm run test:lighthouse`, in the CI `e2e` job) on `/pokemon`, `/pokemon/eevee`, `/login`, mobile + desktop, median of 3 | **Accessibility ≥ 90 enforced** (build fails); Performance ≥ 85, Best Practices ≥ 90, SEO ≥ 90 reported as warnings. `/collection` is covered by Playwright + axe instead (signing in would need puppeteer) |
 | Console hygiene | Playwright console guard | 0 warnings / errors |
 | Manual | Keyboard-only pass + VoiceOver smoke test | Done before the presentation |

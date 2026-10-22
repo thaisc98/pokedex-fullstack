@@ -8,7 +8,7 @@
 |---|---|---|
 | P0 Scaffolding & CI | ✅ Done | #1–#11, #15, #18–#20 |
 | P1–P4 Domain → API & Security | ✅ Done, **story by story** (see note below) | US01 #17, #24 · US02 #25, #32 · Auth #26, #31 · Collection #27, #33 |
-| P5 Frontend | 🟡 Pages done; E2E/axe/console guard + Lighthouse pending | Phase A #29 · Phase B #34 |
+| P5 Frontend | ✅ Done: pages, redesign + name search, Playwright E2E with axe and console guard (61 tests), Lighthouse CI (a11y ≥ 0.98), session-expiry warning, HTTP caching. Frontend coverage gate pending the human's decision | Phase A #29 · Phase B #34 · #39 · #42 · #45 · #47 · #48 · #49 · #50 |
 | P6 Packaging & Seed | 🟡 Compose, Dockerfiles, nginx edge, least-privilege DB role, demo seed, offline mode done; ZAP baseline on hold | #28, #30, #35, #36, #37 |
 | P7 Polish, Docs & GenAI | 🟡 In progress | this update |
 

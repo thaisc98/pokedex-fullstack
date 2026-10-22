@@ -17,3 +17,6 @@ After a successful login the frontend sets `pokedex_signed_in=1` (not HttpOnly, 
 ## Alternatives considered
 - **`access_token` with `Path=/`:** sends the JWT with every page and asset request; rejected (wider exposure for no security gain).
 - **No server-side redirect, client-side only:** works, but flashes protected UI before redirecting.
+
+## Addendum (2026-10-22, PR #50): `pokedex_session_expires`
+The session-expiry warning (security.md §5) needs the session's `expiresAt` after a page reload, but `GET /auth/me` doesn't return it. Login therefore also writes a second **non-secret** cookie, `pokedex_session_expires` (the expiry timestamp only, same lifetime and path as the hint, removed with it on logout, any 401 or expiry). Same security reasoning as the hint: it grants nothing, and Spring still authorizes every request. If `/auth/me` ever returns `expiresAt`, this cookie can be removed.

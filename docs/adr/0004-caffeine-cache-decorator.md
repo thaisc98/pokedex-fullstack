@@ -19,3 +19,6 @@ One list page needs about 41 PokeAPI calls (see architecture §1.5). PokeAPI dat
 ## Alternatives considered
 - **`@Cacheable` on the adapter:** less code, but it hides the behaviour behind a proxy and is harder to unit-test.
 - **Redis:** not needed for a single instance.
+
+## Addendum (2026-10-22, PR #48): HTTP caching
+On top of the server-side Caffeine caches, successful (200) public catalog responses (`GET /api/v1/pokemon`, `/pokemon/{idOrName}`, `/pokemon/search`) send `Cache-Control: max-age=300, public, stale-while-revalidate=86400` (configurable under `pokedex.catalog.http-cache.*`) and an **ETag** (`ShallowEtagHeaderFilter` on those paths only), so revalidation returns **304**. Every other response, including all errors and everything authenticated, keeps `no-store` (security.md §4.7).
