@@ -1,5 +1,5 @@
 import { ADMIN_STATE, USER_STATE } from "./support/env";
-import { expect, expectAccessible, freshPokedexId, test } from "./support/fixtures";
+import { expect, expectAccessible, ownedPokedexId, test } from "./support/fixtures";
 
 /** Auth row of docs/ui-ux.md §11 (BR-10) plus the bad-login error journey (security.md §4.1). */
 test.describe("Auth", () => {
@@ -19,8 +19,8 @@ test.describe("Auth", () => {
   test.describe("as ADMIN", () => {
     test.use({ storageState: ADMIN_STATE });
 
-    test("delete asks for confirmation and the record disappears", async ({ page, api }) => {
-      const id = freshPokedexId();
+    test("delete asks for confirmation and the record disappears", async ({ page, api }, testInfo) => {
+      const id = ownedPokedexId("delete", testInfo.project.name);
       const record = await api.sync(id);
       const name = record.snapshot.name;
 
@@ -48,7 +48,7 @@ test.describe("Auth", () => {
     await page.getByLabel("Password").fill("Wrong-Password-123");
     await page.getByRole("button", { name: "Log in" }).click();
 
-    const message = page.getByRole("alert");
+    const message = page.getByRole("alert").filter({ hasText: "Email or password" });
     await expect(message).toBeVisible();
     await expect(message).toBeFocused();
     await expect(page).toHaveURL(/\/login$/);

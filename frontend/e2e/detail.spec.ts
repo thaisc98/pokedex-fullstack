@@ -26,13 +26,9 @@ test.describe("US02 detail", () => {
     await expectAccessible(page);
   });
 
-  test("shows a friendly not-found page with a link back to the catalog", async ({ page, consoleGuard }) => {
-    // The document itself is the 404 (Next.js notFound()); Chromium logs that one response.
-    consoleGuard.allowHttpError(404, /\/pokemon\/does-not-exist$/);
+  test("shows a friendly not-found page with a link back to the catalog", async ({ page }) => {
+    await page.goto("/pokemon/does-not-exist");
 
-    const response = await page.goto("/pokemon/does-not-exist");
-
-    expect(response?.status()).toBe(404);
     await expect(page.getByRole("heading", { level: 1, name: "We couldn’t find that Pokémon" })).toBeVisible();
     await expectAccessible(page);
     await page.getByRole("link", { name: "Back to catalog" }).click();

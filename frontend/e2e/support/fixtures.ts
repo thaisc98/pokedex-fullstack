@@ -133,12 +133,20 @@ function apiFor(request: APIRequestContext): Api {
 }
 
 /**
- * A Pokédex id for data-changing tests: outside the demo seed (1, 4, 7, 25, 133, 143) and spread
- * over 152–1000, so parallel tests and repeated runs practically never share a record. The record
- * may already exist from an earlier run; every test works either way (sync is an upsert).
+ * The Pokédex id a data-changing test owns. The collection is one shared dataset and the offline
+ * PokeAPI serves Generation 1 only (ids 1–151), so every (viewport project, test) pair gets its own
+ * fixed Gen-1 id outside the demo seed (1, 4, 7, 25, 133, 143). Parallel tests never share a record;
+ * a re-run reuses its own id, which works because sync is an idempotent upsert (BR-05).
  */
-export function freshPokedexId() {
-  return 152 + Math.floor(Math.random() * 849);
+export type DataSlot = "resync" | "latitude" | "conflict" | "delete";
+const SLOTS: DataSlot[] = ["resync", "latitude", "conflict", "delete"];
+const PROJECTS = ["mobile-375", "tablet-768", "desktop-1280"];
+const OWNED_IDS = [10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21];
+
+export function ownedPokedexId(slot: DataSlot, project: string) {
+  const p = PROJECTS.indexOf(project);
+  if (p < 0) throw new Error(`no data slot for project ${project}`);
+  return OWNED_IDS[p * SLOTS.length + SLOTS.indexOf(slot)];
 }
 
 /** A unique, valid tag (`^[a-z0-9-]{1,30}$`). */

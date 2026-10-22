@@ -1,5 +1,5 @@
 import { US03_PASSWORD, us03Email, USER_STATE } from "./support/env";
-import { expect, expectAccessible, freshPokedexId, test, uniqueTag } from "./support/fixtures";
+import { expect, expectAccessible, ownedPokedexId, test, uniqueTag } from "./support/fixtures";
 
 /** US03 (docs/ui-ux.md §11 rows 5–6, §4 US03 flow). */
 test.describe("US03 add to collection", () => {
@@ -24,8 +24,8 @@ test.describe("US03 add to collection", () => {
   test.describe("signed in", () => {
     test.use({ storageState: USER_STATE });
 
-    test("re-sync keeps the custom fields and says so in a toast", async ({ page, api }) => {
-      const id = freshPokedexId();
+    test("re-sync keeps the custom fields and says so in a toast", async ({ page, api }, testInfo) => {
+      const id = ownedPokedexId("resync", testInfo.project.name);
       const tag = uniqueTag("kept");
       const before = await api.sync(id);
       const custom = {

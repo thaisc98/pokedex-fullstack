@@ -1,12 +1,12 @@
 import { USER_STATE } from "./support/env";
-import { expect, expectAccessible, freshPokedexId, test, uniqueTag } from "./support/fixtures";
+import { expect, expectAccessible, ownedPokedexId, test, uniqueTag } from "./support/fixtures";
 
 /** US04 (docs/ui-ux.md §11 rows 7–8, §4 US04 flow). */
 test.use({ storageState: USER_STATE });
 
 test.describe("US04 edit custom attributes", () => {
-  test("latitude 91 → the error summary takes focus and the field shows the error", async ({ page, api }) => {
-    const id = freshPokedexId();
+  test("latitude 91 → the error summary takes focus and the field shows the error", async ({ page, api }, testInfo) => {
+    const id = ownedPokedexId("latitude", testInfo.project.name);
     await api.sync(id);
 
     await page.goto(`/collection/${id}?edit=1`);
@@ -23,8 +23,8 @@ test.describe("US04 edit custom attributes", () => {
     await expectAccessible(page);
   });
 
-  test("stale version → conflict dialog → Reload latest shows the current data", async ({ page, api, consoleGuard }) => {
-    const id = freshPokedexId();
+  test("stale version → conflict dialog → Reload latest shows the current data", async ({ page, api, consoleGuard }, testInfo) => {
+    const id = ownedPokedexId("conflict", testInfo.project.name);
     const record = await api.sync(id);
     // The 409 is the journey: the browser logs that one failed PUT.
     consoleGuard.allowHttpError(409, new RegExp(`/api/v1/collection/${id}$`));

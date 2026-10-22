@@ -11,7 +11,8 @@ test.describe("US01 catalog", () => {
     await page.goto("/pokemon");
 
     await expect(page.getByRole("heading", { level: 1, name: "Pokémon" })).toBeVisible();
-    const cards = page.getByRole("main").getByRole("list").first().getByRole("listitem");
+    // Direct children only: each card also contains an abilities list.
+    const cards = page.getByRole("main").getByRole("list").first().locator(":scope > li");
     await expect(cards).toHaveCount(20);
 
     // Columns = cards sharing the first card's row.
@@ -20,7 +21,8 @@ test.describe("US01 catalog", () => {
 
     // Sprite, number, name, category, mass and abilities (Bulbasaur, the first entry).
     const first = cards.first();
-    await expect(first.getByRole("img")).toBeVisible();
+    // The sprite is decorative (alt=""), so it has no img role; check the element itself.
+    await expect(first.locator("img")).toBeVisible();
     await expect(first).toContainText("#001");
     await expect(first).toContainText("Bulbasaur");
     await expect(first).toContainText("Seed Pokémon");
