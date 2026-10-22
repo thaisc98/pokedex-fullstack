@@ -97,13 +97,15 @@ function Stage({ node, currentId }: { node: EvolutionNode; currentId: number }) 
       href={`/pokemon/${node.speciesId}`}
       aria-current={isCurrent ? "page" : undefined}
       className={`flex w-28 flex-col items-center gap-1 rounded-xl border p-2 text-foreground no-underline transition-colors hover:bg-surface-secondary hover:no-underline ${
-        isCurrent ? "border-accent bg-accent-soft" : "border-border bg-surface"
+        // Current stage: thicker accent border + a visible label (not color alone). The fill stays
+        // a neutral surface so the muted number keeps >= 4.5:1 (an accent tint dropped it to 3.8:1).
+        isCurrent ? "border-2 border-accent bg-surface-secondary" : "border-border bg-surface"
       }`}
     >
       <Sprite src={spriteForId(node.speciesId)} alt="" size={72} />
       <span className="text-xs text-muted">{formatDexNumber(node.speciesId)}</span>
       <span className="text-sm font-semibold">{name}</span>
-      {isCurrent && <span className="sr-only">(this Pokémon)</span>}
+      {isCurrent && <span className="text-xs font-medium text-foreground">This Pokémon</span>}
     </AppLink>
   );
 }

@@ -143,8 +143,10 @@ function ReadView({ item }: { item: CollectedPokemon }) {
         <h2 id="custom-heading" className="text-xl font-semibold">
           Our notes
         </h2>
-        <dl className="grid gap-4">
-          <div>
+        {/* A <dl> may only hold dt/dd or one wrapping div per dt+dd group, so the 2-column
+            row is made with the grid on the dl itself (col-span-2 for full-width groups). */}
+        <dl className="grid grid-cols-2 gap-4">
+          <div className="col-span-2">
             <dt className="text-sm text-muted">Localized names</dt>
             <dd>
               {custom.localizedNames.length === 0 ? (
@@ -163,21 +165,19 @@ function ReadView({ item }: { item: CollectedPokemon }) {
               )}
             </dd>
           </div>
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <dt className="text-sm text-muted">Region</dt>
-              <dd>{custom.geo?.region || <span className="text-muted">—</span>}</dd>
-            </div>
-            <div>
-              <dt className="text-sm text-muted">Habitat</dt>
-              <dd>{custom.geo?.habitat || <span className="text-muted">—</span>}</dd>
-            </div>
+          <div>
+            <dt className="text-sm text-muted">Region</dt>
+            <dd>{custom.geo?.region || <span className="text-muted">—</span>}</dd>
           </div>
           <div>
+            <dt className="text-sm text-muted">Habitat</dt>
+            <dd>{custom.geo?.habitat || <span className="text-muted">—</span>}</dd>
+          </div>
+          <div className="col-span-2">
             <dt className="text-sm text-muted">Coordinates</dt>
             <dd>{coords ? `${coords.latitude}, ${coords.longitude}` : <span className="text-muted">—</span>}</dd>
           </div>
-          <div>
+          <div className="col-span-2">
             <dt className="text-sm text-muted">Tags</dt>
             <dd>
               {custom.tags.length === 0 ? (

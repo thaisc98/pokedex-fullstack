@@ -174,6 +174,64 @@ jobs:
       - name: Build
         run: npm run build
 
+  e2e:
+    name: E2E (Playwright vs the offline Compose stack)
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    defaults:
+      run:
+        working-directory: frontend
+    env:
+      NEXT_TELEMETRY_DISABLED: "1"
+      E2E_BASE_URL: http://localhost:3000
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Set up Node (version from .nvmrc, npm cache)
+        uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Install Chromium for Playwright
+        run: npx playwright install --with-deps chromium
+
+      # A throwaway .env for this job only: the .env.example placeholders plus a random JWT secret.
+      # .env is ignored by version control and never committed; the runner is discarded afterwards.
+      - name: Write a scratch .env
+        working-directory: .
+        run: |
+          secret="$(openssl rand -base64 48)"
+          echo "::add-mask::${secret}"
+          sed "s|^JWT_SECRET=.*|JWT_SECRET=${secret}|" .env.example > .env
+
+      # Offline override (docker-compose.offline.yml): WireMock serves recorded Gen 1 PokeAPI data and the
+      # backend has no internet route, so the run is deterministic. --wait blocks until every service is healthy.
+      - name: Start the stack
+        working-directory: .
+        run: docker compose -f docker-compose.yml -f docker-compose.offline.yml up -d --build --wait --wait-timeout 600
+
+      - name: Playwright (375 / 768 / 1280, axe, console guard)
+        run: npm run test:e2e
+
+      # No report/trace artifact: traces hold the run's session cookies, and this repository is public.
+      - name: Stack logs on failure
+        if: failure()
+        working-directory: .
+        run: docker compose -f docker-compose.yml -f docker-compose.offline.yml logs --no-color --tail 200
+
+      - name: Tear down
+        if: always()
+        working-directory: .
+        run: docker compose -f docker-compose.yml -f docker-compose.offline.yml down -v
+
   frontend-audit:
     name: Frontend audit (npm audit + SBOM)
     runs-on: ubuntu-latest
