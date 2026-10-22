@@ -63,6 +63,7 @@ classDiagram
       Category category
       Mass mass
       List~Ability~ abilities
+      List~PokemonType~ types
     }
     class PokemonDetail {
       PokedexId id
@@ -140,6 +141,9 @@ classDiagram
 | `Email` | trimmed, lowercased, valid format, ≤ 254 chars |
 | `DisplayName` | trimmed, 1–60 chars |
 | `PageRequest` | page ≥ 0, 1 ≤ size ≤ 100, default size 20 |
+| `NameQuery` | search text: trimmed, lowercased, spaces → hyphens, then `^[a-z0-9-]{1,50}$`; `isPrefixOf` / `isContainedIn` |
+| `SearchLimit` | 1–20, default 10 |
+| `PokemonNameRef` | `PokedexId` + `PokemonName` (an autocomplete suggestion) |
 
 ### 1.3 Business rules
 
@@ -168,6 +172,7 @@ classDiagram
 | UC-06 `RegisterUser` | Auth | email, password, displayName → `User` | duplicate → 409; weak → 400 |
 | UC-07 `AuthenticateUser` | Auth | credentials → `AccessToken` | bad credentials → 401 (generic message) |
 | UC-08 `GetCurrentUser` | Auth | principal → `User` | 401 |
+| UC-09 `SearchPokemonNames` | Catalog search (autocomplete) | `NameQuery` + `SearchLimit` → `List<PokemonNameRef>` (names starting with the query first, then names containing it, each group by id) | invalid query/limit → 400; name index unavailable → 503 |
 
 ### 1.5 Listing Pokémon: many PokeAPI calls per page (main performance risk)
 
@@ -225,8 +230,9 @@ graph TD
 
 | Kind | Port (in `application`) | Adapter |
 |---|---|---|
-| Inbound | `ListPokemonUseCase`, `GetPokemonDetailUseCase`, `SyncPokemonUseCase`, `UpdateCollectedPokemonUseCase`, `QueryCollectionUseCase`, `DeleteCollectedPokemonUseCase`, `RegisterUserUseCase`, `AuthenticateUserUseCase`, `GetCurrentUserUseCase` | REST controllers (`presentation`) |
-| Outbound | `PokemonCatalogPort` (`fetchPage`, `fetchDetail`, `fetchSnapshot`) | `PokeApiCatalogAdapter`, wrapped by `CachingPokemonCatalog` |
+| Inbound | `ListPokemonUseCase`, `GetPokemonDetailUseCase`, `SearchPokemonNamesUseCase`, `SyncPokemonUseCase`, `UpdateCollectedPokemonUseCase`, `QueryCollectionUseCase`, `DeleteCollectedPokemonUseCase`, `RegisterUserUseCase`, `AuthenticateUserUseCase`, `GetCurrentUserUseCase` | REST controllers (`presentation`) |
+| Outbound | `PokemonCatalogPort` (`fetchPage`, `fetchDetail`, `fetchNameIndex`) | `PokeApiCatalogAdapter`, wrapped by `CachingPokemonCatalog` |
+| Outbound | `UpstreamSnapshotPort` (`fetchSnapshot`, live, uncached; [ADR 0013](adr/0013-collection-sync-live-and-cache-refresh.md)) | `PokeApiSnapshotAdapter` |
 | Outbound | `CollectedPokemonRepository` | `JpaCollectedPokemonRepositoryAdapter` |
 | Outbound | `UserRepository` | `JpaUserRepositoryAdapter` |
 | Outbound | `PasswordHasher` | `BCryptPasswordHasher` |
@@ -408,6 +414,7 @@ The upstream snapshot is stored as JSONB because it is read-only and never queri
 | Method | Path | Auth | Success | Errors |
 |---|---|---|---|---|
 | GET | `/api/v1/pokemon?page&size` | public | 200 `PageResponse<PokemonSummaryDto>` | 400, 503 |
+| GET | `/api/v1/pokemon/search?q&limit` | public | 200 `PokemonSearchResult` `{results:[{id, name}]}` | 400, 503 |
 | GET | `/api/v1/pokemon/{idOrName}` | public | 200 `PokemonDetailDto` | 400, 404, 503 |
 | POST | `/api/v1/auth/register` | public | 201 `UserDto` | 400, 403 (CSRF), 409, 413, 415, 429 |
 | GET | `/api/v1/auth/csrf` | public | 200 `{headerName, token}` | — |
@@ -423,6 +430,8 @@ The upstream snapshot is stored as JSONB because it is read-only and never queri
 - The full contract (schemas, examples, constraints) is [api/openapi.yaml](api/openapi.yaml). This table is the summary; if they disagree, the YAML wins.
 - `PageResponse = {content, page, size, totalElements, totalPages}`.
 - `{idOrName}`: all digits → Pokédex id; anything else is lowercased and then checked against `^[a-z0-9-]{1,50}$` (`Pikachu` → `pikachu`; `pika;drop` → 400). `0` and unknown ids → 404.
+- **Name search (`/pokemon/search`, autocomplete):** the backend loads every Pokémon name with **one** PokeAPI call (`/pokemon?offset=0&limit=100000`, ids parsed from the URLs, never followed), caches it for 24 h (`pokemon-name-index`), and filters in memory: names **starting with** `q` first, then names **containing** it, each group by id, at most `limit` (1–20, default 10). `q` is normalized like a name (`" Mr Mime "` → `mr-mime`). The literal `/search` route takes priority over `/{idOrName}`.
+- **List items** (`PokemonSummaryDto`) include `types` (1–2, slot order), so the catalog cards can show type chips.
 - Every error is an RFC 9457 `ProblemDetail` with an `errors[]` list of `{field, message}` violations; `field` uses Spring `FieldError` paths (`customAttributes.tags[2]`).
 - Every endpoint with a request body also returns 413 (body > 16 KB) and 415 (not `application/json`), per [security.md §4.3](security.md).
 - US04 uses PUT, not PATCH: replacing the whole object avoids having to decide whether `null` means "clear" or "unchanged".

@@ -89,6 +89,7 @@ The same fixtures feed the `offline` WireMock container used for the demo.
 ### Catalog / PokeAPI
 - `page=-1`, `size=0`, `size=101`, `page=abc` → 400. A page past the end → 200 with empty `content`.
 - `idOrName`: `0`, `-5`, `99999` → 404. `Pikachu` → normalized to lowercase. `mr-mime` → valid. `pika;drop` → 400.
+- Name search `q`: `Pika` and `"  Mr Mime "` are normalized; names starting with `q` come before names containing it (`duck` → ducklett, psyduck, golduck); no match → `[]`; empty, missing, 51 characters or `pika;drop` → 400 (field `q`); `limit` 0 or 21 → 400 (field `limit`); upstream 5xx → 503; a second search makes no PokeAPI call (cached index); `/pokemon/search` is never treated as a Pokémon named "search".
 - Null `front_default` → placeholder image. Missing official artwork → fall back to the sprite.
 - Weight conversion at the extremes (0 hg, 9999 hg) always rounds the same way.
 - Flavor text containing `\f` / `\n`, duplicated across game versions, or **with no English entry** → empty description.

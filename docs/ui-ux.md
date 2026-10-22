@@ -83,6 +83,7 @@ flowchart LR
     E --> F[URL ?page= updated] --> B
     D -.prefetch.-> G[Next page loaded in the background]
     C -- error --> H[Error state + Retry]
+    D --> S["Find a Pokémon: type 1+ characters"] --> T[Suggestions as you type, debounced 200 ms] --> U[Pick one or press Enter on an exact name/number] --> V[Open /pokemon/{id}]
 ```
 
 ### US02: Detail view
@@ -123,54 +124,64 @@ flowchart LR
 ### 5.1 Catalog (US01)
 
 ```
-Desktop ≥ 1280 px — 5 columns                       Mobile 375 px — 2 columns
-┌───────────────────────────────────────────────┐   ┌───────────────────────┐
-│ Pokémon                    Showing 1–20 of 1302│   │ Pokémon      1–20/1302│
-├────────┬────────┬────────┬────────┬────────────┤   ├──────────┬────────────┤
-│ [img]  │ [img]  │ [img]  │ [img]  │ [img]      │   │ [img]    │ [img]      │
-│ #001   │ #002   │ #003   │ #004   │ #005       │   │ #001     │ #002       │
-│Bulbasaur│Ivysaur│Venusaur│Charmand│Charmeleon  │   │Bulbasaur │Ivysaur     │
-│Seed Pkm│Seed Pkm│Seed Pkm│Lizard  │Flame       │   │Seed Pkm  │Seed Pkm    │
-│ 6.9 kg │ 13 kg  │ 100 kg │ 8.5 kg │ 19 kg      │   │ 6.9 kg   │ 13 kg      │
-│overgrow│overgrow│overgrow│blaze   │blaze       │   │overgrow  │overgrow    │
-│chloro.*│chloro.*│chloro.*│solar-p*│solar-p*    │   │chloro.*  │chloro.*    │
-├────────┴────────┴────────┴────────┴────────────┤   ├──────────┴────────────┤
-│   ‹ Prev   1  2  3 … 66   Next ›   [20 ▾]/page │   │  ‹ Prev  2/66  Next › │
-└───────────────────────────────────────────────┘   └───────────────────────┘
-* = hidden ability (shown in italics, with a “Hidden” label for screen readers)
+Desktop ≥ 1280 px — 5 columns                          Mobile 375 px — 2 columns
+┌──────────────────────────────────────────────────┐   ┌───────────────────────┐
+│ Pokémon                                          │   │ Pokémon               │
+│ Find a Pokémon [ name or number… ▾ ]             │   │ [ Find a Pokémon… ]   │
+│            Showing 1–20 of 1,351  ‹ Prev 1/68 Next›│   │ 1–20/1,351 ‹ 1/68 ›   │
+├─────────┬─────────┬─────────┬─────────┬──────────┤   ├──────────┬────────────┤
+│ [SPRITE]│ [SPRITE]│ [SPRITE]│ [SPRITE]│ [SPRITE] │   │ [SPRITE] │ [SPRITE]   │
+│ #001    │ #002    │ #003    │ #004    │ #005     │   │ #001     │ #002       │
+│Bulbasaur│Ivysaur  │Venusaur │Charmand.│Charmeleon│   │Bulbasaur │Ivysaur     │
+│[Grass][Poison]    │ …       │ [Fire]  │ [Fire]   │   │[Grass][Poison]        │
+│Seed Pkm │Seed Pkm │Seed Pkm │Lizard   │Flame     │   │Seed Pkm  │Seed Pkm    │
+│Weight   │         │         │         │          │   │Weight    │            │
+│ 6.9 kg  │ 13.0 kg │ 100.0 kg│ 8.5 kg  │ 19.0 kg  │   │ 6.9 kg   │ 13.0 kg    │
+│Abilities│         │         │         │          │   │Abilities │            │
+│Overgrow │Overgrow │Overgrow │Blaze    │Blaze     │   │Overgrow  │Overgrow    │
+│Chloro.* │Chloro.* │Chloro.* │Solar P.*│Solar P.* │   │Chloro.*  │Chloro.*    │
+├─────────┴─────────┴─────────┴─────────┴──────────┤   ├──────────┴────────────┤
+│   ‹ Prev   1  2  3 … 68   Next ›   [20 ▾]/page    │   │  ‹ Prev  2/68  Next › │
+└──────────────────────────────────────────────────┘   └───────────────────────┘
+* = hidden ability (italics + a visible “(hidden)” label)
 ```
 
-**Card content (US01):** sprite, Pokédex number, name, **category**, **mass (kg)**, **abilities (skills)**. The whole card is one link (`<a>` wrapping an `<article>`), with hover and focus states.
+**Card content (US01):** sprite (the 96 px PokeAPI sprite scaled 1.5–1.7× with `image-rendering: pixelated`, directly on the card, no grey well), Pokédex number, name, **type chips** (`TypeBadge`, `bg-type-*`), **category**, **weight (kg)** and **abilities (skills)**, each with a small label. The whole card is one link (`<a>` wrapping an `<article>`), with hover (slight sprite zoom, off with reduced motion) and focus states.
+
+**Find a Pokémon (autocomplete):** a HeroUI ComboBox above the grid. After the first character it calls `GET /api/v1/pokemon/search` (debounced 200 ms) and shows up to 10 suggestions as `#025 Pikachu`; picking one (mouse or arrow keys + Enter), or pressing Enter on an exact name or number, opens `/pokemon/{id}`. States: “Searching…”, “No Pokémon match”, and an inline “Search is unavailable right now” on 503. Input outside `[a-z0-9-]{1,50}` (after normalization) sends no request.
+
+**Pagination** appears twice: a compact `‹ Prev · n / N · Next ›` next to “Showing …” at the top, and the full pager with page size at the bottom. Page and size live in the URL.
 
 ### 5.2 Detail (US02)
 
 ```
-┌───────────────────────────────────────────────────────────────┐
-│ ‹ Back to catalog                                             │
-│ ┌────────────────────┐  #025 Pikachu                          │
-│ │                    │  Mouse Pokémon   [Electric]            │
-│ │  official artwork  │  0.4 m · 6.0 kg                        │
-│ │                    │  Abilities: static · lightning-rod*    │
-│ └────────────────────┘  [ ＋ Add to collection ]               │
-│                                                               │
-│ About                                                         │
-│ “When several of these Pokémon gather, their electricity      │
-│  could build and cause lightning storms.”                     │
-│                                                               │
-│ Base stats                                     Total 320      │
-│ HP        35 ███████░░░░░░░░░░░░░░░░░░                         │
-│ Attack    55 ███████████░░░░░░░░░░░░░░                         │
-│ Defense   40 ████████░░░░░░░░░░░░░░░░░                         │
-│ Sp. Atk   50 ██████████░░░░░░░░░░░░░░░                         │
-│ Sp. Def   50 ██████████░░░░░░░░░░░░░░░                         │
-│ Speed     90 ██████████████████░░░░░░░                         │
-│                                                               │
-│ Evolution                                                     │
-│ [Pichu] ──(friendship)──▶ [Pikachu] ──(thunder-stone)──▶ [Raichu]│
-└───────────────────────────────────────────────────────────────┘
-Mobile: artwork on top, sections stacked, evolution chain vertical.
-Branching chains (Eevee): the first stage, then a wrapping grid of branches.
+Desktop ≥ 1024 px — two columns, no panel stretched to its neighbour's height
+┌──────────────────────────────────────────────────────────────────────┐
+│ Catalog › Venusaur                                                   │
+│ ┌───────────────────────────┐  #003                                  │
+│ │                           │  Venusaur                              │
+│ │   official artwork        │  [Grass] [Poison]                      │
+│ │   (max ~384 px tall)      │  Height 2.0 m   Weight 100.0 kg        │
+│ └───────────────────────────┘  Abilities: Overgrow · Chlorophyll*    │
+│ ┌───────────────────────────┐  [ ＋ Add to collection ]               │
+│ │ Base stats      Total 525 │  About                                 │
+│ │ HP       80 ████████░░░░  │  “A bewitching aroma wafts from …”     │
+│ │ Attack   82 ████████░░░░  │  Evolution                             │
+│ │ …                         │  ┌───────┐ Lv 16 ┌───────┐ Lv 32 ┌─This Pokémon─┐│
+│ └───────────────────────────┘  │[art]  │  →    │[art]  │  →    │ [art]        ││
+│                                │#001   │       │#002   │       │ #003         ││
+│                                │Bulba. │       │Ivysaur│       │ Venusaur     ││
+│                                └───────┘       └───────┘       └──────────────┘│
+└──────────────────────────────────────────────────────────────────────┘
+Mobile (one column): artwork, info, About, Evolution, Base stats.
+Branching chains (Eevee): the first stage, then the branches wrapping 4 per row (2 on narrow screens), triggers aligned.
 ```
+
+- **Evolution sits in the right column, directly under About**, so at 1206 × 858 it is visible without scrolling (the human rejected a separate full-width Evolution row: “it's taking so much space”).
+- **Stage cards:** all the same compact size (112 px wide), with the **official artwork** in an 80 px box (built from the species id on the allow-listed path; the sprite is the fallback), number and name. Each card is a link with hover (slight lift, accent border) and a clear focus ring.
+- **Current stage:** an accent border **plus** a small “This Pokémon” badge on the card's top edge (never colour alone; no extra height) and `aria-current="page"`.
+- The arrow between stages is a text character (an inline SVG triggered a CSP inline-style violation), with the trigger in words below it (“Level 16”, “Use Thunder Stone”, “Trade”).
+- Labels: **Weight** (not “Mass”), matching the catalog cards.
 
 ### 5.3 Collection (protected)
 

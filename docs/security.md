@@ -91,7 +91,7 @@ Two boundaries matter most: **browser → API** (every input is untrusted) and *
 
 | Endpoint | ANONYMOUS | USER | ADMIN |
 |---|---|---|---|
-| `GET /api/v1/pokemon`, `GET /api/v1/pokemon/{idOrName}` | ✅ | ✅ | ✅ |
+| `GET /api/v1/pokemon`, `GET /api/v1/pokemon/search`, `GET /api/v1/pokemon/{idOrName}` | ✅ | ✅ | ✅ |
 | `POST /api/v1/auth/register`, `POST /api/v1/auth/login` | ✅ | ✅ | ✅ |
 | `GET /api/v1/auth/csrf` | ✅ | ✅ | ✅ |
 | `GET /api/v1/auth/me`, `POST /api/v1/auth/logout` | 401 | ✅ | ✅ |
