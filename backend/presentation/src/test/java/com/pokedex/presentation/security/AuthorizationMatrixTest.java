@@ -12,6 +12,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import com.pokedex.application.catalog.PokemonDetailFixtures;
 import com.pokedex.application.catalog.port.in.GetPokemonDetailUseCase;
 import com.pokedex.application.catalog.port.in.ListPokemonUseCase;
+import com.pokedex.application.catalog.port.in.SearchPokemonNamesUseCase;
 import com.pokedex.domain.shared.Page;
 import com.pokedex.domain.shared.PageRequest;
 import com.pokedex.presentation.rest.catalog.CatalogController;
@@ -44,10 +45,14 @@ class AuthorizationMatrixTest {
     @MockitoBean
     private GetPokemonDetailUseCase getPokemonDetail;
 
+    @MockitoBean
+    private SearchPokemonNamesUseCase searchPokemonNames;
+
     @BeforeEach
     void emptyCatalog() {
         when(listPokemon.list(any())).thenReturn(new Page<>(List.of(), PageRequest.ofPage(0), 0));
         when(getPokemonDetail.get(any())).thenReturn(PokemonDetailFixtures.pikachu());
+        when(searchPokemonNames.search(any(), any())).thenReturn(List.of());
     }
 
     @ParameterizedTest(name = "anonymous {0} {1} -> {2}")
@@ -57,6 +62,9 @@ class AuthorizationMatrixTest {
         // US02: the catalog detail is public
         "GET,    /api/v1/pokemon/25,     200",
         "GET,    /api/v1/pokemon/pikachu, 200",
+        // name search is public
+        "GET,    /api/v1/pokemon/search?q=pika, 200",
+        "POST,   /api/v1/pokemon/search,  401",
         // deny by default: everything not listed
         "GET,    /api/v1/pokemon/25/evolution, 401",
         "POST,   /api/v1/pokemon/25,     401",

@@ -6,6 +6,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import com.pokedex.application.catalog.port.in.GetPokemonDetailUseCase;
 import com.pokedex.application.catalog.port.in.ListPokemonUseCase;
+import com.pokedex.application.catalog.port.in.SearchPokemonNamesUseCase;
 import com.pokedex.presentation.rest.catalog.CatalogController;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -32,6 +33,9 @@ class ActuatorAccessTest {
 
     @MockitoBean
     private GetPokemonDetailUseCase getPokemonDetail;
+
+    @MockitoBean
+    private SearchPokemonNamesUseCase searchPokemonNames;
 
     @Test
     void should_let_anonymous_callers_reach_the_health_endpoint() throws Exception {

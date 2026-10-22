@@ -9,6 +9,7 @@ import com.pokedex.domain.catalog.vo.ImageUrl;
 import com.pokedex.domain.catalog.vo.Mass;
 import com.pokedex.domain.catalog.vo.PokedexId;
 import com.pokedex.domain.catalog.vo.PokemonName;
+import com.pokedex.domain.catalog.vo.PokemonType;
 import com.pokedex.domain.shared.Page;
 import com.pokedex.domain.shared.PageRequest;
 import com.pokedex.presentation.rest.catalog.dto.AbilityDto;
@@ -29,7 +30,8 @@ class CatalogDtoMapperTest {
                 new ImageUrl(SPRITE),
                 new Category("Mouse Pokémon"),
                 new Mass(60),
-                List.of(new Ability("static", false), new Ability("lightning-rod", true)));
+                List.of(new Ability("static", false), new Ability("lightning-rod", true)),
+                List.of(PokemonType.ELECTRIC));
     }
 
     @Test
@@ -43,13 +45,20 @@ class CatalogDtoMapperTest {
                         SPRITE,
                         "Mouse Pokémon",
                         6.0,
-                        List.of(new AbilityDto("static", false), new AbilityDto("lightning-rod", true))));
+                        List.of(new AbilityDto("static", false), new AbilityDto("lightning-rod", true)),
+                        List.of("electric")));
     }
 
     @Test
     void should_map_an_unknown_category_to_its_text() {
         PokemonSummary summary = new PokemonSummary(
-                new PokedexId(1), new PokemonName("x"), ImageUrl.PLACEHOLDER, Category.UNKNOWN, new Mass(0), List.of());
+                new PokedexId(1),
+                new PokemonName("x"),
+                ImageUrl.PLACEHOLDER,
+                Category.UNKNOWN,
+                new Mass(0),
+                List.of(),
+                List.of(PokemonType.FIRE, PokemonType.FLYING));
 
         PokemonSummaryDto dto = CatalogDtoMapper.toDto(summary);
 
@@ -57,6 +66,7 @@ class CatalogDtoMapperTest {
         assertThat(dto.sprite()).isEqualTo(ImageUrl.PLACEHOLDER.value());
         assertThat(dto.mass()).isZero();
         assertThat(dto.abilities()).isEmpty();
+        assertThat(dto.types()).containsExactly("fire", "flying");
     }
 
     @Test
