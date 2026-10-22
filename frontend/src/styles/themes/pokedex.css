@@ -48,6 +48,12 @@
   --accent-foreground: oklch(100% 0 0);
   --focus: var(--accent);
   --link: var(--accent);
+  /*
+   * Muted text ≈ #5d5d65 (HeroUI default #71717a was 4.43:1 on the page background).
+   * ≥ 5.0:1 on every light background it sits on: background 6.0, surface 6.6,
+   * surface-secondary 5.7, surface-tertiary 5.5, default 5.5.
+   */
+  --muted: oklch(0.48 0.0138 285.94);
 }
 
 /* ── Dark ────────────────────────────────────────────────────────────────── */
@@ -57,6 +63,8 @@
   --accent-foreground: oklch(0.2103 0.0059 285.89);
   --focus: var(--accent);
   --link: var(--accent);
+  /* Muted text ≈ #a3a3ad: ≥ 6.0:1 on background, surface, surface-secondary and default. */
+  --muted: oklch(0.72 0.0138 285.94);
 }
 
 /* Bridge to Tailwind: bg-type-fire, text-type-fire-foreground, … */
