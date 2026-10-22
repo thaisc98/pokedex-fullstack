@@ -8,6 +8,7 @@ import com.pokedex.application.catalog.PokemonDetailFixtures;
 import com.pokedex.application.catalog.StubPokemonCatalog;
 import com.pokedex.application.catalog.port.out.PokemonCatalogPort;
 import com.pokedex.domain.catalog.PokemonDetail;
+import com.pokedex.domain.catalog.PokemonNameRef;
 import com.pokedex.domain.catalog.PokemonSummary;
 import com.pokedex.domain.catalog.vo.Ability;
 import com.pokedex.domain.catalog.vo.Category;
@@ -16,6 +17,7 @@ import com.pokedex.domain.catalog.vo.Mass;
 import com.pokedex.domain.catalog.vo.PokedexId;
 import com.pokedex.domain.catalog.vo.PokemonName;
 import com.pokedex.domain.catalog.vo.PokemonRef;
+import com.pokedex.domain.catalog.vo.PokemonType;
 import com.pokedex.domain.shared.Page;
 import com.pokedex.domain.shared.PageRequest;
 import com.pokedex.domain.shared.UpstreamUnavailableException;
@@ -32,7 +34,34 @@ class CachingPokemonCatalogTest {
     private final Cache cache = new CaffeineCache(
             CachingPokemonCatalog.PAGES_CACHE,
             Caffeine.newBuilder().maximumSize(10).build());
-    private final CachingPokemonCatalog catalog = new CachingPokemonCatalog(delegate, cache);
+    private final Cache nameIndexCache = new CaffeineCache(
+            CachingPokemonCatalog.NAME_INDEX_CACHE,
+            Caffeine.newBuilder().maximumSize(1).build());
+    private final CachingPokemonCatalog catalog = new CachingPokemonCatalog(delegate, cache, nameIndexCache);
+
+    @Test
+    void should_load_the_name_index_once_and_serve_it_from_the_cache() {
+        List<PokemonNameRef> index = List.of(new PokemonNameRef(new PokedexId(25), new PokemonName("pikachu")));
+        StubPokemonCatalog names = StubPokemonCatalog.withNameIndex(index);
+        CachingPokemonCatalog cached = new CachingPokemonCatalog(names, cache, nameIndexCache);
+
+        assertThat(cached.fetchNameIndex()).isEqualTo(index);
+        assertThat(cached.fetchNameIndex()).isEqualTo(index);
+
+        assertThat(names.nameIndexRequests()).isEqualTo(1);
+    }
+
+    @Test
+    void should_not_cache_a_failed_name_index_load() {
+        UpstreamUnavailableException down = new UpstreamUnavailableException("down", new IOException("reset"));
+        StubPokemonCatalog failing = StubPokemonCatalog.withNameIndex(List.of()).failingWith(down);
+        CachingPokemonCatalog cached = new CachingPokemonCatalog(failing, cache, nameIndexCache);
+
+        assertThatThrownBy(cached::fetchNameIndex).isSameAs(down);
+        assertThatThrownBy(cached::fetchNameIndex).isSameAs(down);
+
+        assertThat(failing.nameIndexRequests()).isEqualTo(2);
+    }
 
     @Test
     void should_serve_a_repeated_page_from_the_cache() {
@@ -66,7 +95,7 @@ class CachingPokemonCatalogTest {
     void should_rethrow_the_original_failure_and_not_cache_it() {
         UpstreamUnavailableException down = new UpstreamUnavailableException("down", new IOException("reset"));
         StubPokemonCatalog failing = new StubPokemonCatalog(List.of()).failingWith(down);
-        CachingPokemonCatalog failingCatalog = new CachingPokemonCatalog(failing, cache);
+        CachingPokemonCatalog failingCatalog = new CachingPokemonCatalog(failing, cache, nameIndexCache);
 
         assertThatThrownBy(() -> failingCatalog.fetchPage(PageRequest.ofPage(0)))
                 .isSameAs(down);
@@ -90,8 +119,13 @@ class CachingPokemonCatalogTest {
             public PokemonDetail fetchDetail(PokemonRef ref) {
                 return sneakyThrow(checked);
             }
+
+            @Override
+            public List<PokemonNameRef> fetchNameIndex() {
+                return sneakyThrow(checked);
+            }
         };
-        CachingPokemonCatalog sneaky = new CachingPokemonCatalog(throwingChecked, cache);
+        CachingPokemonCatalog sneaky = new CachingPokemonCatalog(throwingChecked, cache, nameIndexCache);
 
         assertThatThrownBy(() -> sneaky.fetchPage(PageRequest.ofPage(0)))
                 .isInstanceOf(Cache.ValueRetrievalException.class)
@@ -106,7 +140,7 @@ class CachingPokemonCatalogTest {
     @Test
     void should_pass_detail_lookups_through_since_resources_are_cached_below() {
         StubPokemonCatalog details = StubPokemonCatalog.withDetails(PokemonDetailFixtures.pikachu());
-        CachingPokemonCatalog withDetails = new CachingPokemonCatalog(details, cache);
+        CachingPokemonCatalog withDetails = new CachingPokemonCatalog(details, cache, nameIndexCache);
         PokemonRef ref = new PokemonRef.ById(new PokedexId(25));
 
         assertThat(withDetails.fetchDetail(ref)).isEqualTo(PokemonDetailFixtures.pikachu());
@@ -122,6 +156,7 @@ class CachingPokemonCatalogTest {
                 ImageUrl.PLACEHOLDER,
                 Category.UNKNOWN,
                 new Mass(id),
-                List.of(new Ability("static", false)));
+                List.of(new Ability("static", false)),
+                List.of(PokemonType.ELECTRIC));
     }
 }
