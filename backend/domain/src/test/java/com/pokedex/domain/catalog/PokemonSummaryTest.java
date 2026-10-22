@@ -9,6 +9,8 @@ import com.pokedex.domain.catalog.vo.ImageUrl;
 import com.pokedex.domain.catalog.vo.Mass;
 import com.pokedex.domain.catalog.vo.PokedexId;
 import com.pokedex.domain.catalog.vo.PokemonName;
+import com.pokedex.domain.catalog.vo.PokemonType;
+import com.pokedex.domain.shared.InvalidValueException;
 import java.util.ArrayList;
 import java.util.List;
 import org.junit.jupiter.api.Test;
@@ -22,12 +24,13 @@ class PokemonSummaryTest {
             new ImageUrl("https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/25.png");
     private static final Category CATEGORY = new Category("Mouse Pokémon");
     private static final Mass MASS = new Mass(60);
+    private static final List<PokemonType> TYPES = List.of(PokemonType.ELECTRIC);
     private static final List<Ability> ABILITIES =
             List.of(new Ability("static", false), new Ability("lightning-rod", true));
 
     @Test
     void should_compose_id_name_sprite_category_mass_and_abilities() {
-        PokemonSummary summary = new PokemonSummary(ID, NAME, SPRITE, CATEGORY, MASS, ABILITIES);
+        PokemonSummary summary = new PokemonSummary(ID, NAME, SPRITE, CATEGORY, MASS, ABILITIES, TYPES);
 
         assertThat(summary.id()).isEqualTo(ID);
         assertThat(summary.name()).isEqualTo(NAME);
@@ -39,14 +42,14 @@ class PokemonSummaryTest {
 
     @Test
     void should_accept_an_unknown_category() {
-        PokemonSummary summary = new PokemonSummary(ID, NAME, SPRITE, Category.UNKNOWN, MASS, ABILITIES);
+        PokemonSummary summary = new PokemonSummary(ID, NAME, SPRITE, Category.UNKNOWN, MASS, ABILITIES, TYPES);
 
         assertThat(summary.category().isUnknown()).isTrue();
     }
 
     @Test
     void should_allow_an_empty_ability_list() {
-        PokemonSummary summary = new PokemonSummary(ID, NAME, SPRITE, CATEGORY, MASS, List.of());
+        PokemonSummary summary = new PokemonSummary(ID, NAME, SPRITE, CATEGORY, MASS, List.of(), TYPES);
 
         assertThat(summary.abilities()).isEmpty();
     }
@@ -54,7 +57,7 @@ class PokemonSummaryTest {
     @Test
     void should_keep_ability_order_and_copy_the_list_defensively() {
         List<Ability> source = new ArrayList<>(ABILITIES);
-        PokemonSummary summary = new PokemonSummary(ID, NAME, SPRITE, CATEGORY, MASS, source);
+        PokemonSummary summary = new PokemonSummary(ID, NAME, SPRITE, CATEGORY, MASS, source, TYPES);
 
         source.clear();
 
@@ -64,7 +67,7 @@ class PokemonSummaryTest {
 
     @Test
     void should_expose_an_unmodifiable_ability_list() {
-        PokemonSummary summary = new PokemonSummary(ID, NAME, SPRITE, CATEGORY, MASS, ABILITIES);
+        PokemonSummary summary = new PokemonSummary(ID, NAME, SPRITE, CATEGORY, MASS, ABILITIES, TYPES);
 
         assertThatThrownBy(() -> summary.abilities().add(new Ability("pressure", false)))
                 .isInstanceOf(UnsupportedOperationException.class);
@@ -72,17 +75,17 @@ class PokemonSummaryTest {
 
     @Test
     void should_reject_null_components() {
-        assertThatThrownBy(() -> new PokemonSummary(null, NAME, SPRITE, CATEGORY, MASS, ABILITIES))
+        assertThatThrownBy(() -> new PokemonSummary(null, NAME, SPRITE, CATEGORY, MASS, ABILITIES, TYPES))
                 .isInstanceOf(NullPointerException.class);
-        assertThatThrownBy(() -> new PokemonSummary(ID, null, SPRITE, CATEGORY, MASS, ABILITIES))
+        assertThatThrownBy(() -> new PokemonSummary(ID, null, SPRITE, CATEGORY, MASS, ABILITIES, TYPES))
                 .isInstanceOf(NullPointerException.class);
-        assertThatThrownBy(() -> new PokemonSummary(ID, NAME, null, CATEGORY, MASS, ABILITIES))
+        assertThatThrownBy(() -> new PokemonSummary(ID, NAME, null, CATEGORY, MASS, ABILITIES, TYPES))
                 .isInstanceOf(NullPointerException.class);
-        assertThatThrownBy(() -> new PokemonSummary(ID, NAME, SPRITE, null, MASS, ABILITIES))
+        assertThatThrownBy(() -> new PokemonSummary(ID, NAME, SPRITE, null, MASS, ABILITIES, TYPES))
                 .isInstanceOf(NullPointerException.class);
         assertThatThrownBy(() -> new PokemonSummary(ID, NAME, SPRITE, CATEGORY, null, ABILITIES))
                 .isInstanceOf(NullPointerException.class);
-        assertThatThrownBy(() -> new PokemonSummary(ID, NAME, SPRITE, CATEGORY, MASS, null))
+        assertThatThrownBy(() -> new PokemonSummary(ID, NAME, SPRITE, CATEGORY, MASS, null, TYPES))
                 .isInstanceOf(NullPointerException.class);
     }
 
@@ -92,19 +95,57 @@ class PokemonSummaryTest {
         withNull.add(new Ability("static", false));
         withNull.add(null);
 
-        assertThatThrownBy(() -> new PokemonSummary(ID, NAME, SPRITE, CATEGORY, MASS, withNull))
+        assertThatThrownBy(() -> new PokemonSummary(ID, NAME, SPRITE, CATEGORY, MASS, withNull, TYPES))
+                .isInstanceOf(NullPointerException.class);
+    }
+
+    @Test
+    void should_carry_one_or_two_types_in_slot_order() {
+        PokemonSummary charizard = new PokemonSummary(
+                ID, NAME, SPRITE, CATEGORY, MASS, ABILITIES, List.of(PokemonType.FIRE, PokemonType.FLYING));
+
+        assertThat(new PokemonSummary(ID, NAME, SPRITE, CATEGORY, MASS, ABILITIES, TYPES).types())
+                .containsExactly(PokemonType.ELECTRIC);
+        assertThat(charizard.types()).containsExactly(PokemonType.FIRE, PokemonType.FLYING);
+    }
+
+    @Test
+    void should_reject_zero_three_or_duplicate_types() {
+        for (List<PokemonType> types : List.of(
+                List.<PokemonType>of(),
+                List.of(PokemonType.FIRE, PokemonType.FIRE),
+                List.of(PokemonType.FIRE, PokemonType.FLYING, PokemonType.DRAGON))) {
+            assertThatThrownBy(() -> new PokemonSummary(ID, NAME, SPRITE, CATEGORY, MASS, ABILITIES, types))
+                    .isInstanceOfSatisfying(
+                            InvalidValueException.class,
+                            e -> assertThat(e.field()).isEqualTo("types"));
+        }
+    }
+
+    @Test
+    void should_copy_and_freeze_the_types_and_reject_null() {
+        List<PokemonType> source = new ArrayList<>(TYPES);
+        PokemonSummary summary = new PokemonSummary(ID, NAME, SPRITE, CATEGORY, MASS, ABILITIES, source);
+
+        source.add(PokemonType.FAIRY);
+
+        assertThat(summary.types()).containsExactly(PokemonType.ELECTRIC);
+        assertThatThrownBy(() -> summary.types().add(PokemonType.FIRE))
+                .isInstanceOf(UnsupportedOperationException.class);
+        assertThatThrownBy(() -> new PokemonSummary(ID, NAME, SPRITE, CATEGORY, MASS, ABILITIES, null))
                 .isInstanceOf(NullPointerException.class);
     }
 
     @Test
     void should_be_equal_when_all_components_are_equal() {
-        assertThat(new PokemonSummary(ID, NAME, SPRITE, CATEGORY, MASS, ABILITIES))
+        assertThat(new PokemonSummary(ID, NAME, SPRITE, CATEGORY, MASS, ABILITIES, TYPES))
                 .isEqualTo(new PokemonSummary(
                         new PokedexId(25),
                         new PokemonName("pikachu"),
                         SPRITE,
                         new Category("Mouse Pokémon"),
                         new Mass(60),
-                        new ArrayList<>(ABILITIES)));
+                        new ArrayList<>(ABILITIES),
+                        List.of(PokemonType.ELECTRIC)));
     }
 }
