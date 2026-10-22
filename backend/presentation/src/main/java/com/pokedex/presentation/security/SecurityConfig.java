@@ -91,6 +91,9 @@ public class SecurityConfig {
                     auth.requestMatchers(HttpMethod.POST, REGISTER, LOGIN).permitAll();
                     auth.requestMatchers(HttpMethod.GET, ME).authenticated();
                     auth.requestMatchers(HttpMethod.POST, LOGOUT).authenticated();
+                    // Liveness for Compose/orchestrators: status only (show-details/components: never).
+                    // Every other actuator path falls through to denyAll.
+                    auth.requestMatchers(HttpMethod.GET, "/actuator/health").permitAll();
                     // Collection (BR-10): shared team dataset; reads, sync and update need USER, delete needs ADMIN.
                     // The ADMIN token carries USER too (Role.impliedRoles); DELETE is checked again in the use case.
                     auth.requestMatchers(HttpMethod.GET, COLLECTION, COLLECTION_ITEM)

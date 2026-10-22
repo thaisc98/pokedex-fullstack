@@ -36,6 +36,11 @@
             <artifactId>pokedex-presentation</artifactId>
             <version>${project.version}</version>
         </dependency>
+        <!-- GET /actuator/health only (security.md §3.2, §4.8). Boot-managed. -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-actuator</artifactId>
+        </dependency>
         <!-- Flyway migrations on PostgreSQL (Boot-managed). -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
