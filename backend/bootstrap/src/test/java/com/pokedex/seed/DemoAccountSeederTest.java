@@ -103,6 +103,15 @@ class DemoAccountSeederTest {
     }
 
     @Test
+    void should_count_as_configured_only_when_a_demo_variable_is_set() {
+        assertThat(DemoAccountSeeder.isConfigured(env::get)).isTrue();
+        assertThat(DemoAccountSeeder.isConfigured(name -> null))
+                .as("demo profile without DEMO_* (e.g. the contract IT): no seed at all")
+                .isFalse();
+        assertThat(DemoAccountSeeder.isConfigured(name -> " ")).isFalse();
+    }
+
+    @Test
     void should_never_log_passwords_or_hashes(CapturedOutput output) {
         seeder().seed();
 
