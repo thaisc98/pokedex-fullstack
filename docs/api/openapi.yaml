@@ -87,6 +87,38 @@ paths:
         '503':
           $ref: '#/components/responses/UpstreamUnavailable'
 
+  /pokemon/search:
+    get:
+      tags: [Catalog]
+      summary: Search Pokémon names (autocomplete)
+      description: |
+        Name search for autocomplete. `q` is trimmed, lowercased and spaces
+        become hyphens (`Mr Mime` → `mr-mime`); the result must match
+        `^[a-z0-9-]{1,50}$`, otherwise `400` (`/problems/validation-error`,
+        field `q`). Names that **start with** `q` come first, then names that
+        **contain** it; each group is ordered by Pokédex id; at most `limit`
+        results. No match is `200` with empty `results`.
+
+        The name index is one PokeAPI list call, cached for 24 h; filtering is
+        in memory. PokeAPI unavailable → `503`. Declared before
+        `/pokemon/{idOrName}`: `search` is never read as a Pokémon name.
+      operationId: searchPokemonNames
+      security: []        # public
+      parameters:
+        - $ref: '#/components/parameters/SearchQueryParam'
+        - $ref: '#/components/parameters/SearchLimitParam'
+      responses:
+        '200':
+          description: Matching names (possibly none).
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PokemonSearchResult'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '503':
+          $ref: '#/components/responses/UpstreamUnavailable'
+
   /pokemon/{idOrName}:
     get:
       tags: [Catalog]
@@ -491,6 +523,31 @@ components:
           value: '25'
         byName:
           value: pikachu
+    SearchQueryParam:
+      name: q
+      in: query
+      required: true
+      description: |
+        Name fragment. Trimmed, lowercased, spaces → hyphens, then it must match
+        `^[a-z0-9-]{1,50}$` (else `400`, field `q`).
+      schema:
+        type: string
+      examples:
+        prefix:
+          value: pika
+        withSpace:
+          value: Mr Mime
+    SearchLimitParam:
+      name: limit
+      in: query
+      required: false
+      description: 'Maximum number of results (1–20, default 10); else `400`, field `limit`.'
+      schema:
+        type: integer
+        format: int32
+        minimum: 1
+        maximum: 20
+        default: 10
     PokedexIdPathParam:
       name: pokedexId
       in: path
@@ -790,7 +847,7 @@ components:
     PokemonSummaryDto:
       type: object
       description: 'Catalog list item (`PokemonSummary`).'
-      required: [id, name, sprite, category, mass, abilities]
+      required: [id, name, sprite, category, mass, abilities, types]
       properties:
         id:
           $ref: '#/components/schemas/PokedexId'
@@ -806,6 +863,42 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/Ability'
+        types:
+          type: array
+          description: 'One or two types in slot order (same as `PokemonDetailDto.types`).'
+          minItems: 1
+          maxItems: 2
+          items:
+            $ref: '#/components/schemas/PokemonType'
+      additionalProperties: false
+
+    PokemonSearchResult:
+      type: object
+      description: 'Name search results (`searchPokemonNames`): prefix matches first, then other matches, each by id.'
+      required: [results]
+      properties:
+        results:
+          type: array
+          maxItems: 20
+          items:
+            $ref: '#/components/schemas/PokemonNameRef'
+      additionalProperties: false
+      examples:
+        - results:
+            - id: 25
+              name: pikachu
+            - id: 10080
+              name: pikachu-rock-star
+
+    PokemonNameRef:
+      type: object
+      description: 'A Pokémon by id and name (search result entry).'
+      required: [id, name]
+      properties:
+        id:
+          $ref: '#/components/schemas/PokedexId'
+        name:
+          $ref: '#/components/schemas/PokemonName'
       additionalProperties: false
 
     PokemonDetailDto:
@@ -1148,7 +1241,7 @@ components:
 
             | `type` | Status | When |
             |---|---|---|
-            | `/problems/validation-error` | 400 | Invalid input; `errors[]` lists the fields. |
+            | `/problems/validation-error` | 400 | Invalid input; `errors[]` lists the fields (e.g. `q` or `limit` on the name search). |
             | `/problems/unauthorized` | 401 | Authentication required or failed. Anonymous access to a non-public route also gets this (deny by default). |
             | `/problems/invalid-credentials` | 401 | Login failed. One fixed body for an unknown email and a wrong password (security.md §4.1). |
             | `/problems/forbidden` | 403 | Authenticated but not allowed (e.g. a `USER` calling an `ADMIN` route). |
@@ -1159,7 +1252,7 @@ components:
             | `/problems/version-conflict` | 409 | Stale `version` on a collection update (BR-08): reload and retry. |
             | `/problems/payload-too-large` | 413 | Request body over 16 KB (security.md §4.3). |
             | `/problems/unsupported-media-type` | 415 | `Content-Type` of a write is not `application/json` (security.md §4.3). |
-            | `/problems/upstream-unavailable` | 503 | PokeAPI down, erroring, too large (> 1 MB) or partial; never a half-filled page (architecture.md §1.5). |
+            | `/problems/upstream-unavailable` | 503 | PokeAPI down, erroring, too large (> 1 MB) or partial; never a half-filled page (architecture.md §1.5). Also when the search name index cannot be loaded. |
             | `/problems/internal-error` | 500 | Unexpected error. Only a `correlationId`, never details. |
 
             Clients must treat unknown types as generic errors for their `status`;
