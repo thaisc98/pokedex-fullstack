@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
-import { CatalogPagination } from "@/features/catalog/components/CatalogPagination";
+import { CatalogPagination, TopPager } from "@/features/catalog/components/CatalogPagination";
 import { PokemonCard } from "@/features/catalog/components/PokemonCard";
+import { PokemonSearch } from "@/features/catalog/components/PokemonSearch";
 import { catalogHref, parseCatalogParams } from "@/features/catalog/lib/catalogParams";
 import { CatalogError, getCatalogPage } from "@/server/catalogClient";
 import { AppButtonLink } from "@/shared/ui/AppLink";
@@ -57,6 +58,7 @@ export default async function CatalogPage(props: PageProps<"/pokemon">) {
   return (
     <CatalogLayout
       summary={`Showing ${numberFormat.format(first)}–${numberFormat.format(last)} of ${numberFormat.format(totalElements)}`}
+      pager={<TopPager page={currentPage} size={size} totalPages={totalPages} />}
     >
       <ul className="grid grid-cols-2 gap-3 sm:grid-cols-3 sm:gap-4 lg:grid-cols-4 xl:grid-cols-5">
         {content.map((pokemon, index) => (
@@ -71,15 +73,29 @@ export default async function CatalogPage(props: PageProps<"/pokemon">) {
   );
 }
 
-function CatalogLayout({ children, summary }: { children: React.ReactNode; summary?: string }) {
+function CatalogLayout({
+  children,
+  summary,
+  pager,
+}: {
+  children: React.ReactNode;
+  summary?: string;
+  pager?: React.ReactNode;
+}) {
   return (
     <div className="flex flex-col gap-6">
-      <div className="flex flex-wrap items-baseline justify-between gap-2">
-        <h1 className="text-3xl font-bold tracking-tight">Pokémon</h1>
-        {summary && (
-          <p className="text-sm text-muted" aria-live="polite">
-            {summary}
-          </p>
+      <h1 className="text-3xl font-bold tracking-tight">Pokémon</h1>
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+        <PokemonSearch />
+        {(summary || pager) && (
+          <div className="flex flex-wrap items-center justify-between gap-2 sm:justify-end">
+            {summary && (
+              <p className="text-sm text-muted" aria-live="polite">
+                {summary}
+              </p>
+            )}
+            {pager}
+          </div>
         )}
       </div>
       {children}

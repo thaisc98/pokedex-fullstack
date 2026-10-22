@@ -9,6 +9,8 @@ type SpriteProps = {
   src: string;
   alt: string;
   size: number;
+  /** `sizes` for next/image; defaults to the intrinsic size. */
+  sizes?: string;
   priority?: boolean;
   /** Load immediately without a preload hint (small list thumbnails that are on screen). */
   eager?: boolean;
@@ -20,7 +22,7 @@ type SpriteProps = {
  * allow-list first (security.md §5); anything else becomes the placeholder.
  * Below-the-fold images lazy-load (next/image default) unless `priority`.
  */
-export function Sprite({ src, alt, size, priority = false, eager = false, className = "" }: SpriteProps) {
+export function Sprite({ src, alt, size, sizes, priority = false, eager = false, className = "" }: SpriteProps) {
   return (
     <Image
       src={safeSprite(src)}
@@ -29,7 +31,7 @@ export function Sprite({ src, alt, size, priority = false, eager = false, classN
       height={size}
       priority={priority}
       loading={priority ? undefined : eager ? "eager" : "lazy"}
-      sizes={`${size}px`}
+      sizes={sizes ?? `${size}px`}
       // next/image adds `style="color:transparent"` (hides alt text while loading). Inline style
       // attributes are blocked by our CSP (style-src has no 'unsafe-inline'), so we unset it here
       // and get the same effect from the `text-transparent` class.
