@@ -268,6 +268,31 @@ Every substantial AI interaction, with the decision taken on its output. This lo
 
 ---
 
+## #012 — Catalog redesign from design critiques, and name search (autocomplete)
+
+- **Date:** 2026-10-22
+- **Tool:** Claude Code (Claude Opus 5.5): `/design:design-critique` on the human's screenshots; lead session; backend, frontend and test engineers; Docker previews in the in-app browser
+- **Phase:** P5 polish
+
+**Prompt (summary):** The human ran design critiques on the catalog and on the detail page's Evolution panel, then asked for the fixes, choosing a **partial autocomplete** search over an exact-match jump ("do the partial autocomplete, what makes better").
+
+**Output:** PR #45 (backend: `GET /api/v1/pokemon/search`, `types` on list items; 244 ITs, PIT 100%) and the frontend redesign PR (crisp sprites, autocomplete, type chips, top pager, labels, detail layout).
+
+**Verdict:** ✏️ Modified (two layout iterations rejected by the human)
+
+| What the AI proposed | What the human decided / what changed | Why |
+|---|---|---|
+| Exact name/number jump (frontend only) as the default for "Find a Pokémon" | **Partial autocomplete** with a new backend endpoint | Better UX; PokeAPI has no search, so the backend loads all 1,351 names once (cached 24 h) and filters in memory |
+| Evolution as its own **full-width row** under stats | **Rejected:** "it's taking so much space" | — |
+| Evolution side by side with Base stats in a bottom row | **Rejected:** "I have to scroll to get the information of the evolution" | — |
+| — | **Evolution in the right column, directly under About**; compact 112 px cards with official artwork; "This Pokémon" badge + border kept | Fills the empty space beside the stats; visible without scrolling at 1206 × 858 |
+| Pixel sprites for evolution stages | Official artwork | Same art style as the hero image; equal sizes (Bulbasaur's sprite has a lot of empty space) |
+| "Mass" on the detail page | "Weight" | Consistency with the catalog cards |
+
+**What was checked:** every iteration was built into a Docker preview and checked in the browser before any PR; the E2E console guard caught an inline SVG that violated the CSP (fixed with a text arrow); the test engineer caught that the offline mock couldn't answer the "all names" request (fixed in the mock).
+
+---
+
 ## Template
 
 ```markdown

@@ -2,7 +2,7 @@
   "info": {
     "_postman_id": "317edba0-1dff-4c26-bb40-bcf43ccca92a",
     "name": "Pokédex API (local)",
-    "description": "All 12 endpoints of docs/api/openapi.yaml.\n\nStart the stack (`docker compose up -d --build`, see README), select the **Pokédex local** environment (or keep the collection variables), and run the folders in order (Runner works too).\n\nCookies and CSRF are handled by the collection scripts: no manual copying. Each run uses a new email; clear the `email` variable to get another one.",
+    "description": "All 13 endpoints of docs/api/openapi.yaml.\n\nStart the stack (`docker compose up -d --build`, see README), select the **Pokédex local** environment (or keep the collection variables), and run the folders in order (Runner works too).\n\nCookies and CSRF are handled by the collection scripts: no manual copying. Each run uses a new email; clear the `email` variable to get another one.",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
   "event": [
@@ -155,6 +155,124 @@
                 "exec": [
                   "pm.test('status 200', () => pm.response.to.have.status(200));",
                   "pm.test('has content', () => pm.expect(pm.response.json().content.length).to.be.above(0));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Search names (autocomplete): char",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/pokemon/search?q=char&limit=10",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "pokemon",
+                "search"
+              ],
+              "query": [
+                {
+                  "key": "q",
+                  "value": "char"
+                },
+                {
+                  "key": "limit",
+                  "value": "10"
+                }
+              ]
+            },
+            "description": "Name search (autocomplete): names starting with q first, then names containing it."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 200', () => pm.response.to.have.status(200));",
+                  "pm.test('prefix matches first', () => pm.expect(pm.response.json().results[0].name).to.eql('charmander'));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Search names: no match → []",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/pokemon/search?q=zzzz",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "pokemon",
+                "search"
+              ],
+              "query": [
+                {
+                  "key": "q",
+                  "value": "zzzz"
+                }
+              ]
+            },
+            "description": "Name search (autocomplete): names starting with q first, then names containing it."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 200', () => pm.response.to.have.status(200));",
+                  "pm.test('empty results', () => pm.expect(pm.response.json().results).to.eql([]));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Search names: invalid q → 400",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/pokemon/search?q=pika;drop",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "pokemon",
+                "search"
+              ],
+              "query": [
+                {
+                  "key": "q",
+                  "value": "pika;drop"
+                }
+              ]
+            },
+            "description": "Name search (autocomplete): names starting with q first, then names containing it."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 400', () => pm.response.to.have.status(400));",
+                  "pm.test('problem type /problems/validation-error', () => pm.expect(pm.response.json().type).to.eql('/problems/validation-error'));"
                 ]
               }
             }
