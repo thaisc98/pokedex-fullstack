@@ -83,7 +83,7 @@ class PokemonSummaryTest {
                 .isInstanceOf(NullPointerException.class);
         assertThatThrownBy(() -> new PokemonSummary(ID, NAME, SPRITE, null, MASS, ABILITIES, TYPES))
                 .isInstanceOf(NullPointerException.class);
-        assertThatThrownBy(() -> new PokemonSummary(ID, NAME, SPRITE, CATEGORY, null, ABILITIES))
+        assertThatThrownBy(() -> new PokemonSummary(ID, NAME, SPRITE, CATEGORY, null, ABILITIES, TYPES))
                 .isInstanceOf(NullPointerException.class);
         assertThatThrownBy(() -> new PokemonSummary(ID, NAME, SPRITE, CATEGORY, MASS, null, TYPES))
                 .isInstanceOf(NullPointerException.class);
