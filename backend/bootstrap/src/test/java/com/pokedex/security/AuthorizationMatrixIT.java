@@ -56,6 +56,8 @@ class AuthorizationMatrixIT extends AbstractPokeApiIT {
             "GET /api/v1/pokemon",
             // anonymous allowed: GetPokemonDetailIT.should_allow_anonymous_access_to_detail
             "GET /api/v1/pokemon/{idOrName}",
+            // public name search: rows in should_serve_the_public_catalog_to_every_role
+            "GET /api/v1/pokemon/search",
             // identity: rows below (anonymous + USER)
             "GET /api/v1/auth/csrf",
             "POST /api/v1/auth/register",
@@ -197,6 +199,9 @@ class AuthorizationMatrixIT extends AbstractPokeApiIT {
         "ANONYMOUS, /api/v1/pokemon/pikachu",
         "USER,      /api/v1/pokemon/pikachu",
         "ADMIN,     /api/v1/pokemon/pikachu",
+        "ANONYMOUS, /api/v1/pokemon/search?q=pika",
+        "USER,      /api/v1/pokemon/search?q=pika",
+        "ADMIN,     /api/v1/pokemon/search?q=pika",
     })
     void should_serve_the_public_catalog_to_every_role(String role, String path) {
         // PokeAPI is the shared WireMock with recorded fixtures (AbstractPokeApiIT).
@@ -209,6 +214,7 @@ class AuthorizationMatrixIT extends AbstractPokeApiIT {
         stubPokemonByName("pikachu", okJson(fixture("pokemon/25.json")));
         stubRecordedSpecies(25);
         stubRecordedEvolutionChain(10);
+        stubList(0, 100_000, okJson(fixture("pokemon-list/offset-0-limit-100000.json")));
         // A signed-in caller sends its access_token cookie: the public routes must still answer 200.
         Browser caller = switch (role) {
             case "USER" -> loggedInUser();
