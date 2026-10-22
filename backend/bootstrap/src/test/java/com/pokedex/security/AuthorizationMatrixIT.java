@@ -1,12 +1,13 @@
 package com.pokedex.security;
 
+import static com.github.tomakehurst.wiremock.client.WireMock.okJson;
 import static io.restassured.RestAssured.given;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.nullValue;
 import static org.hamcrest.Matchers.startsWith;
 
-import com.pokedex.support.AbstractIntegrationIT;
+import com.pokedex.catalog.AbstractPokeApiIT;
 import io.restassured.response.Response;
 import java.util.List;
 import java.util.Map;
@@ -33,8 +34,8 @@ import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandl
  *       {@code /problems/csrf-token-invalid} (security.md §4.2.1).
  *   <li>springdoc ({@code /v3/api-docs/**}, {@code /swagger-ui/**}) is enabled in {@code dev}/{@code demo} only. In
  *       the default profile it is "anything else": 401. The demo counterpart is {@code OpenApiContractIT}.
- *   <li>The public catalog rows ({@code GET /api/v1/pokemon[/{idOrName}]} → 200) need a stubbed PokeAPI and are
- *       covered by the anonymous-access tests in {@code ListPokemonIT} and {@code GetPokemonDetailIT}.
+ *   <li>The public catalog rows ({@code GET /api/v1/pokemon[/{idOrName}]} → 200) run for anonymous, USER and ADMIN
+ *       against the shared WireMock PokeAPI ({@link AbstractPokeApiIT}), so this class shares the catalog context.
  *   <li>Actuator: only {@code GET /actuator/health} is public and returns exactly {@code {"status":"UP"}}; every
  *       other actuator path is denied (401 anonymous, 403 USER). The completeness check also collects every exposed
  *       actuator endpoint ({@code PathMappedEndpoints}).
@@ -44,7 +45,7 @@ import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandl
  * </ul>
  */
 @DisplayName("Security - authorization matrix (default profile)")
-class AuthorizationMatrixIT extends AbstractIntegrationIT {
+class AuthorizationMatrixIT extends AbstractPokeApiIT {
 
     /**
      * Every handler the application serves in the default profile, as {@code "METHOD /path"}. A new controller
@@ -184,6 +185,43 @@ class AuthorizationMatrixIT extends AbstractIntegrationIT {
                 .statusCode(403)
                 .contentType(startsWith(PROBLEM_JSON))
                 .body("type", equalTo("/problems/forbidden"));
+    }
+
+    // ------------------------------------------------------------ Catalog: anonymous, USER, ADMIN (F-US01-2)
+
+    @ParameterizedTest(name = "{0} GET {1} -> 200")
+    @CsvSource({
+        "ANONYMOUS, /api/v1/pokemon?page=0&size=3",
+        "USER,      /api/v1/pokemon?page=0&size=3",
+        "ADMIN,     /api/v1/pokemon?page=0&size=3",
+        "ANONYMOUS, /api/v1/pokemon/pikachu",
+        "USER,      /api/v1/pokemon/pikachu",
+        "ADMIN,     /api/v1/pokemon/pikachu",
+    })
+    void should_serve_the_public_catalog_to_every_role(String role, String path) {
+        // PokeAPI is the shared WireMock with recorded fixtures (AbstractPokeApiIT).
+        stubRecordedList(0, 3);
+        for (int id = 1; id <= 3; id++) {
+            stubRecordedPokemon(id);
+            stubRecordedSpecies(id);
+        }
+        stubRecordedPokemon(25);
+        stubPokemonByName("pikachu", okJson(fixture("pokemon/25.json")));
+        stubRecordedSpecies(25);
+        stubRecordedEvolutionChain(10);
+        // A signed-in caller sends its access_token cookie: the public routes must still answer 200.
+        Browser caller = switch (role) {
+            case "USER" -> loggedInUser();
+            case "ADMIN" -> loggedInAdmin();
+            default -> new Browser();
+        };
+        if (!"ANONYMOUS".equals(role)) {
+            assertThat(caller.cookie("access_token"))
+                    .as("%s sends its token", role)
+                    .isNotBlank();
+        }
+
+        caller.get(path).then().statusCode(200).contentType(startsWith("application/json"));
     }
 
     // ------------------------------------------------------------ Collection: anonymous, USER, ADMIN
