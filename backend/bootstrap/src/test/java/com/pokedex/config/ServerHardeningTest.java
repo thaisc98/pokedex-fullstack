@@ -115,7 +115,9 @@ class ServerHardeningTest {
         void should_ignore_a_spoofed_x_forwarded_for() throws Exception {
             HttpResponse<String> response = get(port, "/probe/register", "203.0.113.30");
 
-            assertThat(response.body()).isNotEqualTo("203.0.113.30");
+            assertThat(response.body())
+                    .as("the real loopback peer, not the spoofed header")
+                    .isIn("127.0.0.1", "0:0:0:0:0:0:0:1");
         }
     }
 

@@ -53,6 +53,19 @@ class LocalizedNameTest {
     }
 
     @Test
+    void should_accept_a_value_of_exactly_1_character() {
+        assertThat(new LocalizedName("en", "a").value()).isEqualTo("a");
+    }
+
+    @Test
+    void should_accept_a_language_tag_of_exactly_35_characters() {
+        String tag = "en-abcdefgh-bcdefghi-cdefghij-defgh";
+
+        assertThat(tag).hasSize(35);
+        assertThat(new LocalizedName(tag, "Pikachu").lang()).isEqualTo(tag);
+    }
+
+    @Test
     void should_accept_a_value_of_exactly_60_characters() {
         assertThat(new LocalizedName("en", "a".repeat(60)).value()).hasSize(60);
     }

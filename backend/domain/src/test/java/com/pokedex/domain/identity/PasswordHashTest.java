@@ -30,6 +30,7 @@ class PasswordHashTest {
     void should_never_print_the_hash() {
         String printed = new PasswordHash(BCRYPT).toString();
 
+        assertThat(printed).isEqualTo("PasswordHash[***]");
         assertThat(printed).doesNotContain(BCRYPT).doesNotContain("$2a$").doesNotContain("R9h/cIPz0gi");
     }
 
