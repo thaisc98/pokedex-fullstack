@@ -56,12 +56,16 @@ export default async function PokemonDetailPage(props: PageProps<"/pokemon/[idOr
     <article className="flex flex-col gap-8" aria-labelledby="pokemon-name">
       <BackToCatalog current={name} />
 
-      <div className="grid gap-6 lg:grid-cols-2 lg:gap-10">
-        <div className="flex items-center justify-center rounded-3xl bg-surface p-6">
+      {/*
+        Mobile order: artwork, info, stats. From lg: artwork and stats stack on the left, info
+        spans both rows on the right. items-start: no panel stretches to its neighbour's height.
+      */}
+      <div className="grid items-start gap-6 lg:grid-cols-2 lg:gap-x-10 lg:gap-y-6">
+        <div className="flex items-center justify-center rounded-3xl bg-surface p-6 lg:col-start-1 lg:row-start-1">
           <Sprite src={pokemon.artwork} alt={`${name} official artwork`} size={320} priority />
         </div>
 
-        <div className="flex flex-col gap-4">
+        <div className="flex flex-col gap-4 lg:col-start-2 lg:row-span-2 lg:row-start-1">
           <div>
             <p className="text-lg font-semibold text-muted">{formatDexNumber(pokemon.id)}</p>
             <h1 id="pokemon-name" tabIndex={-1} className="text-4xl font-bold tracking-tight outline-none">
@@ -108,23 +112,25 @@ export default async function PokemonDetailPage(props: PageProps<"/pokemon/[idOr
             </p>
           </section>
         </div>
-      </div>
 
-      <div className="grid gap-8 lg:grid-cols-2 lg:gap-10">
-        <section aria-labelledby="stats-heading" className="flex flex-col gap-3 rounded-3xl bg-surface p-5">
+        <section
+          aria-labelledby="stats-heading"
+          className="flex flex-col gap-3 rounded-3xl bg-surface p-5 lg:col-start-1 lg:row-start-2"
+        >
           <h2 id="stats-heading" className="text-xl font-semibold">
             Base stats
           </h2>
           <StatMeters stats={pokemon.stats} />
         </section>
-
-        <section aria-labelledby="evolution-heading" className="flex flex-col gap-3 rounded-3xl bg-surface p-5">
-          <h2 id="evolution-heading" className="text-xl font-semibold">
-            Evolution
-          </h2>
-          <EvolutionTree root={pokemon.evolution.root} currentId={pokemon.id} />
-        </section>
       </div>
+
+      {/* Its own full-width row, sized to its content; the chain is centred. */}
+      <section aria-labelledby="evolution-heading" className="flex flex-col gap-4 rounded-3xl bg-surface p-5">
+        <h2 id="evolution-heading" className="text-xl font-semibold">
+          Evolution
+        </h2>
+        <EvolutionTree root={pokemon.evolution.root} currentId={pokemon.id} />
+      </section>
     </article>
   );
 }

@@ -10,13 +10,13 @@ type Props = { root: EvolutionNode; currentId: number };
 
 /**
  * Evolution tree (BR-04, docs/ui-ux.md §5.2): every stage links to its detail
- * page; branches (Eevee's 8) are kept and shown as a wrapping grid.
- * Nested lists give screen readers the tree structure.
+ * page; branches (Eevee's 8) are kept and shown as a wrapping grid. The chain is
+ * centred in its panel. Nested lists give screen readers the tree structure.
  */
 export function EvolutionTree({ root, currentId }: Props) {
   if (root.evolvesTo.length === 0) {
     return (
-      <div className="flex flex-col items-start gap-3">
+      <div className="flex flex-col items-center gap-3">
         <ul aria-label="Evolution chain">
           <li>
             <Stage node={root} currentId={currentId} />
@@ -27,7 +27,7 @@ export function EvolutionTree({ root, currentId }: Props) {
     );
   }
   return (
-    <ul aria-label="Evolution chain" className="flex justify-center md:justify-start">
+    <ul aria-label="Evolution chain" className="flex justify-center">
       <li>
         <Branch node={root} currentId={currentId} />
       </li>
@@ -67,7 +67,7 @@ function Branch({ node, currentId }: { node: EvolutionNode; currentId: number })
 function Trigger({ trigger, vertical }: { trigger: EvolutionTrigger; vertical: boolean }) {
   return (
     <div
-      className={`flex flex-col items-center gap-0.5 text-center text-xs text-muted ${vertical ? "min-h-12" : ""}`}
+      className={`flex w-24 flex-col items-center gap-0.5 text-center text-xs text-muted ${vertical ? "min-h-12" : ""}`}
     >
       <svg
         aria-hidden="true"
@@ -89,6 +89,12 @@ function Trigger({ trigger, vertical }: { trigger: EvolutionTrigger; vertical: b
   );
 }
 
+/**
+ * One stage: every card has the same size. The sprite sits in a fixed frame and is scaled up
+ * crisply (like the catalog cards), so small and large Pokémon look alike. The current stage
+ * gets a 2 px accent border plus a "This Pokémon" badge laid over the top of the card, so it
+ * is marked by more than color without changing the card's height.
+ */
 function Stage({ node, currentId }: { node: EvolutionNode; currentId: number }) {
   const isCurrent = node.speciesId === currentId;
   const name = formatName(node.name);
@@ -96,16 +102,27 @@ function Stage({ node, currentId }: { node: EvolutionNode; currentId: number }) 
     <AppLink
       href={`/pokemon/${node.speciesId}`}
       aria-current={isCurrent ? "page" : undefined}
-      className={`flex w-28 flex-col items-center gap-1 rounded-xl border p-2 text-foreground no-underline transition-colors hover:bg-surface-secondary hover:no-underline ${
-        // Current stage: thicker accent border + a visible label (not color alone). The fill stays
-        // a neutral surface so the muted number keeps >= 4.5:1 (an accent tint dropped it to 3.8:1).
-        isCurrent ? "border-2 border-accent bg-surface-secondary" : "border-border bg-surface"
+      className={`relative flex w-32 flex-col items-center gap-1 rounded-2xl px-2 pt-6 pb-3 text-foreground no-underline transition-colors hover:bg-surface-secondary hover:no-underline sm:w-36 ${
+        isCurrent ? "border-2 border-accent bg-surface-secondary" : "border-2 border-border bg-surface"
       }`}
     >
-      <Sprite src={spriteForId(node.speciesId)} alt="" size={72} />
+      {isCurrent && (
+        <span className="absolute top-1 left-1/2 -translate-x-1/2 rounded-full bg-accent px-2 py-0.5 text-xs leading-tight font-semibold whitespace-nowrap text-accent-foreground">
+          This Pokémon
+        </span>
+      )}
+      <span className="flex size-24 items-center justify-center sm:size-28">
+        <Sprite
+          src={spriteForId(node.speciesId)}
+          alt=""
+          size={96}
+          // A large width so the optimizer returns the original pixels (it never enlarges).
+          sizes="128px"
+          className="size-24 sm:size-28 [image-rendering:pixelated]"
+        />
+      </span>
       <span className="text-xs text-muted">{formatDexNumber(node.speciesId)}</span>
-      <span className="text-sm font-semibold">{name}</span>
-      {isCurrent && <span className="text-xs font-medium text-foreground">This Pokémon</span>}
+      <span className="max-w-full truncate text-sm font-semibold">{name}</span>
     </AppLink>
   );
 }
