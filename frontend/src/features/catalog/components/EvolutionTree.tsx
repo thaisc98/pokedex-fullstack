@@ -67,7 +67,9 @@ function Branch({ node, currentId }: { node: EvolutionNode; currentId: number })
 function Trigger({ trigger, vertical }: { trigger: EvolutionTrigger; vertical: boolean }) {
   return (
     <div
-      className={`flex w-24 flex-col items-center gap-0.5 text-center text-xs text-muted ${vertical ? "min-h-12" : ""}`}
+      className={`flex w-24 flex-col items-center gap-0.5 text-center text-xs text-muted ${vertical ? "h-14" : ""}`}
+      // Fixed height in a branch grid: a two-line trigger ("Use Thunder Stone") must not push
+      // its card below its neighbours.
     >
       <svg
         aria-hidden="true"
