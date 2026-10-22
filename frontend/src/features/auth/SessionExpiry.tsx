@@ -120,7 +120,8 @@ export function SessionExpiry() {
       <Alert status={showExpired ? "danger" : "warning"} className="shadow-overlay">
         <Alert.Indicator />
         <Alert.Content className="gap-2">
-          <Alert.Title>
+          {/* Foreground text: the warning tint as text is below 4.5:1; the icon carries the tone. */}
+          <Alert.Title className="text-foreground">
             {showExpired ? "You’ve been signed out" : "Your session ends in 2 minutes. Save your changes."}
           </Alert.Title>
           {showExpired && (
