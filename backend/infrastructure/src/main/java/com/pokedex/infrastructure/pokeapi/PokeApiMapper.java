@@ -3,6 +3,7 @@ package com.pokedex.infrastructure.pokeapi;
 import com.pokedex.domain.catalog.EvolutionChain;
 import com.pokedex.domain.catalog.EvolutionNode;
 import com.pokedex.domain.catalog.PokemonDetail;
+import com.pokedex.domain.catalog.PokemonNameRef;
 import com.pokedex.domain.catalog.PokemonSummary;
 import com.pokedex.domain.catalog.vo.Ability;
 import com.pokedex.domain.catalog.vo.BaseStat;
@@ -17,10 +18,13 @@ import com.pokedex.domain.catalog.vo.PokemonName;
 import com.pokedex.domain.catalog.vo.PokemonType;
 import com.pokedex.domain.catalog.vo.StatName;
 import com.pokedex.domain.collection.UpstreamSnapshot;
+import com.pokedex.domain.shared.InvalidValueException;
 import com.pokedex.infrastructure.pokeapi.dto.NamedResourceDto;
 import com.pokedex.infrastructure.pokeapi.dto.PokeApiEvolutionChainDto;
+import com.pokedex.infrastructure.pokeapi.dto.PokeApiListDto;
 import com.pokedex.infrastructure.pokeapi.dto.PokeApiPokemonDto;
 import com.pokedex.infrastructure.pokeapi.dto.PokeApiSpeciesDto;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.OptionalInt;
@@ -58,7 +62,8 @@ public final class PokeApiMapper {
                 ImageUrl.orPlaceholder(sprites == null ? null : sprites.frontDefault()),
                 category(species),
                 new Mass(Objects.requireNonNull(pokemon.weight(), "weight")),
-                abilities(pokemon));
+                abilities(pokemon),
+                types(pokemon));
     }
 
     /** UC-03 sync snapshot: the summary fields (sprite, category, mass, abilities) plus the base stats. */
@@ -108,6 +113,25 @@ public final class PokeApiMapper {
                 new Height(Objects.requireNonNull(pokemon.height(), "height")),
                 new Mass(Objects.requireNonNull(pokemon.weight(), "weight")),
                 abilities(pokemon));
+    }
+
+    /**
+     * The name index for search, from {@code GET /pokemon?offset=0&limit=100000}: ids from the result URLs (strict
+     * pattern, never followed). An entry whose name or URL breaks the rules is skipped; it is never shown.
+     */
+    public List<PokemonNameRef> toNameIndex(PokeApiListDto list) {
+        List<PokemonNameRef> index = new ArrayList<>();
+        for (NamedResourceDto result : Objects.requireNonNull(list.results(), "results")) {
+            if (result == null || result.name() == null) {
+                continue;
+            }
+            try {
+                index.add(new PokemonNameRef(new PokedexId(pokemonId(result.url())), new PokemonName(result.name())));
+            } catch (IllegalArgumentException | InvalidValueException skipped) {
+                // a URL off the strict pattern or a name breaking PokemonName: leave it out of the index
+            }
+        }
+        return List.copyOf(index);
     }
 
     private static ImageUrl artwork(PokeApiPokemonDto pokemon) {

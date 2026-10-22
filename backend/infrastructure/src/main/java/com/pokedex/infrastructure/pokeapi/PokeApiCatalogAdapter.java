@@ -2,6 +2,7 @@ package com.pokedex.infrastructure.pokeapi;
 
 import com.pokedex.application.catalog.port.out.PokemonCatalogPort;
 import com.pokedex.domain.catalog.PokemonDetail;
+import com.pokedex.domain.catalog.PokemonNameRef;
 import com.pokedex.domain.catalog.PokemonSummary;
 import com.pokedex.domain.catalog.vo.PokemonRef;
 import com.pokedex.domain.shared.NotFoundException;
@@ -35,6 +36,9 @@ public final class PokeApiCatalogAdapter implements PokemonCatalogPort {
 
     private static final Logger LOG = LoggerFactory.getLogger(PokeApiCatalogAdapter.class);
     private static final String UNAVAILABLE = "PokeAPI is unavailable";
+
+    /** Larger than any PokeAPI count, so one list call returns every name. */
+    static final int NAME_INDEX_LIMIT = 100_000;
 
     private final PokeApiResources gateway;
     private final PokeApiMapper mapper;
@@ -79,6 +83,16 @@ public final class PokeApiCatalogAdapter implements PokemonCatalogPort {
     private static UpstreamUnavailableException unavailable(String what, RuntimeException cause) {
         LOG.warn("PokeAPI {} failed: {}", what, cause.getClass().getName());
         return new UpstreamUnavailableException(UNAVAILABLE, cause);
+    }
+
+    /** Every Pokémon's id and name: ONE list call ({@code offset=0&limit=100000}), no per-item calls. */
+    @Override
+    public List<PokemonNameRef> fetchNameIndex() {
+        try {
+            return mapper.toNameIndex(gateway.list(0, NAME_INDEX_LIMIT));
+        } catch (RuntimeException e) {
+            throw unavailable("name index", e);
+        }
     }
 
     @Override
