@@ -60,6 +60,8 @@ export default async function CatalogPage(props: PageProps<"/pokemon">) {
       summary={`Showing ${numberFormat.format(first)}–${numberFormat.format(last)} of ${numberFormat.format(totalElements)}`}
       pager={<TopPager page={currentPage} size={size} totalPages={totalPages} />}
     >
+      {/* Heading order (h1 → h2 → card h3), for screen-reader navigation by headings. */}
+      <h2 className="sr-only">Pokémon list</h2>
       <ul className="grid grid-cols-2 gap-3 sm:grid-cols-3 sm:gap-4 lg:grid-cols-4 xl:grid-cols-5">
         {content.map((pokemon, index) => (
           <li key={pokemon.id}>

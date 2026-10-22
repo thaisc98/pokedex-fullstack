@@ -9,7 +9,16 @@ const eslintConfig = defineConfig([
     rules: {
       // security.md §5: dangerouslySetInnerHTML is banned.
       "react/no-danger": "error",
+      // Zod is configured jitless in one module (no `new Function` probe under our CSP).
+      "no-restricted-imports": [
+        "error",
+        { paths: [{ name: "zod", message: 'Import { z } from "@/shared/lib/zod" (jitless config).' }] },
+      ],
     },
+  },
+  {
+    files: ["src/shared/lib/zod.ts"],
+    rules: { "no-restricted-imports": "off" },
   },
   // Override default ignores of eslint-config-next.
   globalIgnores([
