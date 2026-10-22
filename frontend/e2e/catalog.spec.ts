@@ -49,9 +49,13 @@ test.describe("US01 catalog", () => {
 
     await expect(page).toHaveURL(/\/pokemon$/);
     await expect(page.getByText(/Showing 1–20 of/)).toBeVisible();
+    // "Same scroll position" = back where the user was, not at the top. Allow a few pixels for
+    // font/layout rounding differences between machines (CI rendered 664 px vs 668 px before).
+    const tolerance = 16;
+    expect(scrollBefore, "the test needs a scroll position well away from the top").toBeGreaterThan(tolerance * 4);
     await expect
       .poll(() => page.evaluate(() => window.scrollY), { message: "scroll position restored" })
-      .toBeGreaterThanOrEqual(scrollBefore - 2);
-    expect(await page.evaluate(() => window.scrollY)).toBeLessThanOrEqual(scrollBefore + 2);
+      .toBeGreaterThanOrEqual(scrollBefore - tolerance);
+    expect(await page.evaluate(() => window.scrollY)).toBeLessThanOrEqual(scrollBefore + tolerance);
   });
 });
