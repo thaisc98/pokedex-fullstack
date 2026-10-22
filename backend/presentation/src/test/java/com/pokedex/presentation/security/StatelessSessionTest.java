@@ -9,6 +9,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 
 import com.pokedex.application.catalog.port.in.GetPokemonDetailUseCase;
 import com.pokedex.application.catalog.port.in.ListPokemonUseCase;
+import com.pokedex.application.catalog.port.in.SearchPokemonNamesUseCase;
 import com.pokedex.domain.shared.Page;
 import com.pokedex.domain.shared.PageRequest;
 import com.pokedex.presentation.rest.catalog.CatalogController;
@@ -50,6 +51,9 @@ class StatelessSessionTest {
 
     @MockitoBean
     private GetPokemonDetailUseCase getPokemonDetail;
+
+    @MockitoBean
+    private SearchPokemonNamesUseCase searchPokemonNames;
 
     @BeforeEach
     void reset() {

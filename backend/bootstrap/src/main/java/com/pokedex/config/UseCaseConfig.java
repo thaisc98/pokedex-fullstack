@@ -2,9 +2,11 @@ package com.pokedex.config;
 
 import com.pokedex.application.catalog.port.in.GetPokemonDetailUseCase;
 import com.pokedex.application.catalog.port.in.ListPokemonUseCase;
+import com.pokedex.application.catalog.port.in.SearchPokemonNamesUseCase;
 import com.pokedex.application.catalog.port.out.PokemonCatalogPort;
 import com.pokedex.application.catalog.service.GetPokemonDetailService;
 import com.pokedex.application.catalog.service.ListPokemonService;
+import com.pokedex.application.catalog.service.SearchPokemonNamesService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -23,5 +25,10 @@ public class UseCaseConfig {
     @Bean
     GetPokemonDetailUseCase getPokemonDetailUseCase(PokemonCatalogPort pokemonCatalog) {
         return new GetPokemonDetailService(pokemonCatalog);
+    }
+
+    @Bean
+    SearchPokemonNamesUseCase searchPokemonNamesUseCase(PokemonCatalogPort pokemonCatalog) {
+        return new SearchPokemonNamesService(pokemonCatalog);
     }
 }

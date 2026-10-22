@@ -92,8 +92,13 @@ class OpenApiContractIT extends AbstractIntegrationIT {
         assertThat(operations(contract, base).get("GET /api/v1/pokemon").successShape())
                 .as("allOf + $ref resolution reaches PokemonSummaryDto and Ability")
                 .hasToString("{content=[array, {abilities=[array, {hidden=scalar, name=scalar}], category=scalar,"
-                        + " id=scalar, mass=scalar, name=scalar, sprite=scalar}], page=scalar, size=scalar,"
-                        + " totalElements=scalar, totalPages=scalar}");
+                        + " id=scalar, mass=scalar, name=scalar, sprite=scalar, types=[array, scalar]}], page=scalar,"
+                        + " size=scalar, totalElements=scalar, totalPages=scalar}");
+        assertThat(operations(contract, base))
+                .as("name search is in the contract")
+                .containsKey("GET /api/v1/pokemon/search");
+        assertThat(operations(contract, base).get("GET /api/v1/pokemon/search").successShape())
+                .hasToString("{results=[array, {id=scalar, name=scalar}]}");
         assertThat(operations(contract, base))
                 .as("US02 detail is in the contract, so the check covers it as soon as the app serves it")
                 .containsKey("GET /api/v1/pokemon/{}");

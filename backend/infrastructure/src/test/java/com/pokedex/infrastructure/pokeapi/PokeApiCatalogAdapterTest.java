@@ -234,6 +234,37 @@ class PokeApiCatalogAdapterTest {
         throw (E) throwable;
     }
 
+    // ------------------------------------------------------------ name index (search)
+
+    @Test
+    void should_load_the_name_index_with_one_list_call_and_no_item_calls() {
+        client.list(0, 100_000, () -> PokeApiFixtures.list(0, 100_000));
+
+        var index = adapter.fetchNameIndex();
+
+        assertThat(index).hasSize(1351);
+        assertThat(index.getFirst().name().value()).isEqualTo("bulbasaur");
+        assertThat(client.calls()).containsExactly("list?offset=0&limit=100000");
+    }
+
+    @Test
+    void should_fail_the_name_index_with_upstream_unavailable() {
+        client.list(0, 100_000, () -> {
+            throw new ResourceAccessException("reset");
+        });
+
+        assertThatThrownBy(adapter::fetchNameIndex)
+                .isInstanceOf(UpstreamUnavailableException.class)
+                .hasMessage("PokeAPI is unavailable");
+    }
+
+    @Test
+    void should_fail_the_name_index_when_the_body_has_no_results() {
+        client.list(0, 100_000, () -> PokeApiFixtures.parse("{\"count\": 5}", PokeApiListDto.class));
+
+        assertThatThrownBy(adapter::fetchNameIndex).isInstanceOf(UpstreamUnavailableException.class);
+    }
+
     private void stubFirstThree() {
         client.list(0, 3, () -> PokeApiFixtures.list(0, 3));
         for (int id = 1; id <= 3; id++) {

@@ -32,6 +32,43 @@ class PokeApiMapperTest {
         assertThat(summary.mass().kilograms()).isEqualTo(6.9);
         assertThat(summary.abilities())
                 .containsExactly(new Ability("overgrow", false), new Ability("chlorophyll", true));
+        assertThat(summary.types())
+                .containsExactly(
+                        com.pokedex.domain.catalog.vo.PokemonType.GRASS,
+                        com.pokedex.domain.catalog.vo.PokemonType.POISON);
+    }
+
+    // ------------------------------------------------------------ name index (search)
+
+    @Test
+    void should_map_list_entries_to_name_refs_with_ids_from_the_strict_url_pattern() {
+        var refs = mapper.toNameIndex(PokeApiFixtures.list(0, 3));
+
+        assertThat(refs)
+                .extracting(r -> r.id().value() + ":" + r.name().value())
+                .containsExactly("1:bulbasaur", "2:ivysaur", "3:venusaur");
+    }
+
+    @Test
+    void should_skip_index_entries_that_break_the_domain_rules_or_the_url_pattern() {
+        var list = PokeApiFixtures.parse("""
+                {"count": 4, "results": [
+                  {"name": "pikachu", "url": "https://pokeapi.co/api/v2/pokemon/25/"},
+                  {"name": "Bad Name!", "url": "https://pokeapi.co/api/v2/pokemon/26/"},
+                  {"name": "raichu", "url": "https://evil.example/steal"},
+                  {"name": null, "url": null},
+                  null
+                ]}
+                """, com.pokedex.infrastructure.pokeapi.dto.PokeApiListDto.class);
+
+        assertThat(mapper.toNameIndex(list)).extracting(r -> r.name().value()).containsExactly("pikachu");
+    }
+
+    @Test
+    void should_reject_a_list_without_results() {
+        var list = PokeApiFixtures.parse("{\"count\": 1}", com.pokedex.infrastructure.pokeapi.dto.PokeApiListDto.class);
+
+        assertThatThrownBy(() -> mapper.toNameIndex(list)).isInstanceOf(NullPointerException.class);
     }
 
     @Test
@@ -56,7 +93,7 @@ class PokeApiMapperTest {
     @Test
     void should_use_the_placeholder_when_sprites_are_missing() {
         PokeApiPokemonDto pokemon = PokeApiFixtures.parse("""
-                {"id": 1, "name": "bulbasaur", "weight": 69, "abilities": [],
+                {"id": 1, "name": "bulbasaur", "weight": 69, "abilities": [], "types": [{"slot": 1, "type": {"name": "grass", "url": "x"}}],
                  "species": {"name": "bulbasaur", "url": "https://pokeapi.co/api/v2/pokemon-species/1/"}}
                 """, PokeApiPokemonDto.class);
 
@@ -177,6 +214,7 @@ class PokeApiMapperTest {
                 {"id": 1, "name": "%s", "weight": %s,
                  "sprites": {"front_default": %s},
                  "abilities": [{"is_hidden": false, "slot": 1, "ability": {"name": "overgrow", "url": "x"}}],
+                 "types": [{"slot": 1, "type": {"name": "grass", "url": "x"}}],
                  "species": {"name": "bulbasaur", "url": "https://pokeapi.co/api/v2/pokemon-species/1/"}}
                 """.formatted(name, weight, frontDefault);
     }

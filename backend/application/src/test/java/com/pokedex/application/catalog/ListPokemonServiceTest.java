@@ -12,6 +12,7 @@ import com.pokedex.domain.catalog.vo.ImageUrl;
 import com.pokedex.domain.catalog.vo.Mass;
 import com.pokedex.domain.catalog.vo.PokedexId;
 import com.pokedex.domain.catalog.vo.PokemonName;
+import com.pokedex.domain.catalog.vo.PokemonType;
 import com.pokedex.domain.shared.Page;
 import com.pokedex.domain.shared.PageRequest;
 import com.pokedex.domain.shared.UpstreamUnavailableException;
@@ -91,6 +92,7 @@ class ListPokemonServiceTest {
                 ImageUrl.PLACEHOLDER,
                 Category.UNKNOWN,
                 new Mass(id * 10),
-                List.of(new Ability("static", false)));
+                List.of(new Ability("static", false)),
+                List.of(PokemonType.ELECTRIC));
     }
 }

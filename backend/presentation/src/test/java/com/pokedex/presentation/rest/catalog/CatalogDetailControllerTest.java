@@ -16,6 +16,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import com.pokedex.application.catalog.PokemonDetailFixtures;
 import com.pokedex.application.catalog.port.in.GetPokemonDetailUseCase;
 import com.pokedex.application.catalog.port.in.ListPokemonUseCase;
+import com.pokedex.application.catalog.port.in.SearchPokemonNamesUseCase;
 import com.pokedex.domain.catalog.vo.PokedexId;
 import com.pokedex.domain.catalog.vo.PokemonName;
 import com.pokedex.domain.catalog.vo.PokemonRef;
@@ -50,6 +51,9 @@ class CatalogDetailControllerTest {
 
     @MockitoBean
     private GetPokemonDetailUseCase getPokemonDetail;
+
+    @MockitoBean
+    private SearchPokemonNamesUseCase searchPokemonNames;
 
     @Test
     void should_return_the_detail_by_id() throws Exception {
@@ -134,7 +138,7 @@ class CatalogDetailControllerTest {
     @Test
     void should_reject_a_raw_uri_with_a_semicolon_even_if_it_reaches_the_controller() {
         // Defence in depth: the firewall normally stops this first (see the test above).
-        CatalogController controller = new CatalogController(listPokemon, getPokemonDetail);
+        CatalogController controller = new CatalogController(listPokemon, getPokemonDetail, searchPokemonNames);
         MockHttpServletRequest request = new MockHttpServletRequest("GET", "/api/v1/pokemon/pika;drop");
 
         assertThatThrownBy(() -> controller.detail("pika", request))
