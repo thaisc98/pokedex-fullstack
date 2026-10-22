@@ -1,0 +1,2824 @@
+{
+  "mappings": [
+    {
+      "name": "pokemon-species 1",
+      "priority": 5,
+      "request": {
+        "method": "GET",
+        "urlPathPattern": "/api/v2/pokemon-species/(?i)(1|bulbasaur)/?"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json; charset=utf-8"
+        },
+        "bodyFileName": "pokemon-species/1.json"
+      }
+    },
+    {
+      "name": "pokemon-species 10",
+      "priority": 5,
+      "request": {
+        "method": "GET",
+        "urlPathPattern": "/api/v2/pokemon-species/(?i)(10|caterpie)/?"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json; charset=utf-8"
+        },
+        "bodyFileName": "pokemon-species/10.json"
+      }
+    },
+    {
+      "name": "pokemon-species 100",
+      "priority": 5,
+      "request": {
+        "method": "GET",
+        "urlPathPattern": "/api/v2/pokemon-species/(?i)(100|voltorb)/?"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json; charset=utf-8"
+        },
+        "bodyFileName": "pokemon-species/100.json"
+      }
+    },
+    {
+      "name": "pokemon-species 101",
+      "priority": 5,
+      "request": {
+        "method": "GET",
+        "urlPathPattern": "/api/v2/pokemon-species/(?i)(101|electrode)/?"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json; charset=utf-8"
+        },
+        "bodyFileName": "pokemon-species/101.json"
+      }
+    },
+    {
+      "name": "pokemon-species 102",
+      "priority": 5,
+      "request": {
+        "method": "GET",
+        "urlPathPattern": "/api/v2/pokemon-species/(?i)(102|exeggcute)/?"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json; charset=utf-8"
+        },
+        "bodyFileName": "pokemon-species/102.json"
+      }
+    },
+    {
+      "name": "pokemon-species 103",
+      "priority": 5,
+      "request": {
+        "method": "GET",
+        "urlPathPattern": "/api/v2/pokemon-species/(?i)(103|exeggutor)/?"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json; charset=utf-8"
+        },
+        "bodyFileName": "pokemon-species/103.json"
+      }
+    },
+    {
+      "name": "pokemon-species 104",
+      "priority": 5,
+      "request": {
+        "method": "GET",
+        "urlPathPattern": "/api/v2/pokemon-species/(?i)(104|cubone)/?"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json; charset=utf-8"
+        },
+        "bodyFileName": "pokemon-species/104.json"
+      }
+    },
+    {
+      "name": "pokemon-species 105",
+      "priority": 5,
+      "request": {
+        "method": "GET",
+        "urlPathPattern": "/api/v2/pokemon-species/(?i)(105|marowak)/?"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json; charset=utf-8"
+        },
+        "bodyFileName": "pokemon-species/105.json"
+      }
+    },
+    {
+      "name": "pokemon-species 106",
+      "priority": 5,
+      "request": {
+        "method": "GET",
+        "urlPathPattern": "/api/v2/pokemon-species/(?i)(106|hitmonlee)/?"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json; charset=utf-8"
+        },
+        "bodyFileName": "pokemon-species/106.json"
+      }
+    },
+    {
+      "name": "pokemon-species 107",
+      "priority": 5,
+      "request": {
+        "method": "GET",
+        "urlPathPattern": "/api/v2/pokemon-species/(?i)(107|hitmonchan)/?"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json; charset=utf-8"
+        },
+        "bodyFileName": "pokemon-species/107.json"
+      }
+    },
+    {
+      "name": "pokemon-species 108",
+      "priority": 5,
+      "request": {
+        "method": "GET",
+        "urlPathPattern": "/api/v2/pokemon-species/(?i)(108|lickitung)/?"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json; charset=utf-8"
+        },
+        "bodyFileName": "pokemon-species/108.json"
+      }
+    },
+    {
+      "name": "pokemon-species 109",
+      "priority": 5,
+      "request": {
+        "method": "GET",
+        "urlPathPattern": "/api/v2/pokemon-species/(?i)(109|koffing)/?"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json; charset=utf-8"
+        },
+        "bodyFileName": "pokemon-species/109.json"
+      }
+    },
+    {
+      "name": "pokemon-species 11",
+      "priority": 5,
+      "request": {
+        "method": "GET",
+        "urlPathPattern": "/api/v2/pokemon-species/(?i)(11|metapod)/?"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json; charset=utf-8"
+        },
+        "bodyFileName": "pokemon-species/11.json"
+      }
+    },
+    {
+      "name": "pokemon-species 110",
+      "priority": 5,
+      "request": {
+        "method": "GET",
+        "urlPathPattern": "/api/v2/pokemon-species/(?i)(110|weezing)/?"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json; charset=utf-8"
+        },
+        "bodyFileName": "pokemon-species/110.json"
+      }
+    },
+    {
+      "name": "pokemon-species 111",
+      "priority": 5,
+      "request": {
+        "method": "GET",
+        "urlPathPattern": "/api/v2/pokemon-species/(?i)(111|rhyhorn)/?"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json; charset=utf-8"
+        },
+        "bodyFileName": "pokemon-species/111.json"
+      }
+    },
+    {
+      "name": "pokemon-species 112",
+      "priority": 5,
+      "request": {
+        "method": "GET",
+        "urlPathPattern": "/api/v2/pokemon-species/(?i)(112|rhydon)/?"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json; charset=utf-8"
+        },
+        "bodyFileName": "pokemon-species/112.json"
+      }
+    },
+    {
+      "name": "pokemon-species 113",
+      "priority": 5,
+      "request": {
+        "method": "GET",
+        "urlPathPattern": "/api/v2/pokemon-species/(?i)(113|chansey)/?"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json; charset=utf-8"
+        },
+        "bodyFileName": "pokemon-species/113.json"
+      }
+    },
+    {
+      "name": "pokemon-species 114",
+      "priority": 5,
+      "request": {
+        "method": "GET",
+        "urlPathPattern": "/api/v2/pokemon-species/(?i)(114|tangela)/?"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json; charset=utf-8"
+        },
+        "bodyFileName": "pokemon-species/114.json"
+      }
+    },
+    {
+      "name": "pokemon-species 115",
+      "priority": 5,
+      "request": {
+        "method": "GET",
+        "urlPathPattern": "/api/v2/pokemon-species/(?i)(115|kangaskhan)/?"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json; charset=utf-8"
+        },
+        "bodyFileName": "pokemon-species/115.json"
+      }
+    },
+    {
+      "name": "pokemon-species 116",
+      "priority": 5,
+      "request": {
+        "method": "GET",
+        "urlPathPattern": "/api/v2/pokemon-species/(?i)(116|horsea)/?"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json; charset=utf-8"
+        },
+        "bodyFileName": "pokemon-species/116.json"
+      }
+    },
+    {
+      "name": "pokemon-species 117",
+      "priority": 5,
+      "request": {
+        "method": "GET",
+        "urlPathPattern": "/api/v2/pokemon-species/(?i)(117|seadra)/?"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json; charset=utf-8"
+        },
+        "bodyFileName": "pokemon-species/117.json"
+      }
+    },
+    {
+      "name": "pokemon-species 118",
+      "priority": 5,
+      "request": {
+        "method": "GET",
+        "urlPathPattern": "/api/v2/pokemon-species/(?i)(118|goldeen)/?"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json; charset=utf-8"
+        },
+        "bodyFileName": "pokemon-species/118.json"
+      }
+    },
+    {
+      "name": "pokemon-species 119",
+      "priority": 5,
+      "request": {
+        "method": "GET",
+        "urlPathPattern": "/api/v2/pokemon-species/(?i)(119|seaking)/?"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json; charset=utf-8"
+        },
+        "bodyFileName": "pokemon-species/119.json"
+      }
+    },
+    {
+      "name": "pokemon-species 12",
+      "priority": 5,
+      "request": {
+        "method": "GET",
+        "urlPathPattern": "/api/v2/pokemon-species/(?i)(12|butterfree)/?"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json; charset=utf-8"
+        },
+        "bodyFileName": "pokemon-species/12.json"
+      }
+    },
+    {
+      "name": "pokemon-species 120",
+      "priority": 5,
+      "request": {
+        "method": "GET",
+        "urlPathPattern": "/api/v2/pokemon-species/(?i)(120|staryu)/?"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json; charset=utf-8"
+        },
+        "bodyFileName": "pokemon-species/120.json"
+      }
+    },
+    {
+      "name": "pokemon-species 121",
+      "priority": 5,
+      "request": {
+        "method": "GET",
+        "urlPathPattern": "/api/v2/pokemon-species/(?i)(121|starmie)/?"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json; charset=utf-8"
+        },
+        "bodyFileName": "pokemon-species/121.json"
+      }
+    },
+    {
+      "name": "pokemon-species 122",
+      "priority": 5,
+      "request": {
+        "method": "GET",
+        "urlPathPattern": "/api/v2/pokemon-species/(?i)(122|mr-mime)/?"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json; charset=utf-8"
+        },
+        "bodyFileName": "pokemon-species/122.json"
+      }
+    },
+    {
+      "name": "pokemon-species 123",
+      "priority": 5,
+      "request": {
+        "method": "GET",
+        "urlPathPattern": "/api/v2/pokemon-species/(?i)(123|scyther)/?"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json; charset=utf-8"
+        },
+        "bodyFileName": "pokemon-species/123.json"
+      }
+    },
+    {
+      "name": "pokemon-species 124",
+      "priority": 5,
+      "request": {
+        "method": "GET",
+        "urlPathPattern": "/api/v2/pokemon-species/(?i)(124|jynx)/?"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json; charset=utf-8"
+        },
+        "bodyFileName": "pokemon-species/124.json"
+      }
+    },
+    {
+      "name": "pokemon-species 125",
+      "priority": 5,
+      "request": {
+        "method": "GET",
+        "urlPathPattern": "/api/v2/pokemon-species/(?i)(125|electabuzz)/?"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json; charset=utf-8"
+        },
+        "bodyFileName": "pokemon-species/125.json"
+      }
+    },
+    {
+      "name": "pokemon-species 126",
+      "priority": 5,
+      "request": {
+        "method": "GET",
+        "urlPathPattern": "/api/v2/pokemon-species/(?i)(126|magmar)/?"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json; charset=utf-8"
+        },
+        "bodyFileName": "pokemon-species/126.json"
+      }
+    },
+    {
+      "name": "pokemon-species 127",
+      "priority": 5,
+      "request": {
+        "method": "GET",
+        "urlPathPattern": "/api/v2/pokemon-species/(?i)(127|pinsir)/?"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json; charset=utf-8"
+        },
+        "bodyFileName": "pokemon-species/127.json"
+      }
+    },
+    {
+      "name": "pokemon-species 128",
+      "priority": 5,
+      "request": {
+        "method": "GET",
+        "urlPathPattern": "/api/v2/pokemon-species/(?i)(128|tauros)/?"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json; charset=utf-8"
+        },
+        "bodyFileName": "pokemon-species/128.json"
+      }
+    },
+    {
+      "name": "pokemon-species 129",
+      "priority": 5,
+      "request": {
+        "method": "GET",
+        "urlPathPattern": "/api/v2/pokemon-species/(?i)(129|magikarp)/?"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json; charset=utf-8"
+        },
+        "bodyFileName": "pokemon-species/129.json"
+      }
+    },
+    {
+      "name": "pokemon-species 13",
+      "priority": 5,
+      "request": {
+        "method": "GET",
+        "urlPathPattern": "/api/v2/pokemon-species/(?i)(13|weedle)/?"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json; charset=utf-8"
+        },
+        "bodyFileName": "pokemon-species/13.json"
+      }
+    },
+    {
+      "name": "pokemon-species 130",
+      "priority": 5,
+      "request": {
+        "method": "GET",
+        "urlPathPattern": "/api/v2/pokemon-species/(?i)(130|gyarados)/?"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json; charset=utf-8"
+        },
+        "bodyFileName": "pokemon-species/130.json"
+      }
+    },
+    {
+      "name": "pokemon-species 131",
+      "priority": 5,
+      "request": {
+        "method": "GET",
+        "urlPathPattern": "/api/v2/pokemon-species/(?i)(131|lapras)/?"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json; charset=utf-8"
+        },
+        "bodyFileName": "pokemon-species/131.json"
+      }
+    },
+    {
+      "name": "pokemon-species 132",
+      "priority": 5,
+      "request": {
+        "method": "GET",
+        "urlPathPattern": "/api/v2/pokemon-species/(?i)(132|ditto)/?"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json; charset=utf-8"
+        },
+        "bodyFileName": "pokemon-species/132.json"
+      }
+    },
+    {
+      "name": "pokemon-species 133",
+      "priority": 5,
+      "request": {
+        "method": "GET",
+        "urlPathPattern": "/api/v2/pokemon-species/(?i)(133|eevee)/?"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json; charset=utf-8"
+        },
+        "bodyFileName": "pokemon-species/133.json"
+      }
+    },
+    {
+      "name": "pokemon-species 134",
+      "priority": 5,
+      "request": {
+        "method": "GET",
+        "urlPathPattern": "/api/v2/pokemon-species/(?i)(134|vaporeon)/?"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json; charset=utf-8"
+        },
+        "bodyFileName": "pokemon-species/134.json"
+      }
+    },
+    {
+      "name": "pokemon-species 135",
+      "priority": 5,
+      "request": {
+        "method": "GET",
+        "urlPathPattern": "/api/v2/pokemon-species/(?i)(135|jolteon)/?"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json; charset=utf-8"
+        },
+        "bodyFileName": "pokemon-species/135.json"
+      }
+    },
+    {
+      "name": "pokemon-species 136",
+      "priority": 5,
+      "request": {
+        "method": "GET",
+        "urlPathPattern": "/api/v2/pokemon-species/(?i)(136|flareon)/?"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json; charset=utf-8"
+        },
+        "bodyFileName": "pokemon-species/136.json"
+      }
+    },
+    {
+      "name": "pokemon-species 137",
+      "priority": 5,
+      "request": {
+        "method": "GET",
+        "urlPathPattern": "/api/v2/pokemon-species/(?i)(137|porygon)/?"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json; charset=utf-8"
+        },
+        "bodyFileName": "pokemon-species/137.json"
+      }
+    },
+    {
+      "name": "pokemon-species 138",
+      "priority": 5,
+      "request": {
+        "method": "GET",
+        "urlPathPattern": "/api/v2/pokemon-species/(?i)(138|omanyte)/?"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json; charset=utf-8"
+        },
+        "bodyFileName": "pokemon-species/138.json"
+      }
+    },
+    {
+      "name": "pokemon-species 139",
+      "priority": 5,
+      "request": {
+        "method": "GET",
+        "urlPathPattern": "/api/v2/pokemon-species/(?i)(139|omastar)/?"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json; charset=utf-8"
+        },
+        "bodyFileName": "pokemon-species/139.json"
+      }
+    },
+    {
+      "name": "pokemon-species 14",
+      "priority": 5,
+      "request": {
+        "method": "GET",
+        "urlPathPattern": "/api/v2/pokemon-species/(?i)(14|kakuna)/?"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json; charset=utf-8"
+        },
+        "bodyFileName": "pokemon-species/14.json"
+      }
+    },
+    {
+      "name": "pokemon-species 140",
+      "priority": 5,
+      "request": {
+        "method": "GET",
+        "urlPathPattern": "/api/v2/pokemon-species/(?i)(140|kabuto)/?"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json; charset=utf-8"
+        },
+        "bodyFileName": "pokemon-species/140.json"
+      }
+    },
+    {
+      "name": "pokemon-species 141",
+      "priority": 5,
+      "request": {
+        "method": "GET",
+        "urlPathPattern": "/api/v2/pokemon-species/(?i)(141|kabutops)/?"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json; charset=utf-8"
+        },
+        "bodyFileName": "pokemon-species/141.json"
+      }
+    },
+    {
+      "name": "pokemon-species 142",
+      "priority": 5,
+      "request": {
+        "method": "GET",
+        "urlPathPattern": "/api/v2/pokemon-species/(?i)(142|aerodactyl)/?"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json; charset=utf-8"
+        },
+        "bodyFileName": "pokemon-species/142.json"
+      }
+    },
+    {
+      "name": "pokemon-species 143",
+      "priority": 5,
+      "request": {
+        "method": "GET",
+        "urlPathPattern": "/api/v2/pokemon-species/(?i)(143|snorlax)/?"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json; charset=utf-8"
+        },
+        "bodyFileName": "pokemon-species/143.json"
+      }
+    },
+    {
+      "name": "pokemon-species 144",
+      "priority": 5,
+      "request": {
+        "method": "GET",
+        "urlPathPattern": "/api/v2/pokemon-species/(?i)(144|articuno)/?"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json; charset=utf-8"
+        },
+        "bodyFileName": "pokemon-species/144.json"
+      }
+    },
+    {
+      "name": "pokemon-species 145",
+      "priority": 5,
+      "request": {
+        "method": "GET",
+        "urlPathPattern": "/api/v2/pokemon-species/(?i)(145|zapdos)/?"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json; charset=utf-8"
+        },
+        "bodyFileName": "pokemon-species/145.json"
+      }
+    },
+    {
+      "name": "pokemon-species 146",
+      "priority": 5,
+      "request": {
+        "method": "GET",
+        "urlPathPattern": "/api/v2/pokemon-species/(?i)(146|moltres)/?"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json; charset=utf-8"
+        },
+        "bodyFileName": "pokemon-species/146.json"
+      }
+    },
+    {
+      "name": "pokemon-species 147",
+      "priority": 5,
+      "request": {
+        "method": "GET",
+        "urlPathPattern": "/api/v2/pokemon-species/(?i)(147|dratini)/?"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json; charset=utf-8"
+        },
+        "bodyFileName": "pokemon-species/147.json"
+      }
+    },
+    {
+      "name": "pokemon-species 148",
+      "priority": 5,
+      "request": {
+        "method": "GET",
+        "urlPathPattern": "/api/v2/pokemon-species/(?i)(148|dragonair)/?"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json; charset=utf-8"
+        },
+        "bodyFileName": "pokemon-species/148.json"
+      }
+    },
+    {
+      "name": "pokemon-species 149",
+      "priority": 5,
+      "request": {
+        "method": "GET",
+        "urlPathPattern": "/api/v2/pokemon-species/(?i)(149|dragonite)/?"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json; charset=utf-8"
+        },
+        "bodyFileName": "pokemon-species/149.json"
+      }
+    },
+    {
+      "name": "pokemon-species 15",
+      "priority": 5,
+      "request": {
+        "method": "GET",
+        "urlPathPattern": "/api/v2/pokemon-species/(?i)(15|beedrill)/?"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json; charset=utf-8"
+        },
+        "bodyFileName": "pokemon-species/15.json"
+      }
+    },
+    {
+      "name": "pokemon-species 150",
+      "priority": 5,
+      "request": {
+        "method": "GET",
+        "urlPathPattern": "/api/v2/pokemon-species/(?i)(150|mewtwo)/?"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json; charset=utf-8"
+        },
+        "bodyFileName": "pokemon-species/150.json"
+      }
+    },
+    {
+      "name": "pokemon-species 151",
+      "priority": 5,
+      "request": {
+        "method": "GET",
+        "urlPathPattern": "/api/v2/pokemon-species/(?i)(151|mew)/?"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json; charset=utf-8"
+        },
+        "bodyFileName": "pokemon-species/151.json"
+      }
+    },
+    {
+      "name": "pokemon-species 16",
+      "priority": 5,
+      "request": {
+        "method": "GET",
+        "urlPathPattern": "/api/v2/pokemon-species/(?i)(16|pidgey)/?"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json; charset=utf-8"
+        },
+        "bodyFileName": "pokemon-species/16.json"
+      }
+    },
+    {
+      "name": "pokemon-species 169",
+      "priority": 5,
+      "request": {
+        "method": "GET",
+        "urlPathPattern": "/api/v2/pokemon-species/(?i)(169|crobat)/?"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json; charset=utf-8"
+        },
+        "bodyFileName": "pokemon-species/169.json"
+      }
+    },
+    {
+      "name": "pokemon-species 17",
+      "priority": 5,
+      "request": {
+        "method": "GET",
+        "urlPathPattern": "/api/v2/pokemon-species/(?i)(17|pidgeotto)/?"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json; charset=utf-8"
+        },
+        "bodyFileName": "pokemon-species/17.json"
+      }
+    },
+    {
+      "name": "pokemon-species 172",
+      "priority": 5,
+      "request": {
+        "method": "GET",
+        "urlPathPattern": "/api/v2/pokemon-species/(?i)(172|pichu)/?"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json; charset=utf-8"
+        },
+        "bodyFileName": "pokemon-species/172.json"
+      }
+    },
+    {
+      "name": "pokemon-species 173",
+      "priority": 5,
+      "request": {
+        "method": "GET",
+        "urlPathPattern": "/api/v2/pokemon-species/(?i)(173|cleffa)/?"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json; charset=utf-8"
+        },
+        "bodyFileName": "pokemon-species/173.json"
+      }
+    },
+    {
+      "name": "pokemon-species 174",
+      "priority": 5,
+      "request": {
+        "method": "GET",
+        "urlPathPattern": "/api/v2/pokemon-species/(?i)(174|igglybuff)/?"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json; charset=utf-8"
+        },
+        "bodyFileName": "pokemon-species/174.json"
+      }
+    },
+    {
+      "name": "pokemon-species 18",
+      "priority": 5,
+      "request": {
+        "method": "GET",
+        "urlPathPattern": "/api/v2/pokemon-species/(?i)(18|pidgeot)/?"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json; charset=utf-8"
+        },
+        "bodyFileName": "pokemon-species/18.json"
+      }
+    },
+    {
+      "name": "pokemon-species 182",
+      "priority": 5,
+      "request": {
+        "method": "GET",
+        "urlPathPattern": "/api/v2/pokemon-species/(?i)(182|bellossom)/?"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json; charset=utf-8"
+        },
+        "bodyFileName": "pokemon-species/182.json"
+      }
+    },
+    {
+      "name": "pokemon-species 186",
+      "priority": 5,
+      "request": {
+        "method": "GET",
+        "urlPathPattern": "/api/v2/pokemon-species/(?i)(186|politoed)/?"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json; charset=utf-8"
+        },
+        "bodyFileName": "pokemon-species/186.json"
+      }
+    },
+    {
+      "name": "pokemon-species 19",
+      "priority": 5,
+      "request": {
+        "method": "GET",
+        "urlPathPattern": "/api/v2/pokemon-species/(?i)(19|rattata)/?"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json; charset=utf-8"
+        },
+        "bodyFileName": "pokemon-species/19.json"
+      }
+    },
+    {
+      "name": "pokemon-species 196",
+      "priority": 5,
+      "request": {
+        "method": "GET",
+        "urlPathPattern": "/api/v2/pokemon-species/(?i)(196|espeon)/?"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json; charset=utf-8"
+        },
+        "bodyFileName": "pokemon-species/196.json"
+      }
+    },
+    {
+      "name": "pokemon-species 197",
+      "priority": 5,
+      "request": {
+        "method": "GET",
+        "urlPathPattern": "/api/v2/pokemon-species/(?i)(197|umbreon)/?"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json; charset=utf-8"
+        },
+        "bodyFileName": "pokemon-species/197.json"
+      }
+    },
+    {
+      "name": "pokemon-species 199",
+      "priority": 5,
+      "request": {
+        "method": "GET",
+        "urlPathPattern": "/api/v2/pokemon-species/(?i)(199|slowking)/?"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json; charset=utf-8"
+        },
+        "bodyFileName": "pokemon-species/199.json"
+      }
+    },
+    {
+      "name": "pokemon-species 2",
+      "priority": 5,
+      "request": {
+        "method": "GET",
+        "urlPathPattern": "/api/v2/pokemon-species/(?i)(2|ivysaur)/?"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json; charset=utf-8"
+        },
+        "bodyFileName": "pokemon-species/2.json"
+      }
+    },
+    {
+      "name": "pokemon-species 20",
+      "priority": 5,
+      "request": {
+        "method": "GET",
+        "urlPathPattern": "/api/v2/pokemon-species/(?i)(20|raticate)/?"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json; charset=utf-8"
+        },
+        "bodyFileName": "pokemon-species/20.json"
+      }
+    },
+    {
+      "name": "pokemon-species 208",
+      "priority": 5,
+      "request": {
+        "method": "GET",
+        "urlPathPattern": "/api/v2/pokemon-species/(?i)(208|steelix)/?"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json; charset=utf-8"
+        },
+        "bodyFileName": "pokemon-species/208.json"
+      }
+    },
+    {
+      "name": "pokemon-species 21",
+      "priority": 5,
+      "request": {
+        "method": "GET",
+        "urlPathPattern": "/api/v2/pokemon-species/(?i)(21|spearow)/?"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json; charset=utf-8"
+        },
+        "bodyFileName": "pokemon-species/21.json"
+      }
+    },
+    {
+      "name": "pokemon-species 212",
+      "priority": 5,
+      "request": {
+        "method": "GET",
+        "urlPathPattern": "/api/v2/pokemon-species/(?i)(212|scizor)/?"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json; charset=utf-8"
+        },
+        "bodyFileName": "pokemon-species/212.json"
+      }
+    },
+    {
+      "name": "pokemon-species 22",
+      "priority": 5,
+      "request": {
+        "method": "GET",
+        "urlPathPattern": "/api/v2/pokemon-species/(?i)(22|fearow)/?"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json; charset=utf-8"
+        },
+        "bodyFileName": "pokemon-species/22.json"
+      }
+    },
+    {
+      "name": "pokemon-species 23",
+      "priority": 5,
+      "request": {
+        "method": "GET",
+        "urlPathPattern": "/api/v2/pokemon-species/(?i)(23|ekans)/?"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json; charset=utf-8"
+        },
+        "bodyFileName": "pokemon-species/23.json"
+      }
+    },
+    {
+      "name": "pokemon-species 230",
+      "priority": 5,
+      "request": {
+        "method": "GET",
+        "urlPathPattern": "/api/v2/pokemon-species/(?i)(230|kingdra)/?"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json; charset=utf-8"
+        },
+        "bodyFileName": "pokemon-species/230.json"
+      }
+    },
+    {
+      "name": "pokemon-species 233",
+      "priority": 5,
+      "request": {
+        "method": "GET",
+        "urlPathPattern": "/api/v2/pokemon-species/(?i)(233|porygon2)/?"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json; charset=utf-8"
+        },
+        "bodyFileName": "pokemon-species/233.json"
+      }
+    },
+    {
+      "name": "pokemon-species 236",
+      "priority": 5,
+      "request": {
+        "method": "GET",
+        "urlPathPattern": "/api/v2/pokemon-species/(?i)(236|tyrogue)/?"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json; charset=utf-8"
+        },
+        "bodyFileName": "pokemon-species/236.json"
+      }
+    },
+    {
+      "name": "pokemon-species 237",
+      "priority": 5,
+      "request": {
+        "method": "GET",
+        "urlPathPattern": "/api/v2/pokemon-species/(?i)(237|hitmontop)/?"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json; charset=utf-8"
+        },
+        "bodyFileName": "pokemon-species/237.json"
+      }
+    },
+    {
+      "name": "pokemon-species 238",
+      "priority": 5,
+      "request": {
+        "method": "GET",
+        "urlPathPattern": "/api/v2/pokemon-species/(?i)(238|smoochum)/?"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json; charset=utf-8"
+        },
+        "bodyFileName": "pokemon-species/238.json"
+      }
+    },
+    {
+      "name": "pokemon-species 239",
+      "priority": 5,
+      "request": {
+        "method": "GET",
+        "urlPathPattern": "/api/v2/pokemon-species/(?i)(239|elekid)/?"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json; charset=utf-8"
+        },
+        "bodyFileName": "pokemon-species/239.json"
+      }
+    },
+    {
+      "name": "pokemon-species 24",
+      "priority": 5,
+      "request": {
+        "method": "GET",
+        "urlPathPattern": "/api/v2/pokemon-species/(?i)(24|arbok)/?"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json; charset=utf-8"
+        },
+        "bodyFileName": "pokemon-species/24.json"
+      }
+    },
+    {
+      "name": "pokemon-species 240",
+      "priority": 5,
+      "request": {
+        "method": "GET",
+        "urlPathPattern": "/api/v2/pokemon-species/(?i)(240|magby)/?"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json; charset=utf-8"
+        },
+        "bodyFileName": "pokemon-species/240.json"
+      }
+    },
+    {
+      "name": "pokemon-species 242",
+      "priority": 5,
+      "request": {
+        "method": "GET",
+        "urlPathPattern": "/api/v2/pokemon-species/(?i)(242|blissey)/?"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json; charset=utf-8"
+        },
+        "bodyFileName": "pokemon-species/242.json"
+      }
+    },
+    {
+      "name": "pokemon-species 25",
+      "priority": 5,
+      "request": {
+        "method": "GET",
+        "urlPathPattern": "/api/v2/pokemon-species/(?i)(25|pikachu)/?"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json; charset=utf-8"
+        },
+        "bodyFileName": "pokemon-species/25.json"
+      }
+    },
+    {
+      "name": "pokemon-species 26",
+      "priority": 5,
+      "request": {
+        "method": "GET",
+        "urlPathPattern": "/api/v2/pokemon-species/(?i)(26|raichu)/?"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json; charset=utf-8"
+        },
+        "bodyFileName": "pokemon-species/26.json"
+      }
+    },
+    {
+      "name": "pokemon-species 27",
+      "priority": 5,
+      "request": {
+        "method": "GET",
+        "urlPathPattern": "/api/v2/pokemon-species/(?i)(27|sandshrew)/?"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json; charset=utf-8"
+        },
+        "bodyFileName": "pokemon-species/27.json"
+      }
+    },
+    {
+      "name": "pokemon-species 28",
+      "priority": 5,
+      "request": {
+        "method": "GET",
+        "urlPathPattern": "/api/v2/pokemon-species/(?i)(28|sandslash)/?"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json; charset=utf-8"
+        },
+        "bodyFileName": "pokemon-species/28.json"
+      }
+    },
+    {
+      "name": "pokemon-species 29",
+      "priority": 5,
+      "request": {
+        "method": "GET",
+        "urlPathPattern": "/api/v2/pokemon-species/(?i)(29|nidoran-f)/?"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json; charset=utf-8"
+        },
+        "bodyFileName": "pokemon-species/29.json"
+      }
+    },
+    {
+      "name": "pokemon-species 3",
+      "priority": 5,
+      "request": {
+        "method": "GET",
+        "urlPathPattern": "/api/v2/pokemon-species/(?i)(3|venusaur)/?"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json; charset=utf-8"
+        },
+        "bodyFileName": "pokemon-species/3.json"
+      }
+    },
+    {
+      "name": "pokemon-species 30",
+      "priority": 5,
+      "request": {
+        "method": "GET",
+        "urlPathPattern": "/api/v2/pokemon-species/(?i)(30|nidorina)/?"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json; charset=utf-8"
+        },
+        "bodyFileName": "pokemon-species/30.json"
+      }
+    },
+    {
+      "name": "pokemon-species 31",
+      "priority": 5,
+      "request": {
+        "method": "GET",
+        "urlPathPattern": "/api/v2/pokemon-species/(?i)(31|nidoqueen)/?"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json; charset=utf-8"
+        },
+        "bodyFileName": "pokemon-species/31.json"
+      }
+    },
+    {
+      "name": "pokemon-species 32",
+      "priority": 5,
+      "request": {
+        "method": "GET",
+        "urlPathPattern": "/api/v2/pokemon-species/(?i)(32|nidoran-m)/?"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json; charset=utf-8"
+        },
+        "bodyFileName": "pokemon-species/32.json"
+      }
+    },
+    {
+      "name": "pokemon-species 33",
+      "priority": 5,
+      "request": {
+        "method": "GET",
+        "urlPathPattern": "/api/v2/pokemon-species/(?i)(33|nidorino)/?"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json; charset=utf-8"
+        },
+        "bodyFileName": "pokemon-species/33.json"
+      }
+    },
+    {
+      "name": "pokemon-species 34",
+      "priority": 5,
+      "request": {
+        "method": "GET",
+        "urlPathPattern": "/api/v2/pokemon-species/(?i)(34|nidoking)/?"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json; charset=utf-8"
+        },
+        "bodyFileName": "pokemon-species/34.json"
+      }
+    },
+    {
+      "name": "pokemon-species 35",
+      "priority": 5,
+      "request": {
+        "method": "GET",
+        "urlPathPattern": "/api/v2/pokemon-species/(?i)(35|clefairy)/?"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json; charset=utf-8"
+        },
+        "bodyFileName": "pokemon-species/35.json"
+      }
+    },
+    {
+      "name": "pokemon-species 36",
+      "priority": 5,
+      "request": {
+        "method": "GET",
+        "urlPathPattern": "/api/v2/pokemon-species/(?i)(36|clefable)/?"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json; charset=utf-8"
+        },
+        "bodyFileName": "pokemon-species/36.json"
+      }
+    },
+    {
+      "name": "pokemon-species 37",
+      "priority": 5,
+      "request": {
+        "method": "GET",
+        "urlPathPattern": "/api/v2/pokemon-species/(?i)(37|vulpix)/?"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json; charset=utf-8"
+        },
+        "bodyFileName": "pokemon-species/37.json"
+      }
+    },
+    {
+      "name": "pokemon-species 38",
+      "priority": 5,
+      "request": {
+        "method": "GET",
+        "urlPathPattern": "/api/v2/pokemon-species/(?i)(38|ninetales)/?"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json; charset=utf-8"
+        },
+        "bodyFileName": "pokemon-species/38.json"
+      }
+    },
+    {
+      "name": "pokemon-species 39",
+      "priority": 5,
+      "request": {
+        "method": "GET",
+        "urlPathPattern": "/api/v2/pokemon-species/(?i)(39|jigglypuff)/?"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json; charset=utf-8"
+        },
+        "bodyFileName": "pokemon-species/39.json"
+      }
+    },
+    {
+      "name": "pokemon-species 4",
+      "priority": 5,
+      "request": {
+        "method": "GET",
+        "urlPathPattern": "/api/v2/pokemon-species/(?i)(4|charmander)/?"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json; charset=utf-8"
+        },
+        "bodyFileName": "pokemon-species/4.json"
+      }
+    },
+    {
+      "name": "pokemon-species 40",
+      "priority": 5,
+      "request": {
+        "method": "GET",
+        "urlPathPattern": "/api/v2/pokemon-species/(?i)(40|wigglytuff)/?"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json; charset=utf-8"
+        },
+        "bodyFileName": "pokemon-species/40.json"
+      }
+    },
+    {
+      "name": "pokemon-species 41",
+      "priority": 5,
+      "request": {
+        "method": "GET",
+        "urlPathPattern": "/api/v2/pokemon-species/(?i)(41|zubat)/?"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json; charset=utf-8"
+        },
+        "bodyFileName": "pokemon-species/41.json"
+      }
+    },
+    {
+      "name": "pokemon-species 42",
+      "priority": 5,
+      "request": {
+        "method": "GET",
+        "urlPathPattern": "/api/v2/pokemon-species/(?i)(42|golbat)/?"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json; charset=utf-8"
+        },
+        "bodyFileName": "pokemon-species/42.json"
+      }
+    },
+    {
+      "name": "pokemon-species 43",
+      "priority": 5,
+      "request": {
+        "method": "GET",
+        "urlPathPattern": "/api/v2/pokemon-species/(?i)(43|oddish)/?"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json; charset=utf-8"
+        },
+        "bodyFileName": "pokemon-species/43.json"
+      }
+    },
+    {
+      "name": "pokemon-species 439",
+      "priority": 5,
+      "request": {
+        "method": "GET",
+        "urlPathPattern": "/api/v2/pokemon-species/(?i)(439|mime-jr)/?"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json; charset=utf-8"
+        },
+        "bodyFileName": "pokemon-species/439.json"
+      }
+    },
+    {
+      "name": "pokemon-species 44",
+      "priority": 5,
+      "request": {
+        "method": "GET",
+        "urlPathPattern": "/api/v2/pokemon-species/(?i)(44|gloom)/?"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json; charset=utf-8"
+        },
+        "bodyFileName": "pokemon-species/44.json"
+      }
+    },
+    {
+      "name": "pokemon-species 440",
+      "priority": 5,
+      "request": {
+        "method": "GET",
+        "urlPathPattern": "/api/v2/pokemon-species/(?i)(440|happiny)/?"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json; charset=utf-8"
+        },
+        "bodyFileName": "pokemon-species/440.json"
+      }
+    },
+    {
+      "name": "pokemon-species 446",
+      "priority": 5,
+      "request": {
+        "method": "GET",
+        "urlPathPattern": "/api/v2/pokemon-species/(?i)(446|munchlax)/?"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json; charset=utf-8"
+        },
+        "bodyFileName": "pokemon-species/446.json"
+      }
+    },
+    {
+      "name": "pokemon-species 45",
+      "priority": 5,
+      "request": {
+        "method": "GET",
+        "urlPathPattern": "/api/v2/pokemon-species/(?i)(45|vileplume)/?"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json; charset=utf-8"
+        },
+        "bodyFileName": "pokemon-species/45.json"
+      }
+    },
+    {
+      "name": "pokemon-species 46",
+      "priority": 5,
+      "request": {
+        "method": "GET",
+        "urlPathPattern": "/api/v2/pokemon-species/(?i)(46|paras)/?"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json; charset=utf-8"
+        },
+        "bodyFileName": "pokemon-species/46.json"
+      }
+    },
+    {
+      "name": "pokemon-species 462",
+      "priority": 5,
+      "request": {
+        "method": "GET",
+        "urlPathPattern": "/api/v2/pokemon-species/(?i)(462|magnezone)/?"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json; charset=utf-8"
+        },
+        "bodyFileName": "pokemon-species/462.json"
+      }
+    },
+    {
+      "name": "pokemon-species 463",
+      "priority": 5,
+      "request": {
+        "method": "GET",
+        "urlPathPattern": "/api/v2/pokemon-species/(?i)(463|lickilicky)/?"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json; charset=utf-8"
+        },
+        "bodyFileName": "pokemon-species/463.json"
+      }
+    },
+    {
+      "name": "pokemon-species 464",
+      "priority": 5,
+      "request": {
+        "method": "GET",
+        "urlPathPattern": "/api/v2/pokemon-species/(?i)(464|rhyperior)/?"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json; charset=utf-8"
+        },
+        "bodyFileName": "pokemon-species/464.json"
+      }
+    },
+    {
+      "name": "pokemon-species 465",
+      "priority": 5,
+      "request": {
+        "method": "GET",
+        "urlPathPattern": "/api/v2/pokemon-species/(?i)(465|tangrowth)/?"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json; charset=utf-8"
+        },
+        "bodyFileName": "pokemon-species/465.json"
+      }
+    },
+    {
+      "name": "pokemon-species 466",
+      "priority": 5,
+      "request": {
+        "method": "GET",
+        "urlPathPattern": "/api/v2/pokemon-species/(?i)(466|electivire)/?"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json; charset=utf-8"
+        },
+        "bodyFileName": "pokemon-species/466.json"
+      }
+    },
+    {
+      "name": "pokemon-species 467",
+      "priority": 5,
+      "request": {
+        "method": "GET",
+        "urlPathPattern": "/api/v2/pokemon-species/(?i)(467|magmortar)/?"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json; charset=utf-8"
+        },
+        "bodyFileName": "pokemon-species/467.json"
+      }
+    },
+    {
+      "name": "pokemon-species 47",
+      "priority": 5,
+      "request": {
+        "method": "GET",
+        "urlPathPattern": "/api/v2/pokemon-species/(?i)(47|parasect)/?"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json; charset=utf-8"
+        },
+        "bodyFileName": "pokemon-species/47.json"
+      }
+    },
+    {
+      "name": "pokemon-species 470",
+      "priority": 5,
+      "request": {
+        "method": "GET",
+        "urlPathPattern": "/api/v2/pokemon-species/(?i)(470|leafeon)/?"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json; charset=utf-8"
+        },
+        "bodyFileName": "pokemon-species/470.json"
+      }
+    },
+    {
+      "name": "pokemon-species 471",
+      "priority": 5,
+      "request": {
+        "method": "GET",
+        "urlPathPattern": "/api/v2/pokemon-species/(?i)(471|glaceon)/?"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json; charset=utf-8"
+        },
+        "bodyFileName": "pokemon-species/471.json"
+      }
+    },
+    {
+      "name": "pokemon-species 474",
+      "priority": 5,
+      "request": {
+        "method": "GET",
+        "urlPathPattern": "/api/v2/pokemon-species/(?i)(474|porygon-z)/?"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json; charset=utf-8"
+        },
+        "bodyFileName": "pokemon-species/474.json"
+      }
+    },
+    {
+      "name": "pokemon-species 48",
+      "priority": 5,
+      "request": {
+        "method": "GET",
+        "urlPathPattern": "/api/v2/pokemon-species/(?i)(48|venonat)/?"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json; charset=utf-8"
+        },
+        "bodyFileName": "pokemon-species/48.json"
+      }
+    },
+    {
+      "name": "pokemon-species 49",
+      "priority": 5,
+      "request": {
+        "method": "GET",
+        "urlPathPattern": "/api/v2/pokemon-species/(?i)(49|venomoth)/?"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json; charset=utf-8"
+        },
+        "bodyFileName": "pokemon-species/49.json"
+      }
+    },
+    {
+      "name": "pokemon-species 5",
+      "priority": 5,
+      "request": {
+        "method": "GET",
+        "urlPathPattern": "/api/v2/pokemon-species/(?i)(5|charmeleon)/?"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json; charset=utf-8"
+        },
+        "bodyFileName": "pokemon-species/5.json"
+      }
+    },
+    {
+      "name": "pokemon-species 50",
+      "priority": 5,
+      "request": {
+        "method": "GET",
+        "urlPathPattern": "/api/v2/pokemon-species/(?i)(50|diglett)/?"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json; charset=utf-8"
+        },
+        "bodyFileName": "pokemon-species/50.json"
+      }
+    },
+    {
+      "name": "pokemon-species 51",
+      "priority": 5,
+      "request": {
+        "method": "GET",
+        "urlPathPattern": "/api/v2/pokemon-species/(?i)(51|dugtrio)/?"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json; charset=utf-8"
+        },
+        "bodyFileName": "pokemon-species/51.json"
+      }
+    },
+    {
+      "name": "pokemon-species 52",
+      "priority": 5,
+      "request": {
+        "method": "GET",
+        "urlPathPattern": "/api/v2/pokemon-species/(?i)(52|meowth)/?"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json; charset=utf-8"
+        },
+        "bodyFileName": "pokemon-species/52.json"
+      }
+    },
+    {
+      "name": "pokemon-species 53",
+      "priority": 5,
+      "request": {
+        "method": "GET",
+        "urlPathPattern": "/api/v2/pokemon-species/(?i)(53|persian)/?"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json; charset=utf-8"
+        },
+        "bodyFileName": "pokemon-species/53.json"
+      }
+    },
+    {
+      "name": "pokemon-species 54",
+      "priority": 5,
+      "request": {
+        "method": "GET",
+        "urlPathPattern": "/api/v2/pokemon-species/(?i)(54|psyduck)/?"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json; charset=utf-8"
+        },
+        "bodyFileName": "pokemon-species/54.json"
+      }
+    },
+    {
+      "name": "pokemon-species 55",
+      "priority": 5,
+      "request": {
+        "method": "GET",
+        "urlPathPattern": "/api/v2/pokemon-species/(?i)(55|golduck)/?"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json; charset=utf-8"
+        },
+        "bodyFileName": "pokemon-species/55.json"
+      }
+    },
+    {
+      "name": "pokemon-species 56",
+      "priority": 5,
+      "request": {
+        "method": "GET",
+        "urlPathPattern": "/api/v2/pokemon-species/(?i)(56|mankey)/?"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json; charset=utf-8"
+        },
+        "bodyFileName": "pokemon-species/56.json"
+      }
+    },
+    {
+      "name": "pokemon-species 57",
+      "priority": 5,
+      "request": {
+        "method": "GET",
+        "urlPathPattern": "/api/v2/pokemon-species/(?i)(57|primeape)/?"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json; charset=utf-8"
+        },
+        "bodyFileName": "pokemon-species/57.json"
+      }
+    },
+    {
+      "name": "pokemon-species 58",
+      "priority": 5,
+      "request": {
+        "method": "GET",
+        "urlPathPattern": "/api/v2/pokemon-species/(?i)(58|growlithe)/?"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json; charset=utf-8"
+        },
+        "bodyFileName": "pokemon-species/58.json"
+      }
+    },
+    {
+      "name": "pokemon-species 59",
+      "priority": 5,
+      "request": {
+        "method": "GET",
+        "urlPathPattern": "/api/v2/pokemon-species/(?i)(59|arcanine)/?"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json; charset=utf-8"
+        },
+        "bodyFileName": "pokemon-species/59.json"
+      }
+    },
+    {
+      "name": "pokemon-species 6",
+      "priority": 5,
+      "request": {
+        "method": "GET",
+        "urlPathPattern": "/api/v2/pokemon-species/(?i)(6|charizard)/?"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json; charset=utf-8"
+        },
+        "bodyFileName": "pokemon-species/6.json"
+      }
+    },
+    {
+      "name": "pokemon-species 60",
+      "priority": 5,
+      "request": {
+        "method": "GET",
+        "urlPathPattern": "/api/v2/pokemon-species/(?i)(60|poliwag)/?"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json; charset=utf-8"
+        },
+        "bodyFileName": "pokemon-species/60.json"
+      }
+    },
+    {
+      "name": "pokemon-species 61",
+      "priority": 5,
+      "request": {
+        "method": "GET",
+        "urlPathPattern": "/api/v2/pokemon-species/(?i)(61|poliwhirl)/?"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json; charset=utf-8"
+        },
+        "bodyFileName": "pokemon-species/61.json"
+      }
+    },
+    {
+      "name": "pokemon-species 62",
+      "priority": 5,
+      "request": {
+        "method": "GET",
+        "urlPathPattern": "/api/v2/pokemon-species/(?i)(62|poliwrath)/?"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json; charset=utf-8"
+        },
+        "bodyFileName": "pokemon-species/62.json"
+      }
+    },
+    {
+      "name": "pokemon-species 63",
+      "priority": 5,
+      "request": {
+        "method": "GET",
+        "urlPathPattern": "/api/v2/pokemon-species/(?i)(63|abra)/?"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json; charset=utf-8"
+        },
+        "bodyFileName": "pokemon-species/63.json"
+      }
+    },
+    {
+      "name": "pokemon-species 64",
+      "priority": 5,
+      "request": {
+        "method": "GET",
+        "urlPathPattern": "/api/v2/pokemon-species/(?i)(64|kadabra)/?"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json; charset=utf-8"
+        },
+        "bodyFileName": "pokemon-species/64.json"
+      }
+    },
+    {
+      "name": "pokemon-species 65",
+      "priority": 5,
+      "request": {
+        "method": "GET",
+        "urlPathPattern": "/api/v2/pokemon-species/(?i)(65|alakazam)/?"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json; charset=utf-8"
+        },
+        "bodyFileName": "pokemon-species/65.json"
+      }
+    },
+    {
+      "name": "pokemon-species 66",
+      "priority": 5,
+      "request": {
+        "method": "GET",
+        "urlPathPattern": "/api/v2/pokemon-species/(?i)(66|machop)/?"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json; charset=utf-8"
+        },
+        "bodyFileName": "pokemon-species/66.json"
+      }
+    },
+    {
+      "name": "pokemon-species 67",
+      "priority": 5,
+      "request": {
+        "method": "GET",
+        "urlPathPattern": "/api/v2/pokemon-species/(?i)(67|machoke)/?"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json; charset=utf-8"
+        },
+        "bodyFileName": "pokemon-species/67.json"
+      }
+    },
+    {
+      "name": "pokemon-species 68",
+      "priority": 5,
+      "request": {
+        "method": "GET",
+        "urlPathPattern": "/api/v2/pokemon-species/(?i)(68|machamp)/?"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json; charset=utf-8"
+        },
+        "bodyFileName": "pokemon-species/68.json"
+      }
+    },
+    {
+      "name": "pokemon-species 69",
+      "priority": 5,
+      "request": {
+        "method": "GET",
+        "urlPathPattern": "/api/v2/pokemon-species/(?i)(69|bellsprout)/?"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json; charset=utf-8"
+        },
+        "bodyFileName": "pokemon-species/69.json"
+      }
+    },
+    {
+      "name": "pokemon-species 7",
+      "priority": 5,
+      "request": {
+        "method": "GET",
+        "urlPathPattern": "/api/v2/pokemon-species/(?i)(7|squirtle)/?"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json; charset=utf-8"
+        },
+        "bodyFileName": "pokemon-species/7.json"
+      }
+    },
+    {
+      "name": "pokemon-species 70",
+      "priority": 5,
+      "request": {
+        "method": "GET",
+        "urlPathPattern": "/api/v2/pokemon-species/(?i)(70|weepinbell)/?"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json; charset=utf-8"
+        },
+        "bodyFileName": "pokemon-species/70.json"
+      }
+    },
+    {
+      "name": "pokemon-species 700",
+      "priority": 5,
+      "request": {
+        "method": "GET",
+        "urlPathPattern": "/api/v2/pokemon-species/(?i)(700|sylveon)/?"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json; charset=utf-8"
+        },
+        "bodyFileName": "pokemon-species/700.json"
+      }
+    },
+    {
+      "name": "pokemon-species 71",
+      "priority": 5,
+      "request": {
+        "method": "GET",
+        "urlPathPattern": "/api/v2/pokemon-species/(?i)(71|victreebel)/?"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json; charset=utf-8"
+        },
+        "bodyFileName": "pokemon-species/71.json"
+      }
+    },
+    {
+      "name": "pokemon-species 72",
+      "priority": 5,
+      "request": {
+        "method": "GET",
+        "urlPathPattern": "/api/v2/pokemon-species/(?i)(72|tentacool)/?"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json; charset=utf-8"
+        },
+        "bodyFileName": "pokemon-species/72.json"
+      }
+    },
+    {
+      "name": "pokemon-species 73",
+      "priority": 5,
+      "request": {
+        "method": "GET",
+        "urlPathPattern": "/api/v2/pokemon-species/(?i)(73|tentacruel)/?"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json; charset=utf-8"
+        },
+        "bodyFileName": "pokemon-species/73.json"
+      }
+    },
+    {
+      "name": "pokemon-species 74",
+      "priority": 5,
+      "request": {
+        "method": "GET",
+        "urlPathPattern": "/api/v2/pokemon-species/(?i)(74|geodude)/?"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json; charset=utf-8"
+        },
+        "bodyFileName": "pokemon-species/74.json"
+      }
+    },
+    {
+      "name": "pokemon-species 75",
+      "priority": 5,
+      "request": {
+        "method": "GET",
+        "urlPathPattern": "/api/v2/pokemon-species/(?i)(75|graveler)/?"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json; charset=utf-8"
+        },
+        "bodyFileName": "pokemon-species/75.json"
+      }
+    },
+    {
+      "name": "pokemon-species 76",
+      "priority": 5,
+      "request": {
+        "method": "GET",
+        "urlPathPattern": "/api/v2/pokemon-species/(?i)(76|golem)/?"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json; charset=utf-8"
+        },
+        "bodyFileName": "pokemon-species/76.json"
+      }
+    },
+    {
+      "name": "pokemon-species 77",
+      "priority": 5,
+      "request": {
+        "method": "GET",
+        "urlPathPattern": "/api/v2/pokemon-species/(?i)(77|ponyta)/?"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json; charset=utf-8"
+        },
+        "bodyFileName": "pokemon-species/77.json"
+      }
+    },
+    {
+      "name": "pokemon-species 78",
+      "priority": 5,
+      "request": {
+        "method": "GET",
+        "urlPathPattern": "/api/v2/pokemon-species/(?i)(78|rapidash)/?"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json; charset=utf-8"
+        },
+        "bodyFileName": "pokemon-species/78.json"
+      }
+    },
+    {
+      "name": "pokemon-species 79",
+      "priority": 5,
+      "request": {
+        "method": "GET",
+        "urlPathPattern": "/api/v2/pokemon-species/(?i)(79|slowpoke)/?"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json; charset=utf-8"
+        },
+        "bodyFileName": "pokemon-species/79.json"
+      }
+    },
+    {
+      "name": "pokemon-species 8",
+      "priority": 5,
+      "request": {
+        "method": "GET",
+        "urlPathPattern": "/api/v2/pokemon-species/(?i)(8|wartortle)/?"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json; charset=utf-8"
+        },
+        "bodyFileName": "pokemon-species/8.json"
+      }
+    },
+    {
+      "name": "pokemon-species 80",
+      "priority": 5,
+      "request": {
+        "method": "GET",
+        "urlPathPattern": "/api/v2/pokemon-species/(?i)(80|slowbro)/?"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json; charset=utf-8"
+        },
+        "bodyFileName": "pokemon-species/80.json"
+      }
+    },
+    {
+      "name": "pokemon-species 81",
+      "priority": 5,
+      "request": {
+        "method": "GET",
+        "urlPathPattern": "/api/v2/pokemon-species/(?i)(81|magnemite)/?"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json; charset=utf-8"
+        },
+        "bodyFileName": "pokemon-species/81.json"
+      }
+    },
+    {
+      "name": "pokemon-species 82",
+      "priority": 5,
+      "request": {
+        "method": "GET",
+        "urlPathPattern": "/api/v2/pokemon-species/(?i)(82|magneton)/?"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json; charset=utf-8"
+        },
+        "bodyFileName": "pokemon-species/82.json"
+      }
+    },
+    {
+      "name": "pokemon-species 83",
+      "priority": 5,
+      "request": {
+        "method": "GET",
+        "urlPathPattern": "/api/v2/pokemon-species/(?i)(83|farfetchd)/?"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json; charset=utf-8"
+        },
+        "bodyFileName": "pokemon-species/83.json"
+      }
+    },
+    {
+      "name": "pokemon-species 84",
+      "priority": 5,
+      "request": {
+        "method": "GET",
+        "urlPathPattern": "/api/v2/pokemon-species/(?i)(84|doduo)/?"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json; charset=utf-8"
+        },
+        "bodyFileName": "pokemon-species/84.json"
+      }
+    },
+    {
+      "name": "pokemon-species 85",
+      "priority": 5,
+      "request": {
+        "method": "GET",
+        "urlPathPattern": "/api/v2/pokemon-species/(?i)(85|dodrio)/?"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json; charset=utf-8"
+        },
+        "bodyFileName": "pokemon-species/85.json"
+      }
+    },
+    {
+      "name": "pokemon-species 86",
+      "priority": 5,
+      "request": {
+        "method": "GET",
+        "urlPathPattern": "/api/v2/pokemon-species/(?i)(86|seel)/?"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json; charset=utf-8"
+        },
+        "bodyFileName": "pokemon-species/86.json"
+      }
+    },
+    {
+      "name": "pokemon-species 863",
+      "priority": 5,
+      "request": {
+        "method": "GET",
+        "urlPathPattern": "/api/v2/pokemon-species/(?i)(863|perrserker)/?"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json; charset=utf-8"
+        },
+        "bodyFileName": "pokemon-species/863.json"
+      }
+    },
+    {
+      "name": "pokemon-species 865",
+      "priority": 5,
+      "request": {
+        "method": "GET",
+        "urlPathPattern": "/api/v2/pokemon-species/(?i)(865|sirfetchd)/?"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json; charset=utf-8"
+        },
+        "bodyFileName": "pokemon-species/865.json"
+      }
+    },
+    {
+      "name": "pokemon-species 866",
+      "priority": 5,
+      "request": {
+        "method": "GET",
+        "urlPathPattern": "/api/v2/pokemon-species/(?i)(866|mr-rime)/?"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json; charset=utf-8"
+        },
+        "bodyFileName": "pokemon-species/866.json"
+      }
+    },
+    {
+      "name": "pokemon-species 87",
+      "priority": 5,
+      "request": {
+        "method": "GET",
+        "urlPathPattern": "/api/v2/pokemon-species/(?i)(87|dewgong)/?"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json; charset=utf-8"
+        },
+        "bodyFileName": "pokemon-species/87.json"
+      }
+    },
+    {
+      "name": "pokemon-species 88",
+      "priority": 5,
+      "request": {
+        "method": "GET",
+        "urlPathPattern": "/api/v2/pokemon-species/(?i)(88|grimer)/?"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json; charset=utf-8"
+        },
+        "bodyFileName": "pokemon-species/88.json"
+      }
+    },
+    {
+      "name": "pokemon-species 89",
+      "priority": 5,
+      "request": {
+        "method": "GET",
+        "urlPathPattern": "/api/v2/pokemon-species/(?i)(89|muk)/?"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json; charset=utf-8"
+        },
+        "bodyFileName": "pokemon-species/89.json"
+      }
+    },
+    {
+      "name": "pokemon-species 9",
+      "priority": 5,
+      "request": {
+        "method": "GET",
+        "urlPathPattern": "/api/v2/pokemon-species/(?i)(9|blastoise)/?"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json; charset=utf-8"
+        },
+        "bodyFileName": "pokemon-species/9.json"
+      }
+    },
+    {
+      "name": "pokemon-species 90",
+      "priority": 5,
+      "request": {
+        "method": "GET",
+        "urlPathPattern": "/api/v2/pokemon-species/(?i)(90|shellder)/?"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json; charset=utf-8"
+        },
+        "bodyFileName": "pokemon-species/90.json"
+      }
+    },
+    {
+      "name": "pokemon-species 900",
+      "priority": 5,
+      "request": {
+        "method": "GET",
+        "urlPathPattern": "/api/v2/pokemon-species/(?i)(900|kleavor)/?"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json; charset=utf-8"
+        },
+        "bodyFileName": "pokemon-species/900.json"
+      }
+    },
+    {
+      "name": "pokemon-species 91",
+      "priority": 5,
+      "request": {
+        "method": "GET",
+        "urlPathPattern": "/api/v2/pokemon-species/(?i)(91|cloyster)/?"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json; charset=utf-8"
+        },
+        "bodyFileName": "pokemon-species/91.json"
+      }
+    },
+    {
+      "name": "pokemon-species 92",
+      "priority": 5,
+      "request": {
+        "method": "GET",
+        "urlPathPattern": "/api/v2/pokemon-species/(?i)(92|gastly)/?"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json; charset=utf-8"
+        },
+        "bodyFileName": "pokemon-species/92.json"
+      }
+    },
+    {
+      "name": "pokemon-species 93",
+      "priority": 5,
+      "request": {
+        "method": "GET",
+        "urlPathPattern": "/api/v2/pokemon-species/(?i)(93|haunter)/?"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json; charset=utf-8"
+        },
+        "bodyFileName": "pokemon-species/93.json"
+      }
+    },
+    {
+      "name": "pokemon-species 94",
+      "priority": 5,
+      "request": {
+        "method": "GET",
+        "urlPathPattern": "/api/v2/pokemon-species/(?i)(94|gengar)/?"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json; charset=utf-8"
+        },
+        "bodyFileName": "pokemon-species/94.json"
+      }
+    },
+    {
+      "name": "pokemon-species 95",
+      "priority": 5,
+      "request": {
+        "method": "GET",
+        "urlPathPattern": "/api/v2/pokemon-species/(?i)(95|onix)/?"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json; charset=utf-8"
+        },
+        "bodyFileName": "pokemon-species/95.json"
+      }
+    },
+    {
+      "name": "pokemon-species 96",
+      "priority": 5,
+      "request": {
+        "method": "GET",
+        "urlPathPattern": "/api/v2/pokemon-species/(?i)(96|drowzee)/?"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json; charset=utf-8"
+        },
+        "bodyFileName": "pokemon-species/96.json"
+      }
+    },
+    {
+      "name": "pokemon-species 97",
+      "priority": 5,
+      "request": {
+        "method": "GET",
+        "urlPathPattern": "/api/v2/pokemon-species/(?i)(97|hypno)/?"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json; charset=utf-8"
+        },
+        "bodyFileName": "pokemon-species/97.json"
+      }
+    },
+    {
+      "name": "pokemon-species 979",
+      "priority": 5,
+      "request": {
+        "method": "GET",
+        "urlPathPattern": "/api/v2/pokemon-species/(?i)(979|annihilape)/?"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json; charset=utf-8"
+        },
+        "bodyFileName": "pokemon-species/979.json"
+      }
+    },
+    {
+      "name": "pokemon-species 98",
+      "priority": 5,
+      "request": {
+        "method": "GET",
+        "urlPathPattern": "/api/v2/pokemon-species/(?i)(98|krabby)/?"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json; charset=utf-8"
+        },
+        "bodyFileName": "pokemon-species/98.json"
+      }
+    },
+    {
+      "name": "pokemon-species 99",
+      "priority": 5,
+      "request": {
+        "method": "GET",
+        "urlPathPattern": "/api/v2/pokemon-species/(?i)(99|kingler)/?"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json; charset=utf-8"
+        },
+        "bodyFileName": "pokemon-species/99.json"
+      }
+    }
+  ]
+}

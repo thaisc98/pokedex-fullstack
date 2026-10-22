@@ -5,7 +5,7 @@
 #   open http://localhost:3000 (UI) · http://localhost:8080/swagger-ui (API, demo profile)
 #
 # Services: postgres → backend (Spring Boot, Flyway migrates on start) → frontend (Next.js standalone) → edge (nginx).
-# Still to come (docs/roadmap.md P6): the "offline" profile (WireMock + recorded PokeAPI fixtures) and demo seed data.
+# Offline demo (no internet, WireMock instead of PokeAPI): add `-f docker-compose.offline.yml` (see that file).
 #
 # Security (docs/security.md §4.8, §4.10):
 #   - Credentials come only from .env (git-ignored); compose refuses to start if they are missing.

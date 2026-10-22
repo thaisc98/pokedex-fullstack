@@ -116,6 +116,26 @@ Log out and in again so the new role is in your token.
 
 **Postman:** import `postman/pokedex.postman_collection.json` and `postman/local.postman_environment.json`, select the **Pokédex local** environment, and run the folders in order (0 → 5). Cookies and CSRF are handled by the collection scripts. Folder 4 (ADMIN) needs the command above for the email shown in the collection variable `email`, then "Login again".
 
+### Offline demo (no internet)
+
+The same stack with PokeAPI replaced by a local WireMock server (`pokeapi-mock`) that serves recorded **Generation 1** data (Bulbasaur #1 to Mew #151, plus every Pokémon in their evolution chains such as Pichu, Crobat or Sylveon). Same `.env` as above; add the override file to every command:
+
+```bash
+docker compose -f docker-compose.yml -f docker-compose.offline.yml up -d --build
+```
+```bash
+docker compose -f docker-compose.yml -f docker-compose.offline.yml down -v
+```
+
+The images must already be pulled or built once (that first build needs internet; after that, none). What changes in offline mode:
+
+- The catalog has 151 Pokémon. Any other id or name (for example #152) answers 404, as PokeAPI does for an unknown Pokémon.
+- The backend is on an internal-only Docker network, so it cannot reach the internet even by mistake. Its port 8080 is not published: use the API at `http://localhost:3000/api/v1` (through the edge proxy). Swagger UI is not reachable in this mode.
+- Sprites and artwork are loaded by your browser from `raw.githubusercontent.com`. With no internet they don't load and the UI shows its image fallback.
+- The demo seed (accounts and the 6-Pokémon collection) works as usual.
+
+The recorded data, the script that records it, and the transformations applied are described in [docker/pokeapi-mock/README.md](docker/pokeapi-mock/README.md).
+
 ### 3. Run the tests
 
 ```bash

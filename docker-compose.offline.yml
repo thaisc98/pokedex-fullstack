@@ -1,0 +1,73 @@
+# Offline demo (docs/roadmap.md P6): the whole stack with NO internet. PokeAPI is replaced by a WireMock
+# server that serves recorded Generation 1 data (docker/pokeapi-mock/, README there).
+#
+#   docker compose -f docker-compose.yml -f docker-compose.offline.yml up -d --build
+#   docker compose -f docker-compose.yml -f docker-compose.offline.yml down -v
+#
+# Why an override file and not `--profile offline`: a profile can add a service but cannot change another
+# service's environment, and the backend must get POKEAPI_BASE_URL=http://pokeapi-mock:8080/api/v2 and wait for
+# the mock. One extra -f flag does all of it, with no .env edits to remember or undo.
+#
+# Isolation: the backend is attached ONLY to the `offline` network, which is `internal: true` (no route to
+# the internet). If anything still tried pokeapi.co, it would fail instead of silently going online.
+# Side effect: the backend's direct port (8080) is not published; the API is still at
+# http://localhost:3000/api/... through edge → frontend. Sprites and artwork are loaded by the browser from
+# raw.githubusercontent.com, so with no internet the UI shows its image fallback (expected).
+
+services:
+  pokeapi-mock:
+    # Same WireMock version as the backend ITs (backend/pom.xml wiremock.version). Pinned by tag AND digest
+    # (multi-arch index; the -alpine variant is amd64-only). Verified with `docker buildx imagetools inspect`.
+    image: wiremock/wiremock:3.13.2-3@sha256:0d4ecb3e4dc8213fd7a4d37d6a78f6e6b553a6d2e15bd51b0999781282ac61b3
+    restart: unless-stopped
+    # Non-root (the image defaults to root), read-only filesystem, recorded data mounted read-only.
+    user: "1000:1000"
+    read_only: true
+    tmpfs:
+      - /tmp
+    command:
+      - --port=8080
+      - --disable-banner
+      # The request journal (GET /__admin/requests) proves where every call went; bounded so it can't grow.
+      - --max-request-journal-entries=2000
+    volumes:
+      - ./docker/pokeapi-mock/mappings:/home/wiremock/mappings:ro
+      - ./docker/pokeapi-mock/__files:/home/wiremock/__files:ro
+    networks:
+      - offline
+    # No published port: only the backend talks to it.
+    expose:
+      - "8080"
+    healthcheck:
+      test: ["CMD-SHELL", "curl -fsS http://127.0.0.1:8080/__admin/health > /dev/null || exit 1"]
+      interval: 5s
+      timeout: 3s
+      retries: 12
+      start_period: 10s
+    security_opt:
+      - no-new-privileges:true
+
+  postgres:
+    networks:
+      - default
+      - offline
+
+  backend:
+    depends_on:
+      pokeapi-mock:
+        condition: service_healthy
+    environment:
+      POKEAPI_BASE_URL: http://pokeapi-mock:8080/api/v2
+    networks:
+      - offline
+    # A port can't be published from an internal-only network; see the header.
+    ports: !reset []
+
+  frontend:
+    networks:
+      - default
+      - offline
+
+networks:
+  offline:
+    internal: true

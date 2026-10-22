@@ -1,0 +1,58 @@
+{
+  "mappings": [
+    {
+      "name": "pokemon list page (templated slice)",
+      "priority": 5,
+      "request": {
+        "method": "GET",
+        "urlPath": "/api/v2/pokemon",
+        "queryParameters": {
+          "offset": {
+            "matches": "[0-9]{1,9}"
+          },
+          "limit": {
+            "matches": "[0-9]{1,3}"
+          }
+        }
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json; charset=utf-8"
+        },
+        "bodyFileName": "pokemon-list/page.json.hbs",
+        "transformers": [
+          "response-template"
+        ]
+      }
+    },
+    {
+      "name": "pokemon list page far past the end",
+      "priority": 5,
+      "request": {
+        "method": "GET",
+        "urlPath": "/api/v2/pokemon",
+        "queryParameters": {
+          "offset": {
+            "matches": "[0-9]{10,}"
+          },
+          "limit": {
+            "matches": "[0-9]{1,3}"
+          }
+        }
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json; charset=utf-8"
+        },
+        "jsonBody": {
+          "count": 151,
+          "next": null,
+          "previous": null,
+          "results": []
+        }
+      }
+    }
+  ]
+}
