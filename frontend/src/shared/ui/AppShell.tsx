@@ -1,5 +1,6 @@
 import type { ReactNode } from "react";
-import { AppButtonLink, AppLink } from "./AppLink";
+import { UserMenu } from "@/features/auth/UserMenu";
+import { AppLink } from "./AppLink";
 import { MainNav, MobileMenu } from "./MainNav";
 import { ThemeToggle } from "./ThemeToggle";
 
@@ -32,12 +33,7 @@ export function AppShell({ children }: { children: ReactNode }) {
 
           <div className="ml-auto flex items-center gap-2">
             <div className="hidden items-center gap-2 md:flex">
-              <AppButtonLink href="/login" variant="ghost" size="sm">
-                Log in
-              </AppButtonLink>
-              <AppButtonLink href="/register" variant="primary" size="sm">
-                Register
-              </AppButtonLink>
+              <UserMenu />
             </div>
             <ThemeToggle />
             <MobileMenu className="md:hidden" />

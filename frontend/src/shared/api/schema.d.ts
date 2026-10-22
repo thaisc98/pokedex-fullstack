@@ -409,6 +409,8 @@ export interface components {
             types: components["schemas"]["PokemonType"][];
             height: components["schemas"]["HeightM"];
             mass: components["schemas"]["MassKg"];
+            /** @description Abilities with the hidden flag, upstream order (same as `PokemonSummaryDto.abilities`; ui-ux §5.2). */
+            abilities: components["schemas"]["Ability"][];
         };
         /**
          * @description A normalized tag (`Tag`): lowercased, trimmed.

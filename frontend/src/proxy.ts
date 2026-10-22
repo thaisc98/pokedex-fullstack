@@ -1,5 +1,8 @@
 import { NextResponse, type NextRequest } from "next/server";
 
+/** Same name as `SIGNED_IN_HINT_COOKIE` in shared/api/cookies.ts (kept local: proxy stays dependency-free). */
+const SIGNED_IN_HINT_COOKIE = "pokedex_signed_in";
+
 /**
  * Per-request CSP nonce + security headers (docs/security.md §4.7, §5; Next.js CSP guide).
  *
@@ -38,6 +41,14 @@ function buildCsp(nonce: string, { isDev, https }: { isDev: boolean; https: bool
 }
 
 export function proxy(request: NextRequest) {
+  if (request.nextUrl.pathname.startsWith("/api/")) {
+    // /api/* is rewritten to Spring. On its own the rewrite forwards no X-Forwarded-For
+    // (verified against a local echo backend), so Spring would see only this server's IP.
+    // Here Next has already filled X-Forwarded-For with the client's socket address (or kept
+    // the value an upstream proxy set); we pass exactly that along, unchanged.
+    // Spring sets its own security headers on API responses.
+    return NextResponse.next({ request: { headers: new Headers(request.headers) } });
+  }
   const nonce = createNonce();
   const https = isHttps(request);
   const csp = buildCsp(nonce, { isDev: process.env.NODE_ENV === "development", https });
@@ -47,8 +58,19 @@ export function proxy(request: NextRequest) {
   requestHeaders.set("x-nonce", nonce);
   requestHeaders.set("Content-Security-Policy", csp);
 
-  // TODO(Phase B): optimistic redirect of /collection/** to /login?from=… when the
-  // `access_token` cookie is ABSENT (presence check only, never verification).
+  // Optimistic, UX-only redirect (security.md §3.3): no sign-in hint → go to login first.
+  // `access_token` is `Path=/api`, so it is never sent with page requests; we check the
+  // `pokedex_signed_in` hint the app sets after login. Never an authorization decision:
+  // the Spring API still answers 401/403 on its own.
+  const { pathname, search } = request.nextUrl;
+  if (
+    (pathname === "/collection" || pathname.startsWith("/collection/")) &&
+    request.cookies.get(SIGNED_IN_HINT_COOKIE)?.value !== "1"
+  ) {
+    const login = new URL("/login", request.url);
+    login.searchParams.set("from", `${pathname}${search}`);
+    return NextResponse.redirect(login);
+  }
 
   const response = NextResponse.next({ request: { headers: requestHeaders } });
   response.headers.set("Content-Security-Policy", csp);
@@ -65,8 +87,8 @@ export function proxy(request: NextRequest) {
 export const config = {
   matcher: [
     /*
-     * All paths except /api (Spring sets its own headers), static files, the image
-     * optimizer and the favicon. Prefetches skip the proxy (Next.js CSP guide).
+     * Pages: all paths except /api, static files, the image optimizer and the favicon.
+     * Prefetches skip the proxy (Next.js CSP guide). /api gets its own entry (X-Forwarded-For).
      */
     {
       source: "/((?!api|_next/static|_next/image|favicon.ico).*)",
@@ -75,5 +97,6 @@ export const config = {
         { type: "header", key: "purpose", value: "prefetch" },
       ],
     },
+    "/api/:path*",
   ],
 };
