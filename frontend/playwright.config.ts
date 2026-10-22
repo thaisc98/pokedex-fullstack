@@ -31,18 +31,23 @@ export default defineConfig({
   },
   projects: [
     { name: "setup", testMatch: /global\.setup\.ts/ },
+    // One request-level check of the nginx edge (X-Forwarded-For overwrite); no viewport involved.
+    { name: "edge", testMatch: /edge\.spec\.ts/, dependencies: ["setup"] },
     {
       name: "mobile-375",
+      testIgnore: /edge\.spec\.ts/,
       use: { ...devices["Desktop Chrome"], viewport: { width: 375, height: 812 } },
       dependencies: ["setup"],
     },
     {
       name: "tablet-768",
+      testIgnore: /edge\.spec\.ts/,
       use: { ...devices["Desktop Chrome"], viewport: { width: 768, height: 1024 } },
       dependencies: ["setup"],
     },
     {
       name: "desktop-1280",
+      testIgnore: /edge\.spec\.ts/,
       use: { ...devices["Desktop Chrome"], viewport: { width: 1280, height: 800 } },
       dependencies: ["setup"],
     },
