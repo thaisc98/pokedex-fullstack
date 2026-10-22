@@ -293,6 +293,30 @@ Every substantial AI interaction, with the decision taken on its output. This lo
 
 ---
 
+## #013 — HTTP caching, session-expiry warning and the Lighthouse gate
+
+- **Date:** 2026-10-22
+- **Tool:** Claude Code (Claude Opus 5.5): backend, frontend and test engineers in parallel worktrees; lead session reviewing CI
+- **Phase:** P5 / P6 polish
+
+**Prompts (summary):** #4 `Cache-Control` on public catalog responses (ADR 0004 promised it); #5 a session-expiry warning 2 minutes before the 60-minute login ends (security.md §5); #6 a Lighthouse CI gate (accessibility ≥ 90).
+
+**Output:** PRs #48 (`Cache-Control` + ETag/304), #50 (session warning), #49 (Lighthouse CI in the E2E job; accessibility 0.98–1.00 on every page and preset).
+
+**Verdict:** ✏️ Modified
+
+| What the AI did or proposed | What was changed / decided | Why |
+|---|---|---|
+| Disable Spring Security's cache-control writer for the catalog | Not needed: the writer skips responses that already have `Cache-Control`; errors keep `no-store` | Found by the backend agent, so no security config was loosened |
+| — | Firewall-rejected requests (`/pokemon/pika;drop`) had **no** `Cache-Control` at all; now `no-store` | A gap found while adding the header |
+| Session warning only from the login response | A second non-secret cookie `pokedex_session_expires` (ADR 0012 addendum) | `GET /auth/me` doesn't return `expiresAt`, so a reload lost the timer; the human chose not to change the backend |
+| Expiry clears the session like a 401 | …except when the edit form has unsaved input: the page stays and says so | Never discard a user's edits silently |
+| Lighthouse "temporary public storage" upload (LHCI default) | Reports to the filesystem only | Public repo: reports can contain URLs and data from the run |
+
+**Findings handed to the frontend engineer:** card titles skip a heading level (`h3` after `h1`), a missing favicon (404 in the console), Zod 4's JIT probe hitting the strict CSP on `/login` (fix: `z.config({ jitless: true })`, never loosen the CSP), and missing meta descriptions on detail pages.
+
+---
+
 ## Template
 
 ```markdown

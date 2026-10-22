@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { ThemeProvider } from "next-themes";
 import type { ReactNode } from "react";
 import { SessionBootstrap } from "@/features/auth/SessionBootstrap";
+import { SessionExpiry } from "@/features/auth/SessionExpiry";
 import { StoreProvider } from "@/store/StoreProvider";
 
 /**
@@ -29,6 +30,7 @@ export function Providers({ children, nonce }: { children: ReactNode; nonce?: st
       <RouterProvider navigate={(href) => router.push(href)}>
         <StoreProvider>
           <SessionBootstrap />
+          <SessionExpiry />
           {children}
           <Toast.Provider placement="bottom end" />
         </StoreProvider>

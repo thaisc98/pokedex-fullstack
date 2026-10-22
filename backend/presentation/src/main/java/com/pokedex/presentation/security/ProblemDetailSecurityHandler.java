@@ -58,6 +58,8 @@ final class ProblemDetailSecurityHandler
     public void handle(
             HttpServletRequest request, HttpServletResponse response, RequestRejectedException requestRejectedException)
             throws IOException {
+        // The firewall rejects before the security filter chain, so its header writers never run here.
+        response.setHeader("Cache-Control", "no-store");
         write(response, HttpServletResponse.SC_BAD_REQUEST, REQUEST_REJECTED);
     }
 

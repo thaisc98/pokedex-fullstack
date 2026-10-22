@@ -6,6 +6,7 @@ import static org.mockito.Mockito.when;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.jwt;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.request;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -123,6 +124,14 @@ class CollectionAuthorizationMatrixTest {
                 .andExpect(status().isForbidden())
                 .andExpect(jsonPath("$.type").value("/problems/forbidden"));
         verifyNoInteractions(deleteOne);
+    }
+
+    @Test
+    void should_never_let_a_personal_collection_response_be_cached() throws Exception {
+        // security.md §4.7: only the public catalog is cacheable; the collection is per user -> no-store
+        mockMvc.perform(as("USER", request(HttpMethod.GET, "/api/v1/collection")))
+                .andExpect(status().isOk())
+                .andExpect(header().string("Cache-Control", org.hamcrest.Matchers.containsString("no-store")));
     }
 
     static MockHttpServletRequestBuilder as(String caller, MockHttpServletRequestBuilder request) {

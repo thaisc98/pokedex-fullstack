@@ -22,6 +22,7 @@ import { fieldErrors, isApiError } from "@/shared/api/apiError";
 import type { CollectedPokemon } from "@/shared/api/types";
 import { formatName } from "@/shared/lib/formatName";
 import { problemCopy } from "@/shared/lib/problemCopy";
+import { useReportUnsavedChanges } from "@/shared/lib/unsavedChanges";
 import { ErrorSummary, type SummaryItem } from "@/shared/ui/ErrorSummary";
 import { FormTextField } from "@/shared/ui/FormTextField";
 import { useUpdateCollectedMutation } from "../collectionApi";
@@ -65,6 +66,8 @@ export function EditForm({ item, onDone, onCancel, onReloadLatest, onRemoved }: 
     defaultValues: fromItem(item.custom),
   });
   const names = useFieldArray({ control, name: "localizedNames" });
+  // Lets the session-expiry handling keep this page (and the input) instead of redirecting.
+  useReportUnsavedChanges(formState.isDirty);
 
   const onValid = async (values: EditValues) => {
     setFormError(null);

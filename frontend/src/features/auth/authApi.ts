@@ -1,5 +1,5 @@
 import { baseApi } from "@/shared/api/baseApi";
-import { clearSignedInHint, setSignedInHint } from "@/shared/api/cookies";
+import { clearSignedInHint, readSessionExpiry, setSignedInHint } from "@/shared/api/cookies";
 import type { LoginRequest, LoginResponse, RegisterRequest, UserDto } from "@/shared/api/types";
 import { sessionEnded, signedIn, userLoaded } from "./authSlice";
 
@@ -11,7 +11,9 @@ export const authApi = baseApi.injectEndpoints({
       async onQueryStarted(_, { dispatch, queryFulfilled }) {
         try {
           const { data } = await queryFulfilled;
-          dispatch(userLoaded(data));
+          // /auth/me has no expiry; the one saved at login re-arms the expiry warning.
+          const expiresAt = readSessionExpiry();
+          dispatch(expiresAt ? signedIn({ user: data, expiresAt }) : userLoaded(data));
         } catch {
           // 401 is handled in baseQuery (sessionEnded); anything else: treat as signed out.
           dispatch(sessionEnded());

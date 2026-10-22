@@ -19,8 +19,13 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
+import java.time.Duration;
 import org.jspecify.annotations.Nullable;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.CacheControl;
 import org.springframework.http.ProblemDetail;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -45,6 +50,10 @@ public class CatalogController {
     private final ListPokemonUseCase listPokemon;
     private final GetPokemonDetailUseCase getPokemonDetail;
     private final SearchPokemonNamesUseCase searchPokemonNames;
+    private final CacheControl httpCache;
+
+    static final Duration DEFAULT_MAX_AGE = Duration.ofSeconds(300);
+    static final Duration DEFAULT_STALE_WHILE_REVALIDATE = Duration.ofSeconds(86_400);
 
     /**
      * Name search (autocomplete). A literal {@code /search} mapping, so Spring matches it before {@code
@@ -65,7 +74,7 @@ public class CatalogController {
             responseCode = "503",
             description = "The name index cannot be loaded (`/problems/upstream-unavailable`).",
             content = @Content(mediaType = PROBLEM_JSON, schema = @Schema(implementation = ProblemDetail.class)))
-    public PokemonSearchResultDto search(
+    public ResponseEntity<PokemonSearchResultDto> search(
             @Parameter(description = "Name fragment; trimmed, lowercased, spaces become hyphens.", required = true)
                     @RequestParam(name = "q", required = false)
                     @Nullable String q,
@@ -76,16 +85,38 @@ public class CatalogController {
             throw new InvalidValueException("q", "is required");
         }
         NameQuery query = NameQuery.parse(q);
-        return CatalogDtoMapper.toSearchResult(searchPokemonNames.search(query, new SearchLimit(limit)));
+        return cacheable(CatalogDtoMapper.toSearchResult(searchPokemonNames.search(query, new SearchLimit(limit))));
     }
 
+    /** With the default HTTP cache policy (5 min fresh, 1 day stale-while-revalidate). */
     public CatalogController(
             ListPokemonUseCase listPokemon,
             GetPokemonDetailUseCase getPokemonDetail,
             SearchPokemonNamesUseCase searchPokemonNames) {
+        this(listPokemon, getPokemonDetail, searchPokemonNames, DEFAULT_MAX_AGE, DEFAULT_STALE_WHILE_REVALIDATE);
+    }
+
+    /**
+     * @param maxAge how long a shared or browser cache may serve a catalog 200 without asking again
+     * @param staleWhileRevalidate how long after that it may still serve it while revalidating in the background
+     */
+    @Autowired
+    public CatalogController(
+            ListPokemonUseCase listPokemon,
+            GetPokemonDetailUseCase getPokemonDetail,
+            SearchPokemonNamesUseCase searchPokemonNames,
+            @Value("${pokedex.catalog.http-cache.max-age:300s}") Duration maxAge,
+            @Value("${pokedex.catalog.http-cache.stale-while-revalidate:86400s}") Duration staleWhileRevalidate) {
         this.searchPokemonNames = searchPokemonNames;
         this.listPokemon = listPokemon;
         this.getPokemonDetail = getPokemonDetail;
+        // security.md §4.7: public, non-personalized catalog data only. Spring Security leaves a Cache-Control that
+        // is already set alone; every other response (errors included) keeps its no-store.
+        this.httpCache = CacheControl.maxAge(maxAge).cachePublic().staleWhileRevalidate(staleWhileRevalidate);
+    }
+
+    private <T> ResponseEntity<T> cacheable(T body) {
+        return ResponseEntity.ok().cacheControl(httpCache).body(body);
     }
 
     /**
@@ -113,7 +144,7 @@ public class CatalogController {
             responseCode = "503",
             description = "PokeAPI unavailable, too large or partial (`/problems/upstream-unavailable`).",
             content = @Content(mediaType = PROBLEM_JSON, schema = @Schema(implementation = ProblemDetail.class)))
-    public PokemonDetailDto detail(
+    public ResponseEntity<PokemonDetailDto> detail(
             @Parameter(description = "Pokédex id (all digits) or name (case-insensitive).")
                     @PathVariable(name = ID_OR_NAME)
                     String idOrName,
@@ -127,7 +158,7 @@ public class CatalogController {
         } catch (InvalidValueException e) {
             throw new InvalidValueException(ID_OR_NAME, ID_OR_NAME_MESSAGE);
         }
-        return CatalogDtoMapper.toDto(getPokemonDetail.get(ref));
+        return cacheable(CatalogDtoMapper.toDto(getPokemonDetail.get(ref)));
     }
 
     /**
@@ -148,12 +179,12 @@ public class CatalogController {
             responseCode = "503",
             description = "PokeAPI unavailable, too large or partial (`/problems/upstream-unavailable`).",
             content = @Content(mediaType = PROBLEM_JSON, schema = @Schema(implementation = ProblemDetail.class)))
-    public PageResponse<PokemonSummaryDto> list(
+    public ResponseEntity<PageResponse<PokemonSummaryDto>> list(
             @Parameter(description = "Zero-based page index (BR-01).") @RequestParam(name = "page", defaultValue = "0")
                     int page,
             @Parameter(description = "Page size (BR-01). 1–100, default 20.")
                     @RequestParam(name = "size", defaultValue = "" + PageRequest.DEFAULT_SIZE)
                     int size) {
-        return CatalogDtoMapper.toResponse(listPokemon.list(new PageRequest(page, size)));
+        return cacheable(CatalogDtoMapper.toResponse(listPokemon.list(new PageRequest(page, size))));
     }
 }

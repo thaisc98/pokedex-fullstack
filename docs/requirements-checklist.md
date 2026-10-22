@@ -42,7 +42,7 @@ Every requirement from the exercise brief, mapped to where it is designed and wh
 | Responsive, user-centric design | [ui-ux.md](ui-ux.md) §1–7, §9 | P5 | [x] |
 | CRUD operations for the user stories | [architecture §3](architecture.md) | P5 | [x] |
 | Clean component structure and efficient state management | [architecture §3.1](architecture.md) | P5 | [x] |
-| Nice-to-have: no browser console warnings | Playwright console guard | P5 | [ ] (pages are clean in the production build; the automated guard lands with the Playwright PR) |
+| Nice-to-have: no browser console warnings | Playwright console guard | P5 | [x] (enforced on every PR by the E2E job) |
 
 ## Delivery
 

@@ -30,3 +30,6 @@ test-results/
 
 # Logs
 *.log
+
+# Lighthouse CI working directory (reports go to frontend/test-results/lighthouse/)
+.lighthouseci/

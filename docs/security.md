@@ -116,7 +116,7 @@ Two boundaries matter most: **browser → API** (every input is untrusted) and *
 
 Hiding a button is a convenience. The API enforces every rule on its own.
 
-> **Why `proxy.ts` is never the security boundary:** the Next.js docs describe Proxy as being for *optimistic* checks, not full authorization. CVE-2025-29927 (a Next.js middleware bypass via a crafted header) showed what happens when apps rely on it. Our proxy only checks that a cookie **exists**. Because `access_token` is scoped to `Path=/api`, page requests never carry it, so the frontend sets a separate `pokedex_signed_in=1` hint cookie after login (removed on logout or any 401). It holds no secret and grants nothing; it only drives this redirect and lets visitors skip a pointless `GET /auth/me`. It doesn't hold the JWT secret and doesn't verify the token. Even if the proxy is bypassed, the Spring API still returns 401/403.
+> **Why `proxy.ts` is never the security boundary:** the Next.js docs describe Proxy as being for *optimistic* checks, not full authorization. CVE-2025-29927 (a Next.js middleware bypass via a crafted header) showed what happens when apps rely on it. Our proxy only checks that a cookie **exists**. Because `access_token` is scoped to `Path=/api`, page requests never carry it, so the frontend sets a separate `pokedex_signed_in=1` hint cookie after login (removed on logout or any 401). It holds no secret and grants nothing; it only drives this redirect and lets visitors skip a pointless `GET /auth/me`. A second non-secret cookie, `pokedex_session_expires` (the session's expiry time only, same lifetime, removed together with the hint), lets the session-expiry warning survive a page reload, because `GET /auth/me` doesn't return `expiresAt` ([ADR 0012](adr/0012-signed-in-hint-cookie.md)). It doesn't hold the JWT secret and doesn't verify the token. Even if the proxy is bypassed, the Spring API still returns 401/403.
 
 ---
 
@@ -207,7 +207,8 @@ Sources: the [Spring Security 7.1.1 CSRF reference](https://docs.spring.io/sprin
 | `X-Frame-Options` | `DENY` |
 | `Referrer-Policy` | `strict-origin-when-cross-origin` |
 | `Permissions-Policy` | `camera=(), microphone=(), geolocation=()` |
-| `Cache-Control` (authenticated responses) | `no-store` |
+| `Cache-Control` (public catalog: `200` from `GET /api/v1/pokemon`, `/api/v1/pokemon/{idOrName}`, `/api/v1/pokemon/search`) | `public, max-age=300, stale-while-revalidate=86400` (`pokedex.catalog.http-cache.*`), plus an `ETag` for `304` revalidation. The data is public and the same for every caller (ADR 0004) |
+| `Cache-Control` (everything else: auth, collection, actuator, docs, and every error, catalog `400`/`404`/`503` included) | `no-store` |
 
 ### 4.8 Configuration and secrets (A02)
 
@@ -242,6 +243,7 @@ Sources: the [Spring Security 7.1.1 CSRF reference](https://docs.spring.io/sprin
   | Package | Path | Advisory | Why accepted |
   |---|---|---|---|
   | `braces` ≤ 3.0.3 | via `eslint-config-next` (lint tooling) | [GHSA-vfj7-8cjw-p6xm](https://github.com/advisories/GHSA-vfj7-8cjw-p6xm) | Dev-only, never shipped in the bundle; no patched release available |
+  | `tmp`, `basic-ftp`, `extract-zip`, `uuid` | via `@lhci/cli` (Lighthouse CI) | npm audit advisories (dev tree) | Dev-only CI tooling, runs only against our own local stack in CI; never shipped. Revisit when `@lhci/cli` updates them |
 - Dependabot for Maven, npm, Docker and GitHub Actions.
 - Docker base images pinned by digest in CI builds.
 
@@ -262,7 +264,7 @@ Sources: the [Spring Security 7.1.1 CSRF reference](https://docs.spring.io/sprin
 | Fingerprinting | `poweredByHeader: false` (no `X-Powered-By: Next.js`) |
 | Third-party code | No CDN scripts. Fonts and icons are self-hosted, so CSP can stay `'self'` |
 | Error details | `error.tsx` / `global-error.tsx` and `ErrorState` show friendly messages plus the `correlationId`, never stack traces (Next.js hides server error details in production) |
-| Session expiry | On `401` → `logout()` clears the store and redirects to `/login?from=…`. A timer based on `expiresAt` warns 2 min before expiry |
+| Session expiry | On `401` → `logout()` clears the store and redirects to `/login?from=…`. A timer based on `expiresAt` (restored after a reload from the non-secret `pokedex_session_expires` cookie) shows a polite notice 2 min before expiry: "Your session ends in 2 minutes. Save your changes." with **Log in again** (back to the same page) and **Dismiss**. At expiry the session is cleared like a 401; unsaved edit-form input is never discarded silently. No refresh token, so the session can't be extended (§9) |
 | Dependency risk | `npm audit --omit=dev --audit-level=high` in CI (dev-tool findings reviewed by hand, §4.10), Dependabot, lockfile committed |
 
 ---
@@ -333,7 +335,7 @@ Sources: the [Spring Security 7.1.1 CSRF reference](https://docs.spring.io/sprin
 | Cryptography | L1 | ✅ library primitives only (BCrypt, Nimbus); no custom crypto |
 | Secure communication | L1 | ✅ HTTPS + HSTS in deployment · ⚠️ plain HTTP accepted for `localhost` only |
 | Configuration | L1 + L2 | ✅ secrets from env, minimal actuator, least-privilege DB user |
-| Data protection | L1 | ✅ `no-store` on authenticated responses, no sensitive data in URLs |
+| Data protection | L1 | ✅ `no-store` on every response except public catalog `200`s (§4.7), no sensitive data in URLs |
 | Security logging & error handling | L1 + L2 | ✅ security events, no secrets in logs, generic errors |
 | File handling, OAuth/OIDC, WebRTC | — | N/A (the app has no file uploads, external identity provider or WebRTC) |
 
