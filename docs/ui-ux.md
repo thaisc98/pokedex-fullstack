@@ -303,7 +303,7 @@ HeroUI's theme uses CSS variables mapped to Tailwind with `@theme inline`. A pla
 | Screen | Loading | Empty | Error | Unauthorized |
 |---|---|---|---|---|
 | Catalog | Skeleton grid (20 cards) | "No Pokémon on this page" + go to page 1 | `ErrorState` + Retry (503: "PokeAPI is unavailable") | — |
-| Detail | Skeleton layout | — | 404 page variant / `ErrorState` | — |
+| Detail | Skeleton layout (client-side navigation). On a full page load the page waits for its data, because `htmlLimitedBots: /.*/` puts `generateMetadata` (title + meta description) in `<head>` for every visitor (#52) | — | 404 page variant / `ErrorState` | — |
 | Collection | Skeleton rows | `EmptyState` + Browse catalog | `ErrorState` + Retry | Redirect to login |
 | Edit | Form skeleton | — | Field errors / `ErrorSummary` / 409 dialog / 404 notice | Redirect to login |
 | Login / Register | Button spinner | — | Generic auth error / 429 countdown / field errors | — |

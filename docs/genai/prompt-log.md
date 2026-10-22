@@ -315,6 +315,8 @@ Every substantial AI interaction, with the decision taken on its output. This lo
 
 **Findings handed to the frontend engineer:** card titles skip a heading level (`h3` after `h1`), a missing favicon (404 in the console), Zod 4's JIT probe hitting the strict CSP on `/login` (fix: `z.config({ jitless: true })`, never loosen the CSP), and missing meta descriptions on detail pages.
 
+**Follow-up (#52, the last PR before delivery):** all four fixed; Lighthouse accessibility, best practices and SEO 1.0 on every audited page, performance 0.92–0.94 mobile / 1.0 desktop. The meta description needed `htmlLimitedBots: /.*/` (metadata in `<head>` for all visitors); the human kept it for every visitor rather than bots only, accepting that detail pages wait for their data on a full page load.
+
 ---
 
 ## Template
