@@ -72,6 +72,13 @@ describe("EvolutionTree", () => {
     expect(screen.getByRole("link", { name: /Vaporeon/ })).not.toHaveAttribute("aria-current");
   });
 
+  it("should_label_only_the_current_stage_with_a_visible_badge", () => {
+    render(<EvolutionTree root={eevee} currentId={135} />);
+
+    expect(screen.getAllByText("This Pokémon")).toHaveLength(1);
+    expect(within(screen.getByRole("link", { name: /Jolteon/ })).getByText("This Pokémon")).toBeInTheDocument();
+  });
+
   it("should_show_each_trigger_in_words", () => {
     render(<EvolutionTree root={eevee} currentId={133} />);
 

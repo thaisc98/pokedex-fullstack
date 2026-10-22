@@ -44,6 +44,11 @@ export function safeSprite(value: unknown): string {
   return isSpriteUrl(value) ? value : PLACEHOLDER_SPRITE;
 }
 
+/** Official artwork for a species id (the hero image's path), from the allow-listed base. */
+export function artworkForId(id: number): string {
+  return `https://${SPRITE_HOST}${SPRITE_PATH_PREFIX}master/sprites/pokemon/other/official-artwork/${Math.trunc(id)}.png`;
+}
+
 /** Front sprite for a species id, built from the allow-listed base (never from upstream URLs). */
 export function spriteForId(id: number): string {
   return `https://${SPRITE_HOST}${SPRITE_PATH_PREFIX}master/sprites/pokemon/${Math.trunc(id)}.png`;

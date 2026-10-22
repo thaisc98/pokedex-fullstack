@@ -1,6 +1,6 @@
 "use client";
 
-import { Label, ListBox, Pagination, Select, Skeleton } from "@heroui/react";
+import { Button, Label, ListBox, Pagination, Select, Skeleton } from "@heroui/react";
 import { useRouter } from "next/navigation";
 import { useEffect, useTransition } from "react";
 import { useIsClient } from "@/shared/lib/useIsClient";
@@ -111,5 +111,42 @@ function PageSizeSelect({ size, onChange }: { size: number; onChange: (size: num
         </ListBox>
       </Select.Popover>
     </Select>
+  );
+}
+
+/**
+ * Compact pager next to "Showing …" at the top of the grid: Prev · X / Y · Next.
+ * Deliberately not a list and not labelled "Next page": the full pagination below keeps
+ * those names, so there is exactly one "Next page" control on the page.
+ */
+export function TopPager({ page, size, totalPages }: Props) {
+  const router = useRouter();
+  const [isPending, startTransition] = useTransition();
+  const go = (target: number) => startTransition(() => router.push(catalogHref({ page: target, size })));
+  if (totalPages <= 1) return null;
+  return (
+    <nav aria-label="Catalog pages, top" className="flex items-center gap-1" aria-busy={isPending || undefined}>
+      <Button
+        size="sm"
+        variant="ghost"
+        isDisabled={page <= 1}
+        onPress={() => go(page - 1)}
+        aria-label={page > 1 ? `Prev: page ${page - 1}` : "Prev"}
+      >
+        ‹ Prev
+      </Button>
+      <span className="px-1 text-sm tabular-nums text-muted">
+        {page} / {totalPages}
+      </span>
+      <Button
+        size="sm"
+        variant="ghost"
+        isDisabled={page >= totalPages}
+        onPress={() => go(page + 1)}
+        aria-label={page < totalPages ? `Next: page ${page + 1}` : "Next"}
+      >
+        Next ›
+      </Button>
+    </nav>
   );
 }
