@@ -56,6 +56,14 @@
             <artifactId>archunit-junit5</artifactId>
             <scope>test</scope>
         </dependency>
+        <!-- In-memory fakes for the demo-seed unit tests (architecture §2.4). -->
+        <dependency>
+            <groupId>com.pokedex</groupId>
+            <artifactId>pokedex-application</artifactId>
+            <version>${project.version}</version>
+            <type>test-jar</type>
+            <scope>test</scope>
+        </dependency>
         <!-- PostgreSQL Testcontainer for the ITs via @ServiceConnection (Boot-managed, Testcontainers 2.x). -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
