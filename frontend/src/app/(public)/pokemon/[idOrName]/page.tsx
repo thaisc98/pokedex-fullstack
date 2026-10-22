@@ -10,7 +10,7 @@ import { TypeBadge } from "@/features/catalog/components/TypeBadge";
 import type { PokemonDetail } from "@/features/catalog/types";
 import { CatalogError, getPokemonDetail } from "@/server/catalogClient";
 import { formatDexNumber, formatKg, formatMeters } from "@/shared/lib/format";
-import { formatName } from "@/shared/lib/formatName";
+import { formatName, formatSlug } from "@/shared/lib/formatName";
 import type { ProblemDetail } from "@/shared/lib/problemCopy";
 import { ErrorState } from "@/shared/ui/ErrorState";
 import { Sprite } from "@/shared/ui/Sprite";
@@ -31,7 +31,15 @@ const load = cache(async (idOrName: string): Promise<Result> => {
 export async function generateMetadata(props: PageProps<"/pokemon/[idOrName]">): Promise<Metadata> {
   const { idOrName } = await props.params;
   const result = await load(idOrName);
-  return { title: result.ok ? formatName(result.pokemon.name) : "Pokémon unavailable" };
+  if (!result.ok) return { title: "Pokémon unavailable" };
+  const { pokemon } = result;
+  const name = formatName(pokemon.name);
+  // The detail DTO has no category, so the description uses the number and types.
+  const types = pokemon.types.map(formatSlug).join("/");
+  return {
+    title: name,
+    description: `${name} (${formatDexNumber(pokemon.id)}), ${types} type: base stats, abilities and evolution chain.`,
+  };
 }
 
 /** US02 detail: Server Component (Next.js 16: params is a Promise). */

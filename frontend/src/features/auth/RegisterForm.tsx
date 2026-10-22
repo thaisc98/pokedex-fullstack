@@ -5,7 +5,7 @@ import { Button, Card, Form, toast } from "@heroui/react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useState } from "react";
 import { useForm, type FieldPath } from "react-hook-form";
-import { z } from "zod";
+import { z } from "@/shared/lib/zod";
 import { safeRedirect } from "@/shared/lib/safeRedirect";
 import { AppLink } from "@/shared/ui/AppLink";
 import { ErrorSummary, type SummaryItem } from "@/shared/ui/ErrorSummary";
