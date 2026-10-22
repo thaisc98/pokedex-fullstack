@@ -177,7 +177,8 @@ function CollectionTable({ items }: { items: CollectedPokemon[] }) {
                   <Table.Cell className="tabular-nums text-muted">{formatDexNumber(item.id)}</Table.Cell>
                   <Table.Cell>
                     <AppLink href={`/collection/${item.id}`} className="flex items-center gap-2 font-medium text-foreground">
-                      <Sprite src={item.snapshot.sprite} alt="" size={40} className="[image-rendering:pixelated]" />
+                      {/* Eager: lazy images inside the table's scroll container could stay unloaded. */}
+                      <Sprite src={item.snapshot.sprite} alt="" size={48} eager className="-my-2 [image-rendering:pixelated]" />
                       {formatName(item.snapshot.name)}
                     </AppLink>
                   </Table.Cell>
@@ -208,7 +209,7 @@ function CollectionCards({ items }: { items: CollectedPokemon[] }) {
           <Card className="h-full">
             <Card.Header className="flex-row items-start justify-between gap-2">
               <div className="flex items-center gap-3">
-                <Sprite src={item.snapshot.sprite} alt="" size={56} className="[image-rendering:pixelated]" />
+                <Sprite src={item.snapshot.sprite} alt="" size={56} eager className="[image-rendering:pixelated]" />
                 <div className="flex flex-col">
                   <span className="text-xs text-muted">{formatDexNumber(item.id)}</span>
                   <AppLink href={`/collection/${item.id}`} className="font-semibold text-foreground">

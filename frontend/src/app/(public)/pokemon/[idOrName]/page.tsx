@@ -2,6 +2,7 @@ import { Breadcrumbs } from "@heroui/react";
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { cache } from "react";
+import { AbilityList } from "@/features/catalog/components/AbilityList";
 import { AddToCollectionButton } from "@/features/catalog/components/AddToCollectionButton";
 import { EvolutionTree } from "@/features/catalog/components/EvolutionTree";
 import { StatMeters } from "@/features/catalog/components/StatMeters";
@@ -87,8 +88,12 @@ export default async function PokemonDetailPage(props: PageProps<"/pokemon/[idOr
             </div>
           </dl>
 
-          {/* TODO(backend): render <AbilityList abilities={pokemon.abilities} /> here once
-              `abilities` is added to PokemonDetailDto in docs/api/openapi.yaml. */}
+          <section aria-labelledby="abilities-heading" className="flex flex-col gap-1">
+            <h2 id="abilities-heading" className="text-sm text-muted">
+              Abilities
+            </h2>
+            <AbilityList abilities={pokemon.abilities} className="font-medium" />
+          </section>
 
           <div className="pt-2">
             <AddToCollectionButton pokedexId={pokemon.id} name={name} />
