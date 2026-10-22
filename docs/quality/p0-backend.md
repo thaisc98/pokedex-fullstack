@@ -15,7 +15,7 @@ stated as such.
 
 ## Overall verdict
 
-**P0 backend: PASS (with one caveat on CI timing).**
+**P0 backend: PASS.** (The CI-timing caveat below was resolved on 2026-10-22.)
 
 - `./mvnw verify` → **BUILD SUCCESS**; all guards (enforcer, ArchUnit, Spotless) green.
 - Mutation profile → **BUILD SUCCESS**, scores well above the 75% gate.
@@ -26,6 +26,13 @@ stated as such.
   (PRs #8/#11) exists and runs on main, but as of this report its **first** run was
   still **in progress** (one-time full NVD database download); no fully-green
   dependency-scan run has completed yet. Caveat, not a failure.
+
+> **Update 2026-10-22: caveat resolved.** The dependency scan went **green** on PR #8,
+> run [39513438448](https://github.com/thaisc98/pokedex-fullstack/actions/runs/39513438448)
+> (Dependency-Check, backend verify and gitleaks all `success`), after the Tomcat
+> 11.0.27 override (#10). Since #18 the NVD scan runs **weekly and on demand**
+> (`workflow_dispatch`) instead of on every dependency change, so it shows as `skipped`
+> on ordinary pushes to main (e.g. run 39780505513).
 
 Note on the task brief: it anticipated PRs #7/#10 being *open* and the backend/
 dependency-scan CI jobs possibly *absent*. Reality on `origin/main` is further
@@ -167,8 +174,8 @@ green CI run pending; `npm audit` = not present yet. Partial.
 | `spring-context` in `domain` fails the build (enforcer) | ✅ PASS (proven PR #7) |
 | Deliberate cross-layer import fails ArchUnit | ✅ PASS (proven PR #7) |
 | Sample test runs under JaCoCo/PIT/ArchUnit/Mockito on Java 25 | ✅ PASS |
-| Dependency-Check runs in CI | 🟡 implemented+merged; first NVD scan still in progress — no green run observed |
-| `npm audit` runs in CI | ⏭️ not present yet (frontend deferred) |
+| Dependency-Check runs in CI | ✅ green on PR #8 (run 39513438448) after the Tomcat override (#10); weekly + on demand since #18 |
+| `npm audit` runs in CI | ⏭️ not present at P0; added later in #20 (see [frontend.md](frontend.md)) |
 
 ---
 
