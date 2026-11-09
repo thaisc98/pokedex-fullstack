@@ -7,7 +7,7 @@
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>4.1.1</version>
+        <version>4.1.2</version>
         <relativePath/>
     </parent>
 
@@ -32,16 +32,16 @@
 
         <!-- Tool versions verified against Maven Central, 2026-10. Surefire/Failsafe/Enforcer
              are managed by the Boot 4.1.1 parent; these are the ones the parent does not pin. -->
-        <jacoco.version>0.8.15</jacoco.version>
-        <pitest.version>1.30.1</pitest.version>
+        <jacoco.version>0.8.16</jacoco.version>
+        <pitest.version>1.30.2</pitest.version>
         <pitest-junit5.version>1.2.3</pitest-junit5.version>
-        <spotless.version>3.10.4</spotless.version>
+        <spotless.version>3.11.0</spotless.version>
         <palantir.version>2.102.0</palantir.version>
         <archunit.version>1.5.1</archunit.version>
         <jspecify.version>1.0.1</jspecify.version>
         <!-- springdoc-openapi 3.x is the Spring Boot 4 line (springdoc.org FAQ "compatibility matrix");
              3.1.0 moved to Boot 4.1.0. 3.1.1 = <release> on Maven Central, verified 2026-10-20. -->
-        <springdoc.version>3.1.1</springdoc.version>
+        <springdoc.version>3.2.0</springdoc.version>
 
         <!-- JaCoCo gate defaults; domain/application/presentation/infrastructure override them. -->
         <coverage.line.min>0.00</coverage.line.min>
@@ -49,11 +49,11 @@
 
         <!-- Test-only, used by the bootstrap acceptance ITs (approved for US01). -->
         <wiremock.version>3.13.2</wiremock.version>
-        <rest-assured.version>6.2.0</rest-assured.version>
+        <rest-assured.version>6.3.0</rest-assured.version>
 
         <!-- Rate limiting (security.md §4.1 names Bucket4j). Not managed by Boot; 8.21.0 = <release> of
              com.bucket4j:bucket4j_jdk17-core on Maven Central, verified 2026-10-21. -->
-        <bucket4j.version>8.21.0</bucket4j.version>
+        <bucket4j.version>8.22.0</bucket4j.version>
 
         <!-- Supply-chain security tooling (-Psecurity only; see security.md §4.10). Versions are the
              latest releases on Maven Central, verified 2026-10-20:
